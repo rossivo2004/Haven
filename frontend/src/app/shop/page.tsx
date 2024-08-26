@@ -1,6 +1,6 @@
 function Shop_Page() {
     return ( 
-        <div>
+        <div className="">
             aaaaSSS
         </div>
      );
