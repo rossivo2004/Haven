@@ -2,10 +2,8 @@ import Loader from "@/components/ui/Snippet";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
-        <Loader />
-      </div>
-    </main>
+    <div className="max-w-screen-xl mx-auto px-4]">
+      aaaa
+    </div>
   );
 }
