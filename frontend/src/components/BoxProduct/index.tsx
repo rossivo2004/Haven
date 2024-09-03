@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import { formatVND } from "@/src/utils";
 import Link from "next/link";
@@ -9,19 +10,16 @@ function BoxProduct({ product }: { product: ProductProps }) {
 
     return (
         <Link href={`/productDetails/${id}`}>
-        <div className="w-full h-auto lg:h-[422px] flex flex-col">
-            <div className="w-full h-[250px] flex items-center justify-center overflow-hidden">
-                <Image
+        <div className="w-full h-auto lg:h-[380px] flex flex-col group">
+            <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden">
+                <img
                     src={image}
-                    layout="intrinsic"
-                    width={250}
-                    height={250}
-                    objectFit="contain"
                     alt="Product Image"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-all"
                 />
             </div>
-            <div className="w-full lg:h-[122px] h-auto flex flex-col justify-between mt-4">
-                <div className="font-semibold lg:text-xl text-base text-start">
+            <div className="w-full lg:h-[110px] h-auto flex flex-col justify-between mt-4">
+                <div className="font-semibold lg:text-xl text-base text-start group-hover:text-main">
                     {name}
                 </div>
                 <div className="flex justify-between items-center mt-4 gap-2">

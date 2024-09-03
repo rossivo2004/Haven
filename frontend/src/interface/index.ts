@@ -7,6 +7,27 @@ export interface Product {
     image: string;
 }
 
+export interface Category {
+  id: string;
+  image: string;
+  name: string;
+  tag: string;
+}
+
+export interface Blog {
+  id: number;
+  name: string;
+  img: string;
+  date_created: string;
+  date_edit: string;
+  description: string;
+  content: {
+    title: string;
+    content_c: string;
+    img: { img_c: string }[];
+  }[];
+  view: number;
+}
 
 export interface IPromotion {
     id: number,
@@ -86,3 +107,11 @@ export interface IPromotion {
     store: Store;
     variant: 'dark' | 'light';
   }
+
+  export interface IOrders {
+    code?: string,
+    products: ItemCart[],
+    totalPayment: number,
+    status: "Chưa xác nhận" | "Đã xác nhận",
+  }
+  

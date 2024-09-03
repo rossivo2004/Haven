@@ -2,6 +2,8 @@ import "../src/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { Providers } from "./providers";
 
@@ -29,8 +31,9 @@ export default function RootLayout({
     <html suppressHydrationWarning lang="en">
       <head />
       <body>
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
          <Header />
+         <ToastContainer />
               {children}
            <Footer />
         </Providers>

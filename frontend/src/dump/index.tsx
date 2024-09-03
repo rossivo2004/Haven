@@ -137,7 +137,7 @@ export const DUMP_PRODUCTS = [
     id: 1,
     name: "4K UHD LED Smart TV with Chromecast Built-in 1",
     price: 799000,
-    image: "/images/product-1.png",
+    image: "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain",
     discount: 23,
     category: "Smart Phone",
   },
@@ -145,7 +145,7 @@ export const DUMP_PRODUCTS = [
     id: 2,
     name: "4K UHD LED Smart TV with Chromecast Built-in 2",
     price: 1200000,
-    image: "/images/product-2.png",
+    image: "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain",
     discount: 13,
     category: "Smart Phone",
   },
@@ -366,7 +366,7 @@ export const BLOG = [
   {
     id: 1,
     name: 'News News News News News News News News News News News News News',
-    img: '/images/fb920c42a1ba4e000babe2f166d453af.jpg',
+    img: '/images/bn-8.png',
     date_created: '15/08/2023 21:47:47',
     date_edit: '15/08/2023 21:47:47',
     description: 'Thịt tươi Trust Farm đã có mặt tại các cửa hàng thuộc hệ thống siêu thị GS25, mã GS25 chỉ hỗ trợ phục vụ hệ thống mua lẻ. Các sản phẩm thịt heo, thịt bò, thịt gà đóng khay với trọng lượng 300g, 500g, 1kg tất cả tiện lợi cho từng bữa ăn hàng ngày.',
@@ -406,7 +406,7 @@ export const BLOG = [
   {
     id: 2,
     name: 'Sản phẩm hot kkk',
-    img: '/images/st-3.jpg',
+    img: '/images/bn-8.png',
     date_created: '15/08/2023 21:47:47',
     date_edit: '15/08/2023 21:47:47',
     description: 'Thịt tươi Trust Farm đã có mặt tại các cửa hàng thuộc hệ thống siêu thị GS25, mã GS25 chỉ hỗ trợ phục vụ hệ thống mua lẻ. Các sản phẩm thịt heo, thịt bò, thịt gà đóng khay với trọng lượng 300g, 500g, 1kg tất cả tiện lợi cho từng bữa ăn hàng ngày.',
@@ -439,7 +439,7 @@ export const BLOG = [
   {
     id: 3,
     name: 'News News News News News News News News News News News News News',
-    img: '/images/0a37ca30b46811cb1272a616ad550367.jpg',
+    img: '/images/bn-8.png',
     date_created: '15/08/2023 21:47:47',
     date_edit: '15/08/2023 21:47:47',
     description: 'Thịt tươi Trust Farm đã có mặt tại các cửa hàng thuộc hệ thống siêu thị GS25, mã GS25 chỉ hỗ trợ phục vụ hệ thống mua lẻ. Các sản phẩm thịt heo, thịt bò, thịt gà đóng khay với trọng lượng 300g, 500g, 1kg tất cả tiện lợi cho từng bữa ăn hàng ngày.',
@@ -477,7 +477,7 @@ export const BLOG = [
   {
     id: 4,
     name: 'News News News News News News News News News News News News News',
-    img: '/images/fb920c42a1ba4e000babe2f166d453af.jpg',
+    img: '/images/bn-8.png',
     date_created: '15/08/2023 21:47:47',
     date_edit: '15/08/2023 21:47:47',
     description: 'Thịt tươi Trust Farm đã có mặt tại các cửa hàng thuộc hệ thống siêu thị GS25, mã GS25 chỉ hỗ trợ phục vụ hệ thống mua lẻ. Các sản phẩm thịt heo, thịt bò, thịt gà đóng khay với trọng lượng 300g, 500g, 1kg tất cả tiện lợi cho từng bữa ăn hàng ngày.',
@@ -515,7 +515,7 @@ export const BLOG = [
   {
     id: 5,
     name: 'News News News News News News News News News News News News News',
-    img: '/images/fb920c42a1ba4e000babe2f166d453af.jpg',
+    img: '/images/bn-8.png',
     date_created: '15/08/2023 21:47:47',
     date_edit: '15/08/2023 21:47:47',
     description: 'Thịt tươi Trust Farm đã có mặt tại các cửa hàng thuộc hệ thống siêu thị GS25, mã GS25 chỉ hỗ trợ phục vụ hệ thống mua lẻ. Các sản phẩm thịt heo, thịt bò, thịt gà đóng khay với trọng lượng 300g, 500g, 1kg tất cả tiện lợi cho từng bữa ăn hàng ngày.',
@@ -900,3 +900,14 @@ export const DUMP_ORDERS: IOrders[] = [
     status: "Chưa xác nhận",
   },
 ];
+
+export const CATEGORY = [
+  {name: "Đồ uống", image: "ct_giavi.jpg"},
+  {name: "Trái cây", image: "ct_giavi.jpg"},
+  {name: "Hải Sản", image: "ct_giavi.jpg"},
+  {name: "Rau củ", image: "ct_giavi.jpg"},
+  {name: "Thịt", image: "ct_giavi.jpg"},
+  {name: "Đồ khô", image: "ct_giavi.jpg"},
+  {name: "Gia vị", image: "ct_giavi.jpg"},
+  {name: "Khác", image: "ct_giavi.jpg"},
+]

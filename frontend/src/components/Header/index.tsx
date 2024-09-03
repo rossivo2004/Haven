@@ -14,6 +14,7 @@ import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import HeadsetOutlinedIcon from '@mui/icons-material/HeadsetOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { Tooltip, Button } from "@nextui-org/react";
 
@@ -22,6 +23,7 @@ import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, Na
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
 import useDebounce from '@/src/utils';
+import { CATEGORY } from '@/src/dump';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -41,6 +43,13 @@ function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
+
+    const categoryColumns = [];
+    for (let i = 0; i < columns; i++) {
+        categoryColumns.push(CATEGORY.slice(i * 5, i * 5 + 5));
+    }
 
     useEffect(() => {
         const getApi = async () => {
@@ -163,19 +172,30 @@ function Header() {
                             <Link href={''}>TRANG CHỦ</Link>
                         </li>
                         <li>
-                        <Tooltip
-                        isDismissable
-                        color='default'
-                        placement='bottom'
-                        content={
-                            <div className="px-1 py-2">
-                                <div className="text-small font-bold">Custom Content</div>
-                                <div className="text-tiny">This is a custom tooltip content</div>
-                            </div>
-                        }
-                    >
-                        SẢN PHẨM
-                    </Tooltip>
+                            <Tooltip
+                                isDismissable
+                                color="default"
+                                placement="bottom-end"
+                                content={
+                                    <div className="px-1 py-2 grid grid-cols-4 gap-4">
+                                        <div className='bg-slate-400 row-span-4'>asasa</div>
+                                        {CATEGORY.map((item, index) => (
+                                            <div key={index} className="flex gap-4 py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
+                                                <div>
+                                                    <img src={`/images/${item.image}`} alt="" className="w-5 h-5 object-cover rounded-lg" />
+                                                </div>
+                                                <div>{item.name}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                }
+                            >
+                                <div className='flex items-center'>
+                                SẢN PHẨM
+                                <KeyboardArrowDownIcon/>
+                                </div>
+                            </Tooltip>
+
                         </li>
                         <li>
                             <Link href={''}>TRANG CHỦ</Link>
@@ -230,17 +250,17 @@ function Header() {
                 </div>
 
                 <div className=''>
-                    <div className='bg-main h-14 w-full fixed bottom-0 px-4'>
-                        <ul className="menu menu-horizontal w-full flex items-center justify-around">
-                            <li className='mx-4'><Link href={''}><HomeIcon /></Link></li>
-                            <li className='mx-4'><Link href={''}><SearchIcon /></Link></li>
+                    <div className='bg-main h-14 w-full fixed bottom-0 px-4 z-[9999]'>
+                        <ul className="menu menu-horizontal w-full h-full flex items-center justify-around">
+                            <li className='mx-4'><Link href={''}><HomeIcon className='h-5 w-5' /></Link></li>
+                            <li className='mx-4'><Link href={''}><SearchIcon className='h-5 w-5' /></Link></li>
                             <li className='mx-4'><Link href={''}>  <div className="relative">
                                 <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
-                                <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
-                                    {cartCount}
+                                <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-[-4px]">
+                                    <div className='text-white'>{cartCount}</div>
                                 </span>
                             </div></Link></li>
-                            <li className='mx-4'><Link href={''}><PersonIcon /></Link></li>
+                            <li className='mx-4'><Link href={''}><PersonIcon className='h-5 w-5' /></Link></li>
                         </ul>
                     </div>
                 </div>

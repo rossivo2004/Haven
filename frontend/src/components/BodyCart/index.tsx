@@ -6,11 +6,11 @@ const Body_Cart = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* bên trái*/}
                 <div className="lg:col-span-2">
-                    <div className="bg-gray-100 p-4 rounded shadow-sm mb-4">
+                    {/* <div className="bg-gray-100 p-4 rounded shadow-sm mb-4">
                         <h2 className="text-lg font-semibold mb-2">Thông Tin Nhận Hàng</h2>
                         <p className="font-medium">Nguyễn Hữu Tiến | 0901 22 33 44</p>
                         <p>388 J, P. An Khánh, Q. Ninh Kiều, TP. Cần Thơ</p>
-                    </div>
+                    </div> */}
 
                     <div className="bg-white p-4 rounded shadow-sm mb-4">
                         <div className="flex justify-between items-center border-b pb-4 mb-4">
@@ -61,42 +61,7 @@ const Body_Cart = () => {
                 <div className="bg-white p-6 rounded shadow-sm">
                     <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
 
-                    <div className="mb-4">
-                        <label className="block text-lg font-medium">Phương thức vận chuyển</label>
-                        <select className="w-full p-2">
-                            <option>GrabFood</option>
-                            <option>BeeFood</option>
-                            <option>ShoppeFood</option>
-                        </select>
-                        <hr className="border-t-1 border-black mt-2" />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-lg font-medium">Hình thức thanh toán</label>
-                        <select className="w-full p-2">
-                            <option>COD (Thanh toán khi nhận hàng)</option>
-                            <option>COD (Thanh Toán MoMo)</option>
-                            <option>Lựa chọn khác</option>
-                        </select>
-                        <hr className="border-t-1 border-black mt-2" />
-                    </div>
-
-                    <div className="mb-4">
-                        <div>
-                            <label className="inline-flex items-center">
-                                <input type="radio" name="delivery" className="form-radio" />
-                                <span className="block text-lg font-medium ml-2 ">Nhận tại cửa hàng</span>
-                            </label>
-                            <hr className="border-t-1 border-black mt-2 mb-2" />
-                        </div>
-                        <div>
-                            <label className="inline-flex items-center">
-                                <input type="radio" name="delivery" className="form-radio" />
-                                <span className="block text-lg font-medium ml-2">Xuất hóa đơn công ty</span>
-                            </label>
-                            <hr className="border-t-1 border-black mt-2" />
-                        </div>
-                    </div>
+                   
 
                     <div className="mb-4">
                         <div className="flex items-center justify-between">
@@ -145,7 +110,7 @@ const Body_Cart = () => {
                     </div>
 
                     <button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
-                        Xác nhận đơn hàng
+                        Tiếp tục
                     </button>
                 </div>
             </div>
