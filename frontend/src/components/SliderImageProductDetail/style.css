@@ -1,0 +1,28 @@
+.carousel .slide img {
+    width: 519px;
+    vertical-align: top;
+    border: 0;
+    height: 420px;
+    object-fit: cover;
+}
+
+.carousel .thumbs{
+    text-align: center;
+}
+
+.carousel .thumb img{
+    height: 55px;
+    object-fit: cover;
+}
+
+.carousel .slide img {
+    transition: opacity 0.5s ease;
+}
+
+.carousel .slide.inactive img {
+    opacity: 0.6; /* Apply an overlay effect on non-active images */
+}
+
+.carousel .slide.active img {
+    opacity: 1; /* Active image appears normal */
+}
