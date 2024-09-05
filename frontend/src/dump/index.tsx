@@ -902,12 +902,12 @@ export const DUMP_ORDERS: IOrders[] = [
 ];
 
 export const CATEGORY = [
-  {name: "Đồ uống", image: "ct_giavi.jpg"},
-  {name: "Trái cây", image: "ct_giavi.jpg"},
-  {name: "Hải Sản", image: "ct_giavi.jpg"},
-  {name: "Rau củ", image: "ct_giavi.jpg"},
-  {name: "Thịt", image: "ct_giavi.jpg"},
-  {name: "Đồ khô", image: "ct_giavi.jpg"},
-  {name: "Gia vị", image: "ct_giavi.jpg"},
-  {name: "Khác", image: "ct_giavi.jpg"},
+  {name: "Đồ uống", image: "ct_giavi.jpg", tag: "douong"},
+  {name: "Trái cây", image: "ct_giavi.jpg", tag: "traicay"},
+  {name: "Hải Sản", image: "ct_giavi.jpg", tag: "haisan"},
+  {name: "Rau củ", image: "ct_giavi.jpg", tag: "raucu"},
+  {name: "Thịt", image: "ct_giavi.jpg", tag: "thit"},
+  {name: "Đồ khô", image: "ct_giavi.jpg", tag: "dokho"},
+  {name: "Gia vị", image: "ct_giavi.jpg", tag: "giavi"},
+  {name: "Khác", image: "ct_giavi.jpg", tag: "orther"},
 ]

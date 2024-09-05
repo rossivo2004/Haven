@@ -149,11 +149,11 @@ function BodyTrackingorder() {
                         </div>
                     </div>
                     {/* Confirmation Button */}
-                    <div className="text-center">
+                    {/* <div className="text-center">
                         <button className="w-full bg-yellow-500 text-white font-semibold py-3 rounded-md">
                             Đã nhận được hàng
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
 

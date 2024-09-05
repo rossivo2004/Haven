@@ -28,7 +28,7 @@ export default function Home() {
     <div className="">
       <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
         <Image
-          className="banner-image absolute top-0 left-0 w-full h-full object-cover"
+          className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
           src="https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain"
           alt="Banner"
           layout="fill"
@@ -88,16 +88,18 @@ export default function Home() {
             >
               {CATEGORY.map((item, index) => (
                 <SwiperSlide key={index}>
+              <Link href={`/shop?category=${item.tag}`} className="w-full">
                   <div className="w-full max-w-[300px] h-auto">
-                    <div className="flex items-center justify-center">
+                    <div className="flex w-full items-center justify-center">
                       <img
                         src={`/images/${item.image}`}
                         alt=""
                         className="w-full h-auto max-h-[300px] object-cover rounded-lg"
                       />
                     </div>
-                    <div className="text-center text-lg lg:text-xl font-semibold mt-2">{item.name}</div>
+                    <div className="text-center text-lg lg:text-xl font-semibold mt-2 text-black">{item.name}</div>
                   </div>
+                  </Link>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -138,7 +140,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-ful gap-10 lg:pl-[116px] flex lg:flex-row flex-col-reverse lg:h-[500px] mb-16 lg:px-0 px-4 mx-auto">
+        <div className="w-ful max-w-screen-xl gap-10 flex lg:flex-row flex-col-reverse lg:h-[500px] mb-16 px-4 mx-auto">
           <div className="lg:w-1/2 w-full flex flex-col justify-center">
             <div className="lg:text-4xl text-2xl font-semibold mb-3">Giảm giá <span className="text-[40px] text-main">10%</span><br />cho tất cả các sản phẩm</div>
             <div className="mb-6 font-normal text-lg">
@@ -150,14 +152,15 @@ export default function Home() {
             </div>
           </div>
           <div className="flex-1 h-full">
-            <img src={`/images/bn-6.png`} alt="" className="w-full h-full object-cover min-h-[320px] max-h-[500px]" />
+            <img src={`/images/bn-6.png`} alt="" className="w-full h-full object-fill min-h-[320px] max-h-[500px]" />
           </div>
         </div>
 
         <div className="max-w-screen-xl mx-auto px-4 mb-16">
           <div className="flex justify-between items-center mb-6">
             <div className="font-bold lg:text-4xl text-2xl">Sản phẩm mới</div>
-            <div className="font-medium text-sm text-main">Xem thêm</div>
+            <div className="font-medium text-sm text-main">
+              <Link href="/shop?new">Xem thêm</Link></div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2 gap-4">
@@ -172,7 +175,7 @@ export default function Home() {
 
         </div>
 
-        <div className="w-full gap-10 flex lg:flex-row flex-col lg:h-[500px] mb-16 lg:px-0 px-4">
+        <div className="w-full gap-10 max-w-screen-xl mx-auto flex lg:flex-row flex-col lg:h-[500px] mb-16 px-4">
           <div className="lg:w-1/2 w-full h-full">
             <img src={`/images/bn-6.png`} alt="" className="w-full h-full object-cover min-h-[320px] max-h-[500px]" />
           </div>

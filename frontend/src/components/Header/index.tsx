@@ -17,13 +17,17 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { Tooltip, Button } from "@nextui-org/react";
-
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
 
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
 import useDebounce from '@/src/utils';
 import { CATEGORY } from '@/src/dump';
+
+import './style.css'
+import { log } from 'console';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -39,8 +43,8 @@ function Header() {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [search, setSearch] = useState("");
     const [isFocused, setIsFocused] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -71,6 +75,8 @@ function Header() {
                 product.title.toLowerCase().includes(debouncedSearch.toLowerCase())
             );
             setFilteredProducts(filtered);
+
+
         } else {
             setFilteredProducts([]);
         }
@@ -105,26 +111,39 @@ function Header() {
                         </div>
                         {(isFocused) && (
                             <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-                                <div className="p-2 text-xl font-bold">Tìm kiếm theo tên sản phẩm</div>
-                                {search && (
-                                    <>
-                                        {loading ? (
-                                            <div className="p-2 text-center">Loading...</div>
-                                        ) : filteredProducts.length > 0 ? (
-                                            <ul className='overflow-scroll h-[400px]'>
-                                                {filteredProducts.map((product) => (
-                                                    <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                                                        <Link href={`/product/${product.id}`} className="block">
-                                                            {product.title}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <div className="p-2 text-center">No results found</div>
-                                        )}
-                                    </>
-                                )}
+                                <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
+                                <div className='flex gap-5 p-5'>
+                                    <div className='w-1/4'>
+                                        <img src="/images/nav-1.jpg" alt="" className='w-full rounded-lg h-[400px] object-cover' />
+                                    </div>
+                                    <div className='flex-1'>
+                                        {search ? (
+                                            <>
+                                                {loading ? (
+                                                    <div className="p-2 text-center">Loading...</div>
+                                                ) : filteredProducts.length > 0 ? (
+                                                    <ul className='overflow-scroll h-[400px]'>
+                                                        {filteredProducts.map((product) => (
+                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100 ">
+                                                                <Link href={`/product/${product.id}`} className="flex gap-4 items-center ">
+                                                                    <div className='w-14 h-14'>
+                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.image} alt={product.title} />
+                                                                    </div>
+                                                                    <div>
+                                                                        {product.title}
+                                                                    </div>
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
+                                                )}
+                                            </>
+                                        ) : <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>}
+                                    </div>
+                                </div>
+
                             </div>
                         )}
 
@@ -169,7 +188,7 @@ function Header() {
                 <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                     <ul className='flex gap-10'>
                         <li>
-                            <Link href={''}>TRANG CHỦ</Link>
+                            <Link href={'/'}>TRANG CHỦ</Link>
                         </li>
                         <li>
                             <Tooltip
@@ -178,30 +197,39 @@ function Header() {
                                 placement="bottom-end"
                                 content={
                                     <div className="px-1 py-2 grid grid-cols-4 gap-4">
-                                        <div className='bg-slate-400 row-span-4'>asasa</div>
+                                        <div className='row-span-4'>
+                                            <img src="/images/nav-1.jpg" alt="" className='w-[160px] rounded-lg h-auto object-cover' />
+                                        </div>
                                         {CATEGORY.map((item, index) => (
-                                            <div key={index} className="flex gap-4 py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
-                                                <div>
-                                                    <img src={`/images/${item.image}`} alt="" className="w-5 h-5 object-cover rounded-lg" />
+                                            <Link href={`/shop?category=${item.tag}`}>
+                                                <div key={index} className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
+                                                    <div className='mr-2'>
+                                                        <img src={`/images/${item.image}`} alt="" className="w-5 h-5 object-cover rounded-lg" />
+                                                    </div>
+                                                    <div>{item.name}</div>
                                                 </div>
-                                                <div>{item.name}</div>
-                                            </div>
+                                            </Link>
                                         ))}
                                     </div>
                                 }
                             >
                                 <div className='flex items-center'>
-                                SẢN PHẨM
-                                <KeyboardArrowDownIcon/>
+                                    <Link href={'/shop'}>
+                                        SẢN PHẨM
+                                    </Link>
+                                    <KeyboardArrowDownIcon />
                                 </div>
                             </Tooltip>
 
                         </li>
                         <li>
-                            <Link href={''}>TRANG CHỦ</Link>
+                            <Link href={'/blog'}>TIN TỨC</Link>
                         </li>
                         <li>
-                            <Link href={''}>TRANG CHỦ</Link>
+                            <Link href={'/contact'}>LIÊN HỆ</Link>
+                        </li>
+                        <li>
+                            <Link href={'/tracking'}>TRA CỨU</Link>
                         </li>
                     </ul>
                 </div>
@@ -250,20 +278,79 @@ function Header() {
                 </div>
 
                 <div className=''>
-                    <div className='bg-main h-14 w-full fixed bottom-0 px-4 z-[9999]'>
+                    <div className='bg-main h-14 w-full fixed bottom-0 px-4 z-50'>
                         <ul className="menu menu-horizontal w-full h-full flex items-center justify-around">
-                            <li className='mx-4'><Link href={''}><HomeIcon className='h-5 w-5' /></Link></li>
-                            <li className='mx-4'><Link href={''}><SearchIcon className='h-5 w-5' /></Link></li>
-                            <li className='mx-4'><Link href={''}>  <div className="relative">
+                            <li className='mx-4'><Link href={'/'}><HomeIcon className='h-5 w-5' /></Link></li>
+                            <li className='mx-4'> <Button className='p-2 min-w-16' variant='light' onPress={onOpen}><SearchIcon className='h-5 w-5' /></Button></li>
+                            <li className='mx-4'><Link href={'/cart'}>  <div className="relative">
                                 <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
                                 <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-[-4px]">
                                     <div className='text-white'>{cartCount}</div>
                                 </span>
                             </div></Link></li>
-                            <li className='mx-4'><Link href={''}><PersonIcon className='h-5 w-5' /></Link></li>
+                            <li className='mx-4'><Link href={'/signin'}><PersonIcon className='h-5 w-5' /></Link></li>
                         </ul>
                     </div>
                 </div>
+
+                <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='full'>
+                    <ModalContent>
+                        {(onClose) => (
+                            <div className='flex justify-center flex-col'>
+                                <ModalHeader className="flex flex-col gap-1 mr-5">
+                                    <Input
+                                        value={search}
+                                        onChange={(event) => setSearch(event.target.value)}
+                                        onFocus={() => setIsFocused(true)}
+                                        onBlur={() => setIsFocused(false)}
+                                        className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        type="text"
+                                        placeholder="Tìm kiếm sản phẩm..."
+                                    />
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div>
+                                        {search && (
+                                            <>
+                                                {loading ? (
+                                                    <div className="p-2 text-center">Loading...</div>
+                                                ) : filteredProducts.length > 0 ? (
+                                                    <ul className="h-screen overflow-y-auto pb-20">
+                                                        {filteredProducts.map((product) => (
+                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100">
+                                                                <Link href={`/product/${product.id}`} className="flex gap-4 items-center">
+                                                                    <div className="w-14 h-14">
+                                                                        <img
+                                                                            className="w-full h-full object-cover"
+                                                                            src={product.image}
+                                                                            alt={product.title}
+                                                                        />
+                                                                    </div>
+                                                                    <div>{product.title}</div>
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <div className="p-2 text-center">No results found</div>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+
+                                </ModalBody>
+                                {/* <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Action
+                </Button>
+              </ModalFooter> */}
+                            </div>
+                        )}
+                    </ModalContent>
+                </Modal>
             </div>
         </div>
     )

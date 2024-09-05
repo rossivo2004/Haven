@@ -11,7 +11,7 @@ function BoxProduct({ product }: { product: ProductProps }) {
     return (
         <Link href={`/productDetails/${id}`}>
         <div className="w-full h-auto lg:h-[380px] flex flex-col group">
-            <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden">
+            <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden rounded-lg">
                 <img
                     src={image}
                     alt="Product Image"

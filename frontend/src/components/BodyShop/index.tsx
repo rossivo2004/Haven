@@ -85,6 +85,12 @@ function BodyShop() {
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+
+    const resetFilter = () => {
+        setPriceFilter([]);
+        setCateFilter([]);
+    };
+
     return (
 
         <div>
@@ -103,10 +109,13 @@ function BodyShop() {
                     <div className="flex-grow border-t border-black ml-4" />
                 </div>
             </div>
-            <div className="py-5 h-[120px] lg:block flex lg:items-center flex-col lg:flex-row items-start">
+            <div className="py-5 h-[170px] lg:h-[120px] lg:block flex lg:items-center flex-col lg:flex-row items-start">
                 <div className="mr-4 mb-2 flex justify-between items-center w-full">
                     <div className='text-base font-normal'>
                         Bộ lọc đã chọn
+                    </div>
+                    <div className='lg:block hidden'>
+                        <Button onClick={resetFilter}>Xóa bộ lọc</Button>
                     </div>
                     <div className='lg:hidden block'>
                         <div className='flex items-center'>
@@ -116,22 +125,23 @@ function BodyShop() {
                             <Button onPress={onOpen} className='bg-transparent px-0 min-w-0'>
                                 <FilterAltOutlinedIcon />
                             </Button>
+                            
                         </div>
 
                         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-                            <ModalContent>
+                            <ModalContent className='z-50'>
                                 {(onClose) => (
                                     <>
                                         <ModalHeader className="flex flex-col gap-1">Lọc</ModalHeader>
                                         <ModalBody>
-                                            <Accordion selectionMode="multiple" className="px-0">
+                                            <Accordion selectionMode="multiple" className="px-0" defaultExpandedKeys={["category", "price"]}>
                                                 <AccordionItem key="price" indicator={<ArrowLeftIcon />} aria-label="Price" title="Price">
                                                     <CheckboxGroup value={priceFilter} onChange={handlePriceFilterChange}>
                                                         <Checkbox value="0-99000">0 - 99.000</Checkbox>
                                                         <Checkbox value="100000-199000">100.000 - 199.000</Checkbox>
                                                         <Checkbox value="200000-299000">200.000 - 299.000</Checkbox>
                                                         <Checkbox value="300000-399000">300.000 - 399.000</Checkbox>
-                                                        <Checkbox value="400000">400.000+</Checkbox>
+                                                        <Checkbox value="400000">400.000 +</Checkbox>
                                                     </CheckboxGroup>
                                                 </AccordionItem>
                                                 <AccordionItem key="category" indicator={<ArrowLeftIcon />} aria-label="Category" title="Category">
@@ -150,11 +160,29 @@ function BodyShop() {
                         </Modal>
                     </div>
                 </div>
-                <div className='w-full h-20 overflow-scroll hidden-scrollbar bg-transparent' style={{ whiteSpace: 'nowrap' }}>
-                    {priceFilter.concat(cateFilter).map((filter) => (
+                <div className='w-full h-20 overflow-scroll hidden-scrollbar' style={{ whiteSpace: 'nowrap' }}>
+                    {priceFilter.map((filter) => {
+                        const [min, max] = filter.split('-').map(value => formatVND(parseFloat(value)));
+
+                        return (
+                            <Chip
+                                key={filter}
+                                onClose={() => handleChipClose(filter)}
+                                variant="bordered"
+                                className="text-base mr-2"
+                            >
+                                {max ? `${min} - ${max}` : `${min}+`}
+                            </Chip>
+                        );
+                    })}
+
+                    {cateFilter.map((filter) => (
+                        <div>
                         <Chip key={filter} onClose={() => handleChipClose(filter)} variant="bordered" className="text-base mr-2">
-                            {formatVND(parseFloat(filter))}
+                            {filter}
                         </Chip>
+              
+                    </div>
                     ))}
                 </div>
             </div>
