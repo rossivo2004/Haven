@@ -27,6 +27,7 @@
 		"@react-aria/visually-hidden": "3.8.12",
 		"axios": "^1.7.5",
 		"clsx": "2.1.1",
+		"daisyui": "^4.12.10",
 		"formik": "^2.4.6",
 		"framer-motion": "~11.1.1",
 		"intl-messageformat": "^10.5.0",

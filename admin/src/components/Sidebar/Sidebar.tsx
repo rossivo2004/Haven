@@ -69,7 +69,7 @@ const Sidebar: React.FC = () => {
               <li>
                 <Link href="/users">
                   <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/users' ? 'sidebar_active' : ''}`}>
-                    <PeopleIcon className="mr-2" /> User
+                    <PeopleIcon className="mr-2" /> Users
                   </div>
                 </Link>
               </li>
