@@ -112,7 +112,7 @@ export default function Home() {
           <div className="flex gap-4">
             <div className="lg:w-1/4 lg:block hidden">
               <div className="font-bold lg:text-4xl text-2xl mb-6">Sản Phẩm Nổi Bật</div>
-              <img src={`/images/bn-5.png`} alt="" className="lg:block hidden" />
+              <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden" />
             </div>
             <div className="flex-1">
               <div className="flex w-full flex-col items-center lg:items-end">
@@ -152,7 +152,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex-1 h-full">
-            <img src={`/images/bn-6.png`} alt="" className="w-full h-full object-fill min-h-[320px] max-h-[500px]" />
+            <img src={`/images/bn-6.png`} alt="A cat sitting on a chair" className="w-full h-full object-fill min-h-[320px] max-h-[500px]" />
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2 gap-4">
             <div className="lg:col-span-2 md:col-span-3 col-span-2">
-              <img src={`/images/bn-7.png`} alt="" className="w-full h-full object-cover" />
+              <img src={`/images/bn-7.png`} alt="A cat sitting on a chair" className="w-full h-full object-cover" />
             </div>
             {DUMP_PRODUCTS.slice(0, 6).map((product) => (
               <BoxProduct key={product.id} product={product} />
@@ -177,7 +177,7 @@ export default function Home() {
 
         <div className="w-full gap-10 max-w-screen-xl mx-auto flex lg:flex-row flex-col lg:h-[500px] mb-16 px-4">
           <div className="lg:w-1/2 w-full h-full">
-            <img src={`/images/bn-6.png`} alt="" className="w-full h-full object-cover min-h-[320px] max-h-[500px]" />
+            <img src={`/images/bn-6.png`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px]" />
           </div>
           <div className="flex-1 h-full flex flex-col justify-center">
             <div className="text-4xl font-semibold mb-3">Giảm giá <span className="text-[40px] text-main">10%</span><br />cho tất cả các sản phẩm</div>
@@ -236,7 +236,7 @@ export default function Home() {
 
         <div className="max-w-screen-xl mx-auto px-4 mb-16">
           <div className="relative w-full lg:h-[500px] h-auto">
-            <img src={`/images/bn-8.png`} alt="" className="object-cover w-full h-full" />
+            <img src={`/images/bn-8.png`} alt="A cat sitting on a chair" className="object-cover w-full h-full" />
 
             <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 

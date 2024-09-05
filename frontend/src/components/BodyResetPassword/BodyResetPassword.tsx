@@ -21,7 +21,7 @@ function BodyResetPassword() {
                 <div className="lg:w-1/2 w-full">
                     <img
                         src={"/images/si-2.png"}
-                        alt=""
+                        alt="A cat sitting on a chair"
                         className="h-auto w-auto object-cover"
                     />
                 </div>

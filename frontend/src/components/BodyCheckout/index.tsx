@@ -81,7 +81,7 @@ function BodyCheckout() {
                                             <CustomRadio value="pay-momo">
                                                 <div className='flex items-center gap-5'>
                                                     <div>
-                                                        <img src="/images/momo.png" alt="" className='w-10 h-10' />
+                                                        <img src="/images/momo.png" alt="A cat sitting on a chair" className='w-10 h-10' />
                                                     </div>
                                                     <div>Momo</div>
                                                 </div>
@@ -89,7 +89,7 @@ function BodyCheckout() {
                                             <CustomRadio value="pay-cash">
                                                 <div className='flex items-center gap-5'>
                                                     <div>
-                                                        <img src="/images/cash.png" alt="" className='w-10 h-10 object-cover' />
+                                                        <img src="/images/cash.png" alt="A cat sitting on a chair" className='w-10 h-10 object-cover' />
                                                     </div>
                                                     <div>Tiền mặt</div>
                                                 </div>
@@ -106,7 +106,7 @@ function BodyCheckout() {
                             <div className="bg-white lg:p-4 rounded shadow-sm mb-4">
                                 <div className="flex justify-between items-center border-b pb-4 mb-4">
                                     <div className="flex items-start">
-                                        <img src="https://meatdeli.com.vn/upload/medialibrary/c40/c40dd79625dc3345e1807b58ad0ca5a6.png" alt="Product Image" className="w-24 h-24 mr-4 rounded" />
+                                        <img src="https://meatdeli.com.vn/upload/medialibrary/c40/c40dd79625dc3345e1807b58ad0ca5a6.png" alt="Product " className="w-24 h-24 mr-4 rounded" />
                                         <div>
                                             <p className="font-semibold">Ba Chỉ Bò Nhập Khẩu Đông Lạnh Trust Farm (Khay 300g)</p>
                                             <p className="text-sm text-gray-600">Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.</p>
@@ -120,7 +120,7 @@ function BodyCheckout() {
 
                                 <div className="flex justify-between items-center">
                                     <div className="flex items-start">
-                                        <img src="https://product.hstatic.net/200000734847/product/3.21_63g_63daae7b23d6423592031a24e107d4c5_grande.png" alt="Product Image" className="w-24 h-24 mr-4 rounded" />
+                                        <img src="https://product.hstatic.net/200000734847/product/3.21_63g_63daae7b23d6423592031a24e107d4c5_grande.png" alt="Product " className="w-24 h-24 mr-4 rounded" />
                                         <div>
                                             <p className="font-semibold">S2 XÚC XÍCH DINH DƯỠNG - IQ NGON (MỚI) - 210G</p>
                                             <p className="text-sm text-gray-600">Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.</p>

@@ -52,7 +52,7 @@ function BodySingUp() {
                 <div className="lg:w-1/2 w-full">
                     <img
                         src={"/images/si-3.png"}
-                        alt=""
+                        alt="A cat sitting on a chair"
                         className="h-auto w-auto object-cover"
                     />
                 </div>

@@ -14,7 +14,7 @@ function BoxProduct({ product }: { product: ProductProps }) {
             <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden rounded-lg">
                 <img
                     src={image}
-                    alt="Product Image"
+                    alt="Product as"
                     className="w-full h-full object-cover group-hover:scale-110 transition-all"
                 />
             </div>

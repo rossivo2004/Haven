@@ -114,7 +114,7 @@ function Header() {
                                 <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
                                 <div className='flex gap-5 p-5'>
                                     <div className='w-1/4'>
-                                        <img src="/images/nav-1.jpg" alt="" className='w-full rounded-lg h-[400px] object-cover' />
+                                        <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
                                     </div>
                                     <div className='flex-1'>
                                         {search ? (
@@ -198,13 +198,13 @@ function Header() {
                                 content={
                                     <div className="px-1 py-2 grid grid-cols-4 gap-4">
                                         <div className='row-span-4'>
-                                            <img src="/images/nav-1.jpg" alt="" className='w-[160px] rounded-lg h-auto object-cover' />
+                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[160px] rounded-lg h-auto object-cover' />
                                         </div>
                                         {CATEGORY.map((item, index) => (
-                                            <Link href={`/shop?category=${item.tag}`}>
-                                                <div key={index} className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
+                                            <Link key={index} href={`/shop?category=${item.tag}`}>
+                                                <div  className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
                                                     <div className='mr-2'>
-                                                        <img src={`/images/${item.image}`} alt="" className="w-5 h-5 object-cover rounded-lg" />
+                                                        <img src={`/images/${item.image}`} alt="A cat sitting on a chair" className="w-5 h-5 object-cover rounded-lg" />
                                                     </div>
                                                     <div>{item.name}</div>
                                                 </div>
@@ -246,7 +246,7 @@ function Header() {
                     >
                         <Link href={'/'}>
                             <NavbarItem>
-                                <img src="/images/logo.png" alt="" className="h-5" />
+                                <img src="/images/logo.png" alt="A cat sitting on a chair" className="h-5" />
                             </NavbarItem>
                         </Link>
 

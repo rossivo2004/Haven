@@ -13,7 +13,7 @@ function BoxBlog({ blog }: { blog: Blog }) {
           <div className="w-full h-[240px] lg:h-[240px] object-cover flex items-center justify-center overflow-hidden rounded-lg">
             <img
               src={img}
-              alt="Product Image"
+              alt="Product  gg"
               className="w-full h-full object-cover group-hover:scale-110 transition-all rounded-lg"
             />
           </div>

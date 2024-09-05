@@ -161,30 +161,33 @@ function BodyShop() {
                     </div>
                 </div>
                 <div className='w-full h-20 overflow-scroll hidden-scrollbar' style={{ whiteSpace: 'nowrap' }}>
-                    {priceFilter.map((filter) => {
-                        const [min, max] = filter.split('-').map(value => formatVND(parseFloat(value)));
+    {priceFilter.map((filter) => {
+        const [min, max] = filter.split('-').map(value => formatVND(parseFloat(value)));
 
-                        return (
-                            <Chip
-                                key={filter}
-                                onClose={() => handleChipClose(filter)}
-                                variant="bordered"
-                                className="text-base mr-2"
-                            >
-                                {max ? `${min} - ${max}` : `${min}+`}
-                            </Chip>
-                        );
-                    })}
+        return (
+            <Chip
+                key={filter} // Thêm thuộc tính key
+                onClose={() => handleChipClose(filter)}
+                variant="bordered"
+                className="text-base mr-2"
+            >
+                {max ? `${min} - ${max}` : `${min}+`}
+            </Chip>
+        );
+    })}
 
-                    {cateFilter.map((filter) => (
-                        <div>
-                        <Chip key={filter} onClose={() => handleChipClose(filter)} variant="bordered" className="text-base mr-2">
-                            {filter}
-                        </Chip>
-              
-                    </div>
-                    ))}
-                </div>
+    {cateFilter.map((filter) => (
+        <Chip
+            key={filter} // Thêm thuộc tính key
+            onClose={() => handleChipClose(filter)}
+            variant="bordered"
+            className="text-base mr-2"
+        >
+            {filter}
+        </Chip>
+    ))}
+</div>
+
             </div>
 
             <div className="flex w-full gap-5 flex-col lg:flex-row mb-10">

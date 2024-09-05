@@ -59,7 +59,6 @@ function BodyContact() {
               <textarea
                 className="appearance-none border border-gray-300 rounded-md w-full py-2 px-4 bg-gray-50  text-clip font-light placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                 id="message"
-                rows="5"
                 placeholder="Vui lòng nhập"
               ></textarea>
             </div>
@@ -114,7 +113,6 @@ function BodyContact() {
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.4545065405905!2d106.62420897462825!3d10.852993989300469!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752bee0b0ef9e5%3A0x5b4da59e47aa97a8!2zQ8O0bmcgVmnDqm4gUGjhuqduIE3hu4FtIFF1YW5nIFRydW5n!5e0!3m2!1svi!2s!4v1725440633288!5m2!1svi!2s"
           width="100%"
           height="100%"
-          allowFullScreen=""
           loading="lazy"
         ></iframe>
       </div>
