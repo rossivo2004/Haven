@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Divider } from '@nextui-org/react';
 import BreadcrumbNav from '../Breadcrum';
 import ImageSwiper from '../SliderImageProductDetail';
@@ -8,6 +8,7 @@ import BoxProduct from '../BoxProduct';
 
 function BodyProduct() {
     const [activeTab, setActiveTab] = useState<number>(0);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     const images = [
         'https://th.bing.com/th/id/OIP.Jj4yZvYLj07qJRwEAvGkJQHaEU?w=265&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
@@ -16,8 +17,21 @@ function BodyProduct() {
         // Add more images as needed
     ];
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        handleResize(); // Check initial size
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     const handleTabClick = (index: number) => {
-        if (window.innerWidth < 768) {
+        if (isMobile) {
             setActiveTab(index);
         } else {
             // Smooth scroll to the section on desktop
@@ -118,7 +132,7 @@ function BodyProduct() {
                             <button
                                 key={index}
                                 className={`flex-1 py-2 text-center lg:border-b-2 lg:border-transparent ${
-                                    activeTab === index && window.innerWidth < 768 ? 'border-b-2 border-black' : ''
+                                    activeTab === index && isMobile ? 'border-b-2 border-black' : ''
                                 }`}
                                 onClick={() => handleTabClick(index)}
                             >
@@ -132,7 +146,7 @@ function BodyProduct() {
                         {/* Show only active tab content on mobile */}
                         {activeTab === 0 && <div className="content-section font-bold text-3xl">
                             <div className='text-center font-boldtext-4xl mb-4'>
-                        Content of Giới Thiệu
+                            Content of Giới Thiệu
                             </div>
                             <div>
                                 <div className='font-bold text-2xl'>Thông tin sản phẩm</div>
