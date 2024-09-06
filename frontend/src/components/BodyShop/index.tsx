@@ -98,14 +98,13 @@ function BodyShop() {
                 <BreadcrumbNav
                     items={[
                         { name: 'Trang chủ', link: '/' },
-                        { name: 'Sản phẩm', link: '/listproduct' },
-                        { name: 'S2 JOY', link: '#' },
+                        { name: 'Sản phẩm', link: '#' },
                     ]}
                 />
             </div>
             <div className="py-5 h-[62px]">
                 <div className="flex items-center">
-                    <span className="font-bold text-2xl">S2 JOY</span>
+                    <span className="font-bold text-2xl">HAVEN</span>
                     <div className="flex-grow border-t border-black ml-4" />
                 </div>
             </div>
@@ -125,7 +124,7 @@ function BodyShop() {
                             <Button onPress={onOpen} className='bg-transparent px-0 min-w-0'>
                                 <FilterAltOutlinedIcon />
                             </Button>
-                            
+
                         </div>
 
                         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -161,32 +160,32 @@ function BodyShop() {
                     </div>
                 </div>
                 <div className='w-full h-20 overflow-scroll hidden-scrollbar' style={{ whiteSpace: 'nowrap' }}>
-    {priceFilter.map((filter) => {
-        const [min, max] = filter.split('-').map(value => formatVND(parseFloat(value)));
+                    {priceFilter.map((filter) => {
+                        const [min, max] = filter.split('-').map(value => formatVND(parseFloat(value)));
 
-        return (
-            <Chip
-                key={filter} // Thêm thuộc tính key
-                onClose={() => handleChipClose(filter)}
-                variant="bordered"
-                className="text-base mr-2"
-            >
-                {max ? `${min} - ${max}` : `${min}+`}
-            </Chip>
-        );
-    })}
+                        return (
+                            <Chip
+                                key={filter} // Thêm thuộc tính key
+                                onClose={() => handleChipClose(filter)}
+                                variant="bordered"
+                                className="text-base mr-2"
+                            >
+                                {max ? `${min} - ${max}` : `${min}+`}
+                            </Chip>
+                        );
+                    })}
 
-    {cateFilter.map((filter) => (
-        <Chip
-            key={filter} // Thêm thuộc tính key
-            onClose={() => handleChipClose(filter)}
-            variant="bordered"
-            className="text-base mr-2"
-        >
-            {filter}
-        </Chip>
-    ))}
-</div>
+                    {cateFilter.map((filter) => (
+                        <Chip
+                            key={filter} // Thêm thuộc tính key
+                            onClose={() => handleChipClose(filter)}
+                            variant="bordered"
+                            className="text-base mr-2"
+                        >
+                            {filter}
+                        </Chip>
+                    ))}
+                </div>
 
             </div>
 
@@ -213,9 +212,16 @@ function BodyShop() {
                     </Accordion>
                 </div>
                 <div className="flex-1 grid lg:grid-cols-3 grid-cols-2 gap-5">
-                    {currentProducts.map((product) => (
-                        <BoxProduct key={product.id} product={product} />
-                    ))}
+                    {currentProducts.length > 0 ? (
+                        currentProducts.map((product) => (
+                            <BoxProduct key={product.id} product={product} />
+                        ))
+                    ) : (
+                        <div className="flex items-center justify-center col-span-3">
+                            Không tìm thấy sản phẩm nào phù hợp với yêu cầu của bạn.
+                        </div>
+                    )}
+
                 </div>
             </div>
             <div className="flex justify-end w-full">

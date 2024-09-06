@@ -1,78 +1,125 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Checkbox } from "@nextui-org/react";
+import { useDispatch, useSelector } from 'react-redux';
+import { selectTotalItems, removeItem, updateQuantity, setSelectedItems } from '@/src/store/cartSlice';
+import { CartItem } from '@/src/interface';
+
 const Body_Cart = () => {
+    const dispatch = useDispatch();
+    const cart = useSelector((state: { cart: { items: CartItem[] } }) => state.cart.items);
+    const totalItems = useSelector(selectTotalItems);
+
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+    const [isMounted, setIsMounted] = useState(false);
+
+    const handleQuantityChange = (id: number, quantity: number) => {
+        if (quantity > 0) {
+            dispatch(updateQuantity({ id, quantity }));
+        }
+    };
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    const handleCheckSelected = (id: number) => {
+        setSelectedItems(prevSelected => {
+            if (prevSelected.includes(id)) {
+                // Bỏ chọn sản phẩm
+                return prevSelected.filter(item => item !== id);
+            } else {
+                // Chọn sản phẩm
+                return [...prevSelected, id];
+            }
+        });
+    };
+
+    // Hàm xử lý chọn hoặc bỏ chọn tất cả sản phẩm
+    const handleSelectAll = () => {
+        if (selectedItems.length === cart.length) {
+            setSelectedItems([]); // Bỏ chọn tất cả
+        } else {
+            setSelectedItems(cart.map((item: any) => item.id)); // Chọn tất cả
+        }
+    };
+
+    // Cập nhật tổng giá trị các sản phẩm được chọn
+    useEffect(() => {
+        const total = cart.reduce((acc: number, item: any) => {
+            if (selectedItems.includes(item.id)) {
+                return acc + item.price * item.quantity;
+            }
+            return acc;
+        }, 0);
+        setTotalSelectedPrice(total);
+    }, [selectedItems, cart]);
+
+
+    if (!isMounted) return null;
+
     return (
         <div className="max-w-7xl mx-auto p-6">
             <h1 className="text-4xl font-bold mb-6 text-center">Giỏ Hàng</h1>
+            <Checkbox
+              isSelected={selectedItems.length === cart.length}
+              onChange={handleSelectAll}
+                className='pl-42'
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* bên trái*/}
                 <div className="lg:col-span-2">
-                    {/* <div className="bg-gray-100 p-4 rounded shadow-sm mb-4">
-                        <h2 className="text-lg font-semibold mb-2">Thông Tin Nhận Hàng</h2>
-                        <p className="font-medium">Nguyễn Hữu Tiến | 0901 22 33 44</p>
-                        <p>388 J, P. An Khánh, Q. Ninh Kiều, TP. Cần Thơ</p>
-                    </div> */}
-
-                    <div className="bg-white p-4 rounded shadow-sm mb-4">
-                        <div className="flex justify-between items-center border-b pb-4 mb-4">
-                            <div className="flex items-start">
-                                <img src="https://meatdeli.com.vn/upload/medialibrary/c40/c40dd79625dc3345e1807b58ad0ca5a6.png" alt="Product Image" className="w-24 h-24 mr-4 rounded" />
-                                <div>
-                                    <p className="font-semibold">Ba Chỉ Bò Nhập Khẩu Đông Lạnh Trust Farm (Khay 300g)</p>
-                                    <p className="text-sm text-gray-600">Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.</p>
-                                    <div className="flex items-center mt-2">
-                                        <button className="px-3 py-1 border rounded">-</button>
-                                        <span className="px-4">01</span>
-                                        <button className="px-3 py-1 border rounded">+</button>
+                    {cart.map((item) => (
+                        <div key={item.id} className="bg-white">
+                            <div className="flex justify-between items-center border-b pb-4 mb-4">
+                                <div className="flex items-center">
+                                    <Checkbox
+                                          isSelected={selectedItems.includes(item.id)}
+                                          onChange={() => handleCheckSelected(item.id)}
+                                        className="mr-4"
+                                    />
+                                    <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
+                                    <div>
+                                        <p className="font-semibold">{item.name}</p>
+                                        {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
+                                        <div className="flex items-center mt-2">
+                                            <button
+                                                onClick={() => dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }))}
+                                                className="px-3 py-1 border rounded">-</button>
+                                            <span className="px-4">{item.quantity}</span>
+                                            <button
+                                                onClick={() => dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))}
+                                                className="px-3 py-1 border rounded">+</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="text-right">
-                                <span className="text-red-500 font-bold">499.000 đ</span><br />
-                                <span className="text-sm text-gray-500 line-through">49.000 đ đã giảm giá</span>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-start">
-                                <img src="https://product.hstatic.net/200000734847/product/3.21_63g_63daae7b23d6423592031a24e107d4c5_grande.png" alt="Product Image" className="w-24 h-24 mr-4 rounded" />
-                                <div>
-                                    <p className="font-semibold">S2 XÚC XÍCH DINH DƯỠNG - IQ NGON (MỚI) - 210G</p>
-                                    <p className="text-sm text-gray-600">Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.</p>
-                                    <div className="flex items-center mt-2">
-                                        <button className="px-3 py-1 border rounded">-</button>
-                                        <span className="px-4">01</span>
-                                        <button className="px-3 py-1 border rounded">+</button>
-                                    </div>
+                                <div className="text-right">
+                                    <span className="text-red-500 font-bold">{item.price.toLocaleString()} đ</span><br />
+                                    {item.discount && (
+                                        <span className="text-sm text-gray-500 line-through">{item.discount.toLocaleString()} đ đã giảm giá</span>
+                                    )}
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <span className="text-red-500 font-bold">499.000 đ</span><br />
-                                <span className="text-sm text-gray-500 line-through">49.000 đ đã giảm giá</span>
-                            </div>
                         </div>
-                    </div>
-
+                    ))}
                     <div className="text-right font-semibold">
                         Tổng Khối Lượng Giỏ Hàng: <span className="text-black">0.5Kg</span>
                     </div>
                 </div>
 
-                {/* bên phải */}
                 <div className="bg-white p-6 rounded shadow-sm">
                     <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
-
-                   
 
                     <div className="mb-4">
                         <div className="flex items-center justify-between">
                             <label className="block text-lg font-medium mr-4">Mã giảm giá</label>
                             <input
                                 type="text"
-                                className="flex-grow p-1 border border-gray-300 rounded placeholder-gray-500 focus:outline-none focus:border-black" placeholder="Chọn hoặc nhận mã"/>
+                                className="flex-grow p-1 border border-gray-300 rounded placeholder-gray-500 focus:outline-none focus:border-black" placeholder="Chọn hoặc nhận mã" />
                         </div>
                         <hr className="border-t-1 border-black mt-2" />
                     </div>
-
 
                     <div className="mb-4">
                         <label className="block text-lg font-medium pb-2">Ghi chú đơn hàng</label>
@@ -89,7 +136,7 @@ const Body_Cart = () => {
                     <div className="py-4">
                         <div className="flex justify-between mb-2">
                             <span>Tổng tiền</span>
-                            <span>00,000,000</span>
+                            <span>{totalSelectedPrice.toLocaleString()} đ</span>
                         </div>
                         <div className="flex justify-between mb-2">
                             <span>Khuyến mãi</span>
@@ -105,7 +152,7 @@ const Body_Cart = () => {
                         </div>
                         <div className="flex justify-between font-bold text-lg">
                             <span>Tổng thanh toán</span>
-                            <span>00,000,000</span>
+                            <span>{totalSelectedPrice.toLocaleString()} đ</span>
                         </div>
                     </div>
 

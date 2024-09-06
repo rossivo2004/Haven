@@ -137,7 +137,9 @@ export const DUMP_PRODUCTS = [
     id: 1,
     name: "4K UHD LED Smart TV with Chromecast Built-in 1",
     price: 799000,
-    image: "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain",
+    images: [
+      "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain"
+    ],
     discount: 23,
     category: "Smart Phone",
   },
@@ -145,203 +147,254 @@ export const DUMP_PRODUCTS = [
     id: 2,
     name: "4K UHD LED Smart TV with Chromecast Built-in 2",
     price: 1200000,
-    image: "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain",
+    images: [
+      "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain"
+    ],
     discount: 13,
     category: "Smart Phone",
   },
   {
     id: 3,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 3",
+    name: "Sản phẩm 3",
     price: 4600000,
-    image: "/images/product-3.png",
+    images: [
+      "https://th.bing.com/th?id=OIP.sxZncf9Tt3J3OouTbp0rVAHaEL&w=333&h=187&c=8&rs=1&qlt=90&o=6&cb=13&dpr=1.3&pid=3.1&rm=2"
+    ],
     discount: 10,
     category: "Smart Phone",
   },
   {
     id: 4,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 4",
+    name: "Sản phẩm 4",
     price: 90000,
-    image: "/images/product-4.png",
+    images: [
+      "https://th.bing.com/th?id=OIP.Xs9KysdysEhbkQJk981WVgHaE8&w=306&h=204&c=8&rs=1&qlt=90&o=6&cb=13&dpr=1.3&pid=3.1&rm=2"
+    ],
     discount: 10,
     category: "Smart Phone",
   },
   {
     id: 5,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 5",
+    name: "Sản phẩm 5",
     price: 245000,
-    image: "/images/product-5.png",
+    images: [
+      "https://th.bing.com/th/id/OIP.z3HT7WijhW1DpO18PNF-gQHaE8?w=301&h=200&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "Laptop",
   },
   {
     id: 6,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 6",
+    name: "Sản phẩm 6",
     price: 20000,
-    image: "/images/product-6.png",
+    images: [
+      "https://th.bing.com/th/id/R.bbd8bea492720058ed376d4d046a1072?rik=RZxJ2LQ2rD2VoQ&pid=ImgRaw&r=0"
+    ],
     discount: 0,
     category: "Laptop",
   },
   {
     id: 7,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 7",
+    name: "Sản phẩm 7",
     price: 20000,
-    image: "/images/product-7.png",
+    images: [
+      "https://th.bing.com/th?id=OIF.bz62QooaFDVBa6O%2bydqmBw&w=273&h=192&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "Laptop",
   },
   {
     id: 8,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 8",
+    name: "Sản phẩm 8",
     price: 20000,
-    image: "/images/product-8.png",
+    images: [
+      "https://th.bing.com/th?id=OIF.6c0mMjY7iEay%2bxVGysKiYw&w=290&h=193&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "Laptop",
   },
   {
     id: 9,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 9",
+    name: "Sản phẩm 9",
     price: 20000,
-    image: "/images/product-9.png",
+    images: [
+      "https://th.bing.com/th/id/OIF.xPuRks92FEBYTqXdJH7eBQ?w=293&h=181&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "Laptop",
   },
   {
     id: 10,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 10",
+    name: "Sản phẩm 10",
     price: 30000,
-    image: "/images/product-10.png",
+    images: [
+      "https://th.bing.com/th/id/OIF.JI6M7CKm5Cy1wjKqkE9oEQ?w=266&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 30,
     category: "Headphone",
   },
   {
     id: 11,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 11",
-    price: 30000,
-    image: "/images/product-3.png",
+    name: "Sản phẩm 11",
+    price: 350000,
+    images: [
+      "https://th.bing.com/th/id/OIF.pArWXJB9iwqznV09damRdg?w=220&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 30,
     category: "Headphone",
   },
   {
     id: 12,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 12",
+    name: "Sản phẩm 12",
     price: 30,
-    image: "/images/product-3.png",
-    discount: 30,
+    images: [
+      "https://th.bing.com/th?id=OIF.v%2bEFdFyLXwekZE2d0M1cWw&w=285&h=189&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
+    discount: 230000,
     category: "Headphone",
   },
   {
     id: 13,
     name: "4K UHD LED Smart TV with Chromecast Built-in 13",
     price: 30,
-    image: "/images/product-3.png",
-    discount: 30,
+    images: [
+      "https://th.bing.com/th/id/OIF.nOUi3iNsoPdhXlqLfs52Ug?w=189&h=189&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
+    discount: 320000,
     category: "Headphone",
   },
   {
     id: 14,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 14",
-    price: 30,
-    image: "/images/product-3.png",
+    name: "Sản phẩm 99",
+    price: 300000,
+    images: [
+      "https://th.bing.com/th/id/OIF.K%2f7twhoMofaQWsMb3xPnFA?w=142&h=189&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 30,
     category: "Headphone",
   },
   {
     id: 15,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 15",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "4K bbmm",
+    price: 400000,
+    images: [
+      "https://th.bing.com/th/id/OIP.kETtQeWn_YTl2yVR71qLPwHaFj?w=246&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 16,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 16",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "Kim chi DD",
+    price: 1000000,
+    images: [
+      "https://th.bing.com/th/id/OIP.8lGeheOP3j6IsAibGqagQAHaE9?w=268&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 17,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 17",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "Sản phẩm 55",
+    price: 140000,
+    images: [
+      "https://th.bing.com/th/id/OIP.HIavNadN78R1LA8SYzsdFQHaEK?w=339&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 18,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 18",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "Bánh gạo hàn quốc",
+    price: 40000,
+    images: [
+      "https://th.bing.com/th/id/OIP.dKo1derfTDuuWZL9itM-ZQHaFi?w=215&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 19,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 19",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "Bánh mì Việt Nam",
+    price: 40000,
+    images: [
+      "https://th.bing.com/th/id/OIP.uzbOIGzWm-vFYuBG2lhaQwHaE7?rs=1&pid=ImgDetMain"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 20,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 20",
-    price: 40,
-    image: "/images/product-4.png",
+    name: "Bún bò Huế",
+    price: 34000,
+    images: [
+      "https://th.bing.com/th/id/OIP.Mf4_0gnx7foTHOjYp09YpwHaEK?w=326&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 0,
     category: "TV",
   },
   {
     id: 21,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 21",
-    price: 50,
-    image: "/images/product-5.png",
+    name: "Gỏi cuốn",
+    price: 50000,
+    images: [
+      "https://th.bing.com/th/id/R.9d7ccb3f01f52b72e544fb75982eb184?rik=%2bZoqhWeumZ7vyQ&riu=http%3a%2f%2fmedia.cooky.vn%2fimages%2fblog-2016%2fuu-diem-thuc-an-nhanh-cua-viet-nam-1.jpg&ehk=zbllPbCbdGJ2rFBK3BWPo61TwyPuNCncTEECuYy1vPU%3d&risl=&pid=ImgRaw&r=0"
+    ],
     discount: 50,
     category: "Smart Phone",
   },
   {
     id: 22,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 22",
-    price: 50,
-    image: "/images/product-6.png",
+    name: "Chả giò",
+    price: 50000,
+    images: [
+      "https://i.pinimg.com/originals/bd/29/7d/bd297d4376bd97384cca01a1e44991c8.jpg"
+    ],
     discount: 50,
     category: "Headphone",
   },
   {
     id: 23,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 23",
-    price: 50,
-    image: "/images/product-7.png",
+    name: "Bauwx cơm",
+    price: 150000,
+    images: [
+      "https://th.bing.com/th/id/OIP.Z4fM7tdtnyWhmg3Nb3z8zwHaE8?w=265&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 50,
     category: "TV",
   },
   {
     id: 24,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 24",
-    price: 50,
-    image: "/images/product-8.png",
+    name: "Bánh xèo Việt Nam",
+    price: 20000,
+    images: [
+      "https://th.bing.com/th/id/OIP.Hg2H5NVHiNQkxSzUZPmE7AHaE8?w=332&h=181&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 50,
     category: "Laptop",
   },
   {
     id: 25,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 25",
-    price: 50,
-    image: "/images/product-9.png",
-    discount: 50,
+    name: "Xiên bẩn",
+    price: 5000,
+    images: [
+      "https://th.bing.com/th/id/OIP.3OO23gNT5at6R8_G0Jk_YgHaE8?w=241&h=181&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
+    discount: 0,
     category: "Headphone",
   },
   {
     id: 26,
-    name: "4K UHD LED Smart TV with Chromecast Built-in 26",
-    price: 50,
-    image: "/images/product-10.png",
+    name: "Cơm tắm",
+    price: 35000,
+    images: [
+      "https://th.bing.com/th/id/OIP.ekZHgX9NeSOM_DgoWYECXwHaHa?w=183&h=183&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+    ],
     discount: 50,
     category: "Smart Phone",
   },
 ];
+
 
 
 export const DUMP_NEWS = [

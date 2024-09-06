@@ -1,10 +1,20 @@
 export interface Product {
     id: number;
-    title: string;
+    name: string;
     price: number;
     description: string;
     category: string;
-    image: string;
+    images: string[];
+}
+
+export interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  discount: number;
+  images: string[];
+  description?: string; // Added optional description field
 }
 
 export interface Category {
@@ -64,7 +74,7 @@ export interface IPromotion {
   export interface ProductProps {
     id: number;
     name: string;
-    image: string;
+    images: string[];
     price: number;
     discount: number;
     category: string;

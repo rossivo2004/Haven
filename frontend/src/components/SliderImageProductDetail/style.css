@@ -26,3 +26,7 @@
 .carousel .slide.active img {
     opacity: 1; /* Active image appears normal */
 }
+
+.carousel {
+    justify-content: center;
+}

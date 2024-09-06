@@ -5,15 +5,15 @@ import Link from "next/link";
 import { ProductProps } from "@/src/interface";
 
 function BoxProduct({ product }: { product: ProductProps }) {
-    const {id, name, price, discount, image } = product;
+    const {id, name, price, discount, images } = product;
     const discountedPrice = price * (1 - discount / 100);
 
     return (
-        <Link href={`/productDetails/${id}`}>
+        <Link href={`/product/${id}`}>
         <div className="w-full h-auto lg:h-[380px] flex flex-col group">
             <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden rounded-lg">
                 <img
-                    src={image}
+                    src={images[0]}
                     alt="Product as"
                     className="w-full h-full object-cover group-hover:scale-110 transition-all"
                 />

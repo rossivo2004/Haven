@@ -15,19 +15,27 @@ import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import HeadsetOutlinedIcon from '@mui/icons-material/HeadsetOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DeleteIcon from '@mui/icons-material/Delete';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { Spinner } from "@nextui-org/react";
 import { Tooltip, Button } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
+import { Checkbox } from "@nextui-org/react";
 
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
 import useDebounce from '@/src/utils';
 import { CATEGORY } from '@/src/dump';
+import { selectTotalItems } from '@/src/store/cartSlice';
+import { removeItem } from '@/src/store/cartSlice';
 
 import './style.css'
 import { log } from 'console';
+
+import { updateQuantity } from '@/src/store/cartSlice';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -38,15 +46,27 @@ const menuItems = [
 ];
 
 function Header() {
+    const dispatch = useDispatch();
+    const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [search, setSearch] = useState("");
     const [isFocused, setIsFocused] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const totalItems = useSelector(selectTotalItems);
+
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+
+    const handleQuantityChange = (id: number, quantity: number) => {
+        if (quantity > 0) {
+            dispatch(updateQuantity({ id, quantity }));
+        }
+    };
 
     const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
 
@@ -72,7 +92,7 @@ function Header() {
     useEffect(() => {
         if (debouncedSearch) {
             const filtered = products.filter(product =>
-                product.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+                product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
             );
             setFilteredProducts(filtered);
 
@@ -83,9 +103,9 @@ function Header() {
     }, [debouncedSearch, products]);
 
     useEffect(() => {
-        const count = 2;
-        setCartCount(count);
-    }, []);
+        setCartCount(totalItems);
+    }, [totalItems]);
+
 
     return (
         <div>
@@ -120,17 +140,17 @@ function Header() {
                                         {search ? (
                                             <>
                                                 {loading ? (
-                                                    <div className="p-2 text-center">Loading...</div>
+                                                    <div className="flex items-center justify-center h-full"><Spinner /></div>
                                                 ) : filteredProducts.length > 0 ? (
                                                     <ul className='overflow-scroll h-[400px]'>
                                                         {filteredProducts.map((product) => (
                                                             <li key={product.id} className="p-2 border-b hover:bg-gray-100 ">
                                                                 <Link href={`/product/${product.id}`} className="flex gap-4 items-center ">
                                                                     <div className='w-14 h-14'>
-                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.image} alt={product.title} />
+                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
                                                                     </div>
                                                                     <div>
-                                                                        {product.title}
+                                                                        {product.name}
                                                                     </div>
                                                                 </Link>
                                                             </li>
@@ -167,20 +187,86 @@ function Header() {
                                 </div>
                             </div>
                         </div>
-                        <Link href={'/cart'}>
-                            <div className="flex items-center gap-1">
+
+                        <Tooltip showArrow={true} placement='bottom-end' content={
+                            <div>
+
+                                <div className='p-4 min-w-[460px] max-w-[460px]'>
+                                    <div  className='flex justify-between mb-4 items-center'>
+                                        <div className="flex items-center mb-2">
+                                      
+                                        <span className="ml-2">Chọn tất cả</span>
+                                    </div>
+                                    <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
+                                    </div>
+                                    
+                                    <div>
+                                        <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2'>
+
+
+                                            {cart.map((item: any) => (
+                                                <li key={item.id} className='flex items-center gap-4 mb-2'>
+                                                    <div>
+                                                        
+                                                    </div>
+                                                    <div>
+                                                        <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
+                                                    </div>
+                                                    <div>
+                                                        <div className='max-w-[220px]'>{item.name}</div>
+                                                        <div className="flex items-center">
+                                                            <button
+                                                                className="px-3 py-1 border rounded"
+                                                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span className="px-4">{item.quantity}</span>
+                                                            <button
+                                                                className="px-3 py-1 border rounded"
+                                                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex-1 text-right'>
+                                                        <div>
+                                                            {item.price.toLocaleString('vi-VN')} VND
+                                                        </div>
+                                                        <div onClick={() => dispatch(removeItem(item.id))}>
+                                                            <DeleteIcon className='hover:text-red-600 cursor-pointer' />
+                                                        </div>
+
+
+
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className='flex items-center justify-between mt-6'>
+                                        <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
+                                        <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }>
+                            <div className="flex items-center gap-1 max-w-[120px] min-w-[120px]">
                                 <div className="relative">
                                     <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
                                     <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
                                         {cartCount}
                                     </span>
                                 </div>
+                                <Link href={'/cart'}>
                                 <div>
                                     <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
                                     <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
                                 </div>
+                                </Link>
                             </div>
-                        </Link>
+                        </Tooltip>
                     </div>
                 </div>
             </div>
@@ -202,9 +288,9 @@ function Header() {
                                         </div>
                                         {CATEGORY.map((item, index) => (
                                             <Link key={index} href={`/shop?category=${item.tag}`}>
-                                                <div  className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200">
+                                                <div className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200 items-center">
                                                     <div className='mr-2'>
-                                                        <img src={`/images/${item.image}`} alt="A cat sitting on a chair" className="w-5 h-5 object-cover rounded-lg" />
+                                                        <img src={`/images/${item.image}`} alt={item.name} className="w-8 h-8 object-cover rounded-lg" />
                                                     </div>
                                                     <div>{item.name}</div>
                                                 </div>
@@ -322,11 +408,11 @@ function Header() {
                                                                     <div className="w-14 h-14">
                                                                         <img
                                                                             className="w-full h-full object-cover"
-                                                                            src={product.image}
-                                                                            alt={product.title}
+                                                                            src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'}
+                                                                            alt={product.name}
                                                                         />
                                                                     </div>
-                                                                    <div>{product.title}</div>
+                                                                    <div>{product.name}</div>
                                                                 </Link>
                                                             </li>
                                                         ))}
