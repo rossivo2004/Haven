@@ -24,6 +24,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
 import { Checkbox } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
 
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
@@ -132,64 +133,64 @@ function Header() {
                     <Link href={"/"} className="cursor-pointer">
                         <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" />
                     </Link>
-                    <div 
-    className="relative flex-1 px-20"
-    onMouseLeave={() => setIsMouseOver(false)}
-    onMouseEnter={() => setIsMouseOver(true)}
-> 
-    <div className="relative w-full">
-        <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => {
-                // Chỉ ẩn nếu người dùng không hover vào kết quả tìm kiếm
-                if (!isMouseOver) {
-                    setIsFocused(false);
-                    setSearch('')
-                }
-            }}
-            className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-            type="text"
-            placeholder="Tìm kiếm sản phẩm..."
-        />
-        <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
-            <SearchIcon />
-        </div>
-    </div>
-    {(isFocused || isMouseOver) && search && (
-        <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-            <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
-            <div className='flex gap-5 p-5'>
-                <div className='w-1/4'>
-                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
-                </div>
-                <div className='flex-1'>
-                    {loading ? (
-                        <div className="flex items-center justify-center h-full"><Spinner /></div>
-                    ) : filteredProducts.length > 0 ? (
-                        <ul className='overflow-scroll h-[400px]'>
-                            {filteredProducts.map((product) => (
-                                <li key={product.id} className="p-2 border-b hover:bg-gray-100 ">
-                                    <a href={`/product/${product.id}`} className="flex gap-4 items-center ">
-                                        <div className='w-14 h-14'>
-                                            <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
-                                        </div>
-                                        <div>
-                                            {product.name}
-                                        </div>
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
-                    )}
-                </div>
-            </div>
-        </div>
-    )}
-</div>
+                    <div
+                        className="relative flex-1 px-20"
+                        onMouseLeave={() => setIsMouseOver(false)}
+                        onMouseEnter={() => setIsMouseOver(true)}
+                    >
+                        <div className="relative w-full">
+                            <input
+                                value={search}
+                                onChange={(event) => setSearch(event.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => {
+                                    // Chỉ ẩn nếu người dùng không hover vào kết quả tìm kiếm
+                                    if (!isMouseOver) {
+                                        setIsFocused(false);
+                                        setSearch('')
+                                    }
+                                }}
+                                className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                type="text"
+                                placeholder="Tìm kiếm sản phẩm..."
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
+                                <SearchIcon />
+                            </div>
+                        </div>
+                        {(isFocused || isMouseOver) && search && (
+                            <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
+                                <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
+                                <div className='flex gap-5 p-5'>
+                                    <div className='w-1/4'>
+                                        <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
+                                    </div>
+                                    <div className='flex-1'>
+                                        {loading ? (
+                                            <div className="flex items-center justify-center h-full"><Spinner /></div>
+                                        ) : filteredProducts.length > 0 ? (
+                                            <ul className='overflow-scroll h-[400px]'>
+                                                {filteredProducts.map((product) => (
+                                                    <li key={product.id} className="p-2 border-b hover:bg-gray-100 ">
+                                                        <a href={`/product/${product.id}`} className="flex gap-4 items-center ">
+                                                            <div className='w-14 h-14'>
+                                                                <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
+                                                            </div>
+                                                            <div>
+                                                                {product.name}
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
 
                     <div className="text-white flex gap-4 xl:text-sm lg:text-[10px]">
@@ -201,7 +202,7 @@ function Header() {
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
-                            <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
+                            {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
                             <div className="xl:text-sm lg:text-[10px]">
                                 <div>
                                     <Link href={'/signin'}>Đăng nhập</Link>
@@ -209,6 +210,49 @@ function Header() {
                                 <div>
                                     <Link href={'/signup'}>Đăng kí</Link>
                                 </div>
+                            </div> */}
+                            <div>
+                                <Dropdown placement="bottom-end">
+                                    <DropdownTrigger>
+                                        <Avatar
+                                            isBordered
+                                            size='sm'
+                                            as="button"
+                                            className="transition-transform"
+                                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                        />
+                                    </DropdownTrigger>
+                                    <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                        <DropdownItem key="profile" className="h-14 gap-2">
+                                            <p className="font-semibold">Signed in as</p>
+                                            <p className="font-semibold">zoey@example.com</p>
+                                        </DropdownItem>
+                                        <DropdownItem key="settings">
+                                            <Link href={'/profile'}>
+                                                Trang cá nhân
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                        <DropdownItem key="analytics">
+                                        <Link href={'/profile/notify'}>
+                                                Thông báo
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="system">
+                                        <Link href={'/profile/order'}>
+                                                Quản lí đơn hàng
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="configurations">
+                                        <Link href={'/profile/promotion'}>
+                                                Mã giảm giá
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="logout" color="danger">
+                                            Đăng xuất
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
                             </div>
                         </div>
 
@@ -216,51 +260,51 @@ function Header() {
                             <div>
 
                                 <div className='p-4 min-w-[460px] max-w-[460px]'>
-                                    <div  className='flex justify-end mb-4 items-center'>
-                                    <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
+                                    <div className='flex justify-end mb-4 items-center'>
+                                        <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
                                     </div>
-                                    
+
                                     <div>
                                         <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2'>
 
 
-                                        {cart.length > 0 ? (
-    cart.map((item: any) => (
-        <li key={item.id} className='flex items-center gap-4 mb-2'>
-            <div>
-                <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
-            </div>
-            <div>
-                <div className='max-w-[220px]'>{item.name}</div>
-                <div className="flex items-center">
-                    <button
-                        className="px-3 py-1 border rounded"
-                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                    >
-                        -
-                    </button>
-                    <span className="px-4">{item.quantity}</span>
-                    <button
-                        className="px-3 py-1 border rounded"
-                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                    >
-                        +
-                    </button>
-                </div>
-            </div>
-            <div className='flex-1 text-right'>
-                <div className='text-price'>
-                    {item.price.toLocaleString('vi-VN')} VND
-                </div>
-                <div onClick={() => dispatch(removeItem(item.id))}>
-                    <DeleteIcon className='hover:text-red-600 cursor-pointer' />
-                </div>
-            </div>
-        </li>
-    ))
-) : (
-    <div className='text-center py-4'>Giỏ hàng trống</div>
-)}
+                                            {cart.length > 0 ? (
+                                                cart.map((item: any) => (
+                                                    <li key={item.id} className='flex items-center gap-4 mb-2'>
+                                                        <div>
+                                                            <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
+                                                        </div>
+                                                        <div>
+                                                            <div className='max-w-[220px]'>{item.name}</div>
+                                                            <div className="flex items-center">
+                                                                <button
+                                                                    className="px-3 py-1 border rounded"
+                                                                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                                                >
+                                                                    -
+                                                                </button>
+                                                                <span className="px-4">{item.quantity}</span>
+                                                                <button
+                                                                    className="px-3 py-1 border rounded"
+                                                                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                                                >
+                                                                    +
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex-1 text-right'>
+                                                            <div className='text-price'>
+                                                                {item.price.toLocaleString('vi-VN')} VND
+                                                            </div>
+                                                            <div onClick={() => dispatch(removeItem(item.id))}>
+                                                                <DeleteIcon className='hover:text-red-600 cursor-pointer' />
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                ))
+                                            ) : (
+                                                <div className='text-center py-4'>Giỏ hàng trống</div>
+                                            )}
 
                                         </ul>
                                     </div>
@@ -279,10 +323,10 @@ function Header() {
                                     </span>
                                 </div>
                                 <Link href={'/cart'}>
-                                <div>
-                                    <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
-                                    <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
-                                </div>
+                                    <div>
+                                        <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
+                                        <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
+                                    </div>
                                 </Link>
                             </div>
                         </Tooltip>
@@ -292,10 +336,10 @@ function Header() {
             <div className='w-full lg:block bg-main hidden'>
                 <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                     <ul className='flex gap-10'>
-                        <li className=''>
+                        <li className='flex items-center'>
                             <Link href={'/'}>TRANG CHỦ</Link>
                         </li>
-                        <li className=''>
+                        <li className='flex items-center'>
                             <Link href={'/blog'}>TIN TỨC</Link>
                         </li>
                         <li>
@@ -326,16 +370,16 @@ function Header() {
                                         SẢN PHẨM
                                     </Link>
                                     <div className='sp_ar__down'>
-                                    <KeyboardArrowDownIcon />
+                                        <KeyboardArrowDownIcon />
                                     </div>
                                 </div>
                             </Tooltip>
 
                         </li>
-                        <li className=''>
+                        <li className='flex items-center'>
                             <Link href={'/contact'}>LIÊN HỆ</Link>
                         </li>
-                        <li className=''>
+                        <li className='flex items-center'>
                             <Link href={'/tracking'}>TRA CỨU</Link>
                         </li>
                     </ul>
@@ -358,7 +402,7 @@ function Header() {
                         </Link>
 
                         <NavbarContent justify="end" className="gap-0">
-                           
+
                             <NavbarContent className=" text-white nav_menu__mb-ic ml-2" justify="end">
                                 <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
                             </NavbarContent>
@@ -383,7 +427,7 @@ function Header() {
                 </div>
 
                 <div className=''>
-                    <div className='bg-main h-14 w-full fixed bottom-0 px-4 z-50'>
+                    <div className='bg-main h-14 w-full fixed bottom-0 px-4 z-20'>
                         <ul className="menu menu-horizontal w-full h-full flex items-center justify-around">
                             <li className='lg:mx-4'><Link href={'/'}><HomeIcon className='h-5 w-5' /></Link></li>
                             <li className='lg:mx-4'> <Button className='p-2 min-w-16' variant='light' onPress={onOpen}><SearchIcon className='h-5 w-5' /></Button></li>
@@ -393,7 +437,45 @@ function Header() {
                                     <div className='text-white'>{cartCount}</div>
                                 </span>
                             </div></Link></li>
-                            <li className='lg:mx-4'><Link href={'/signin'}><PersonIcon className='h-5 w-5' /></Link></li>
+                            <li className='lg:mx-4'>
+                                {/* <Link href={'/signin'}><PersonIcon className='h-5 w-5' /></Link> */}
+                                <Dropdown placement="bottom-end">
+                                    <DropdownTrigger>
+                                        <Avatar
+                                            isBordered
+                                            size='sm'
+                                            as="button"
+                                            className="transition-transform"
+                                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                        />
+                                    </DropdownTrigger>
+                                    <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                        <DropdownItem key="profile" className="h-14 gap-2">
+                                            <p className="font-semibold">Signed in as</p>
+                                            <p className="font-semibold">zoey@example.com</p>
+                                        </DropdownItem>
+                                        <DropdownItem key="settings">
+                                            <Link href={'/profile'}>
+                                                Trang cá nhân
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                        <DropdownItem key="analytics">
+                                        <Link href={'/profile'}>
+                                                Trang cá nhân
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="system">System</DropdownItem>
+                                        <DropdownItem key="configurations">Configurations</DropdownItem>
+                                        <DropdownItem key="help_and_feedback">
+                                            Help & Feedback
+                                        </DropdownItem>
+                                        <DropdownItem key="logout" color="danger">
+                                            Log Out
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </li>
                         </ul>
                     </div>
                 </div>

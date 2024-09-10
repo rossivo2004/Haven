@@ -15,12 +15,16 @@ interface CartState {
   items: CartItem[];
   selectedItems: number[];
   point: number;
+  sum: number;
+  priceDisscount: number;
 }
 
 const initialState: CartState = {
   items: [],
   selectedItems: [],
   point: 0,
+  priceDisscount: 0,
+  sum: 0,
 };
 
 const loadState = (): CartState | undefined => {
@@ -105,6 +109,16 @@ const cartSlice = createSlice({
       state.items = updatedItems;
       saveState(state);
     },
+
+    setSum: (state, action: PayloadAction<number>) => {
+      state.sum = action.payload;
+      saveState(state);
+    },
+
+    setPriceDisscount: (state, action: PayloadAction<number>) => {
+      state.priceDisscount = action.payload;
+      saveState(state);
+    },
   },
 });
 
@@ -112,5 +126,5 @@ export const selectTotalItems = (state: { cart: CartState }) => {
   return state.cart.items.reduce((total, item) => total + item.quantity, 0);
 };
 
-export const { addItem, removeItem, toggleSelectItem, updateQuantity, setSelectedItems, setPoints, selectAllItems } = cartSlice.actions;
+export const { addItem, setPriceDisscount, removeItem, setSum, toggleSelectItem, updateQuantity, setSelectedItems, setPoints, selectAllItems } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -11,6 +11,7 @@ import { ProductProps } from '@/src/interface';
 
 import { addItem } from '@/src/store/cartSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { number } from 'yup';
 
 function BodyProduct() {
     const { id: id_product } = useParams(); // get id product
@@ -22,13 +23,6 @@ function BodyProduct() {
     const [priceDiscount, setPriceDiscount] = useState(0);
 
     const [quantity, setQuantity] = useState(1); 
-
-    // const images = [
-    //     'https://th.bing.com/th/id/OIP.Jj4yZvYLj07qJRwEAvGkJQHaEU?w=265&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-    //     'https://th.bing.com/th/id/OIP.3e_e7mPeB9T6yNDHtYD8KwHaEo?w=300&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-    //     'https://th.bing.com/th/id/OIP._7vjVvZrEwO7Cyqx8ajSvgHaEK?w=301&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7',
-    //     // Add more images as needed
-    // ];
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);

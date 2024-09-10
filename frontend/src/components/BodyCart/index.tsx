@@ -1,11 +1,21 @@
-'use client';
+'use client'
 import React, { useState, useEffect } from 'react';
 import { Checkbox } from "@nextui-org/react";
 import { useDispatch, useSelector } from 'react-redux';
-import { selectTotalItems, removeItem, updateQuantity, setPoints, selectAllItems, toggleSelectItem } from '@/src/store/cartSlice';
+import { selectTotalItems, removeItem, updateQuantity, setPoints, selectAllItems, toggleSelectItem, setSum, setPriceDisscount } from '@/src/store/cartSlice';
 import { CartItem } from '@/src/interface';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Link from 'next/link';
+import { Chip } from "@nextui-org/react";
+
+import VoucherSelector from '../VoucherSelector';
+import { Voucher } from '@/src/interface';
+
+const availableVouchers: Voucher[] = [
+    { id: '1', code: 'DISCOUNT10', discount: 10 },
+    { id: '2', code: 'DISCOUNT20', discount: 20 },
+    // Thêm voucher khác nếu cần
+];
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -14,6 +24,8 @@ const Body_Cart = () => {
     const point = useSelector((state: { cart: { point: number } }) => state.cart.point);
 
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+    const [disscount, setDisscount] = useState<number>(0);
+    const [totalAfterDiscount, setTotalAfterDiscount] = useState<number>(0);
     const [isMounted, setIsMounted] = useState(false);
 
     const handleQuantityChange = (id: number, quantity: number) => {
@@ -39,12 +51,42 @@ const Body_Cart = () => {
         dispatch(setPoints(integerPoints));
 
         setTotalSelectedPrice(total);
+        setTotalAfterDiscount(total);
+        dispatch(setSum(total)); // Update sum in Redux state
     }, [cart, dispatch]);
 
     const handleSelectAllChange = () => {
         const allSelected = !cart.every(item => item.select);
         dispatch(selectAllItems(allSelected));
     };
+
+    const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+
+    const handleVoucherSelected = (voucher: Voucher | null) => {
+        setSelectedVoucher(voucher);
+        if (voucher) {
+            // Calculate discount
+            const discountAmount = (totalSelectedPrice * voucher.discount) / 100;
+            const newTotalAfterDiscount = totalSelectedPrice - discountAmount;
+    
+            // Set component state
+            setTotalAfterDiscount(newTotalAfterDiscount);
+            setDisscount(discountAmount);
+    
+            // Update Redux state
+            dispatch(setPriceDisscount(discountAmount));
+            dispatch(setSum(newTotalAfterDiscount)); // Update total sum after discount
+        } else {
+            // Reset discount if no voucher is selected
+            setTotalAfterDiscount(totalSelectedPrice);
+            setDisscount(0);
+    
+            // Reset Redux state
+            dispatch(setPriceDisscount(0));
+            dispatch(setSum(totalSelectedPrice)); // Reset sum to original total
+        }
+    };
+    
 
     if (!isMounted) return null;
 
@@ -55,7 +97,7 @@ const Body_Cart = () => {
                 <Checkbox
                     isSelected={cart.every(item => item.select)}
                     onChange={handleSelectAllChange}
-                    className='pl-42'
+                    className='pl-42 mb-4'
                 >
                     Chọn tất cả
                 </Checkbox>
@@ -124,11 +166,8 @@ const Body_Cart = () => {
                     <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
 
                     <div className="mb-4">
-                        <div className="flex items-center justify-between">
-                            <label className="block text-lg font-medium mr-4">Mã giảm giá</label>
-                            <input
-                                type="text"
-                                className="flex-grow p-1 border border-gray-300 rounded placeholder-gray-500 focus:outline-none focus:border-black" placeholder="Chọn hoặc nhận mã" />
+                        <div className="flex flex-col w-full">
+                            <VoucherSelector availableVouchers={availableVouchers} onVoucherSelected={handleVoucherSelected} />
                         </div>
                         <hr className="border-t-1 border-black mt-2" />
                     </div>
@@ -145,8 +184,8 @@ const Body_Cart = () => {
                             <span>{totalSelectedPrice.toLocaleString()} đ</span>
                         </div>
                         <div className="flex justify-between mb-2">
-                            <span>Khuyến mãi (Điểm tích lũy)</span>
-                            <span>0 đ</span>
+                            <span>Khuyến mãi</span>
+                            <span>{disscount.toLocaleString()} đ</span>
                         </div>
                         <div className="flex justify-between mb-2">
                             <span>Số điểm tích lũy</span>
@@ -154,22 +193,19 @@ const Body_Cart = () => {
                         </div>
                         <div className="flex justify-between font-bold text-lg">
                             <span>Tổng thanh toán</span>
-                            <span>{totalSelectedPrice.toLocaleString()} đ</span>
+                            <span>{totalAfterDiscount.toLocaleString()} đ</span>
                         </div>
                     </div>
 
                     {cart.some(item => item.select) ? (
                         <Link href={'/checkout'}>
-                            <button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
-                                Tiếp tục
-                            </button>
+                            <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
                         </Link>
                     ) : (
-                        <button disabled className='w-full bg-gray-500 text-white p-3 rounded mt-4 font-bold'>
-                            Vui lòng chọn sản phẩm để thanh toán
-                        </button>
+                        <div className="w-full text-center">
+                            <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm để thanh toán</p>
+                        </div>
                     )}
-
                 </div>
             </div>
         </div>

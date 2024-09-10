@@ -69,6 +69,9 @@ function BodyCheckout() {
     
     const selectedItems = cart.filter(item => item.select);
 
+    const priceDisscount = useSelector((state: { cart: { priceDisscount: number } }) => state.cart.priceDisscount);
+const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.sum);
+
     useEffect(() => {
         setCartData(selectedItems);
     }, [cart]);
@@ -142,7 +145,7 @@ function BodyCheckout() {
 
 
     useEffect(() => {
-        setSum(totalSelectedPrice + ship);
+        setSum(totalSum + ship);
     }, [totalSelectedPrice, ship]);
     
     console.log(selectedProvince);
@@ -198,7 +201,6 @@ function BodyCheckout() {
                                             value={selectedProvince}
                                             onChange={(e) => setSelectedProvince(e.target.value)}
                                         >
-                                            <SelectItem key="0" value="">Tỉnh Thành</SelectItem>
                                             {provinces.map((province) => (
                                                 <SelectItem key={province.id} value={province.id}>
                                                     {province.full_name}
@@ -220,7 +222,6 @@ function BodyCheckout() {
                                             onChange={(e) => setSelectedDistrict(e.target.value)}
                                             isDisabled={!selectedProvince} // Disable if no province is selected
                                         >
-                                            <SelectItem key="0" value="">Quận Huyện</SelectItem>
                                             {districts.map((district) => (
                                                 <SelectItem
                                                     key={district.id}
@@ -246,7 +247,6 @@ function BodyCheckout() {
                                             onChange={(e) => setSelectedDistrict(e.target.value)}
                                             isDisabled={!selectedDistrict} // Disable if no district is selected
                                         >
-                                            <SelectItem key="0" value="">Phường Xã</SelectItem>
                                             {wards.map((ward) => (
                                                 <SelectItem key={ward.id} value={ward.id}>
                                                     {ward.full_name}
@@ -327,11 +327,11 @@ function BodyCheckout() {
                                 <div className="py-4">
                                 <div className="flex justify-between mb-2">
                                     <span>Tổng tiền</span>
-                                    <span>{totalSelectedPrice.toLocaleString()}</span>
+                                    <span>{totalSum.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span>Khuyến mãi</span>
-                                    <span>{disscount.toLocaleString()}</span>
+                                    <span>{priceDisscount.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span>Phí vận chuyển</span>

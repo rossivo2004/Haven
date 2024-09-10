@@ -55,7 +55,7 @@ function BodyHome() {
             <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
                 <Image
                     className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                    src="https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain"
+                    src={`/images/bn-11.png`}
                     alt="Banner"
                     layout="fill"
                     priority

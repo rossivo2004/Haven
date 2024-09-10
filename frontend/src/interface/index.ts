@@ -80,6 +80,7 @@ export interface IPromotion {
     price: number;
     discount: number;
     category: string;
+    
   }
   
   export interface ItemCart {
@@ -127,3 +128,9 @@ export interface IPromotion {
     status: "Chưa xác nhận" | "Đã xác nhận",
   }
   
+  // types/voucher.ts
+export interface Voucher {
+  id: string;
+  code: string;
+  discount: number; // hoặc kiểu dữ liệu phù hợp khác
+}
