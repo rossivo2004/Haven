@@ -10,8 +10,6 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import LocationSelector from '../SelectProvince';
 import { DUMP_SHIPPING_METHOD } from '@/src/dump';
 import { CartItem } from '@/src/interface';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import { selectTotalItems, removeItem, updateQuantity, setSelectedItems, setPoints, toggleSelectItem } from '@/src/store/cartSlice';
 
 interface Province {
     id: string;
@@ -48,8 +46,6 @@ const CustomRadio = (props: any) => {
 };
 
 function BodyCheckout() {
-    const dispatch = useDispatch();
-
     const cart = useSelector((state: { cart: { items: CartItem[] } }) => state.cart.items);
     const [cartData, setCartData] = useState<CartItem[]>([]);
 
@@ -58,19 +54,9 @@ function BodyCheckout() {
     const [wards, setWards] = useState<Ward[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
-    const point = useSelector((state: { cart: { point: number } }) => state.cart.point);
-    const [pointMM, setPointMM] = useState<number>(0);
-    const [ship, setShip] = useState<number>(0);
-    const [sum, setSum] = useState<number>(0);
-    const [disscount, setDisscount] = useState<number>(0);
-
-
-    const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
-    
-    const selectedItems = cart.filter(item => item.select);
 
     useEffect(() => {
-        setCartData(selectedItems);
+        setCartData(cart);
     }, [cart]);
 
     useEffect(() => {
@@ -112,43 +98,6 @@ function BodyCheckout() {
         }
     }, [selectedDistrict]);
 
-    useEffect(() => {
-        const total = cart.reduce((acc: number, item: CartItem) => {
-            if (item.select) {
-                return acc + item.salePrice * item.quantity;
-            }
-            return acc;
-        }, 0);
-
-        const pointS = total * 0.01;
-        const integerPoints = Math.floor(pointS); // Làm tròn số điểm tích lũy
-        dispatch(setPoints(integerPoints));
-
-        setTotalSelectedPrice(total);
-        setPointMM(integerPoints)
-    }, [cart, dispatch]);
-
-
-    useEffect(() => {
-        if (selectedProvince === '79') {
-            setShip(0);
-        } else if (selectedProvince === '') {
-            setShip(0);
-        } else {
-            setShip(30000)
-        }
-        
-    }, [selectedProvince]);
-
-
-    useEffect(() => {
-        setSum(totalSelectedPrice + ship);
-    }, [totalSelectedPrice, ship]);
-    
-    console.log(selectedProvince);
-    console.log(ship);
-    
-
     return (
         <div className="max-w-screen-xl lg:mx-auto mx-4">
             <div className="py-5 h-[62px]">
@@ -162,26 +111,24 @@ function BodyCheckout() {
             </div>
 
             <div>
-                {/* Main form without nesting another form */}
-                <form className="max-w-7xl mx-auto p-6">
+                <div className="max-w-7xl mx-auto p-6">
                     <h1 className="text-4xl font-bold mb-6 text-center">Checkout</h1>
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                        <div className="lg:col-span-2">
+                        <form className="lg:col-span-2">
                             <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
-
-                            <div className='flex flex-col gap-5'>
+                            <form className='flex flex-col gap-5'>
                                 <div>
                                     <label htmlFor="">Họ và tên người nhận</label>
-                                    <Input size='lg' variant='bordered' placeholder='Họ và tên người nhận' />
+                                    <Input variant='bordered' placeholder='Họ và tên người nhận' />
                                 </div>
                                 <div className='flex gap-5'>
                                     <div className='w-1/2'>
                                         <label htmlFor="">Số điện thoại</label>
-                                        <Input size='lg' variant='bordered' placeholder='Số điện thoại' />
+                                        <Input variant='bordered' placeholder='Số điện thoại' />
                                     </div>
                                     <div className='flex-1'>
                                         <label htmlFor="">Email</label>
-                                        <Input size='lg' variant='bordered' placeholder='Email' />
+                                        <Input variant='bordered' placeholder='Email' />
                                     </div>
                                 </div>
 
@@ -266,7 +213,7 @@ function BodyCheckout() {
                                 </div>
 
                                 {/* Shipping method */}
-                                <div className="">
+                                <div className="mb-10">
                                     <label className="block">Phương thức vận chuyển</label>
                                     <Select size='lg' className="w-full mb-4" isRequired placeholder='Phương thức vận chuyển' variant='bordered'>
                                         {
@@ -276,84 +223,89 @@ function BodyCheckout() {
                                         }
 
                                     </Select>
+                                    <hr className="border-t-1 border-black mt-2" />
                                 </div>
 
                                 {/* Payment method */}
                                 <div className="mb-4 ww-full">
-                                    <label className="block">Hình thức thanh toán</label>
+                                    <label className="block text-lg font-medium">Hình thức thanh toán</label>
                                     <RadioGroup orientation="horizontal" className='w-full' defaultValue="pay-cash">
                                         <CustomRadio value="pay-momo">
                                             <div className='flex items-center gap-5'>
                                                 <div>
                                                     <img src="/images/momo.png" alt="Momo payment" className='w-10 h-10' />
                                                 </div>
-                                                <span>Ví điện tử Momo</span>
+                                                <div>Momo</div>
                                             </div>
                                         </CustomRadio>
                                         <CustomRadio value="pay-cash">
                                             <div className='flex items-center gap-5'>
                                                 <div>
-                                                    <MonetizationOnIcon />
+                                                    <img src="/images/cash.png" alt="Cash payment" className='w-10 h-10 object-cover' />
                                                 </div>
-                                                <span>Thanh toán khi nhận hàng</span>
+                                                <div>Tiền mặt</div>
                                             </div>
                                         </CustomRadio>
                                     </RadioGroup>
                                 </div>
-                            </div>
-                        </div>
+                            </form>
+                        </form>
 
-                        <div className="lg:col-span-2">
-                            <h2 className="text-2xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
-                            {/* Cart items summary */}
-                            <div className='shadow-md border rounded-md p-6'>
-                                <ul>
-                                    {cartData.map((item, index) => (
-                                        <li key={index} className="flex justify-between items-center border-b pb-4 mb-4">
-                                              <div className="flex items-start h-full">
+                        {/* bên phải */}
+                        <div className="lg:col-span-2 bg-white lg:p-6 rounded shadow-sm">
+                            <div className="bg-white lg:p-4 rounded shadow-sm mb-4">
+                                {cart.map((item, index) => (
+                                    <div key={item.id} className="flex justify-between items-center border-b pb-4 mb-4">
+                                        <div className="flex items-start">
                                             <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
-                                            <div className='flex flex-col justify-between h-full'>
+                                            <div>
                                                 <p className="font-semibold">{item.name}</p>
-                                                <p className="text-sm text-gray-600"> x{item.quantity}</p>
+                                                <p className="text-sm text-gray-600">{item.description}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
                                             <span className="text-red-500 font-bold">{item.price.toLocaleString()} đ</span><br />
-                                            <span className="text-xs text-gray-500 "><span className='line-through'>{item.price.toLocaleString()}</span> đ đã giảm giá</span>
+                                            <span className="text-sm text-gray-500 line-through">{item.price.toLocaleString()} đ đã giảm giá</span>
                                         </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <div className="py-4">
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="text-right font-semibold mb-10">
+                                Tổng Khối Lượng Giỏ Hàng: <span className="text-black">0.5Kg</span>
+                            </div>
+
+                            <div className="py-4">
                                 <div className="flex justify-between mb-2">
                                     <span>Tổng tiền</span>
-                                    <span>{totalSelectedPrice.toLocaleString()}</span>
+                                    <span>00,000,000</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span>Khuyến mãi</span>
-                                    <span>{disscount.toLocaleString()}</span>
+                                    <span>00,000,000</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span>Phí vận chuyển</span>
-                                    <span>
-    {ship === 0 ? 'Miễn phí' : ship.toLocaleString()}
-</span>
-
+                                    <span>00,000,000</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span>Số điểm tích lũy</span>
-                                    <span>{pointMM}</span>
+                                    <span>50</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-lg">
                                     <span>Tổng thanh toán</span>
-                                    <span>{sum.toLocaleString()}</span>
+                                    <span>00,000,000</span>
                                 </div>
                             </div>
-                                <Button className="w-full mt-4 bg-main font-semibold text-white">Đặt hàng</Button>
-                            </div>
+                        </div>
+
+                        <div className='lg:col-span-2'>
+                            <button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
+                                Tiếp tục
+                            </button>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );

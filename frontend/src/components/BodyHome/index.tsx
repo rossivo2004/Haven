@@ -107,7 +107,7 @@ function BodyHome() {
                                     spaceBetween: 20,
                                 },
                                 1024: {  // Larger desktops
-                                    slidesPerView: 4,
+                                    slidesPerView: 6,
                                     spaceBetween: 20,
                                 },
                             }}
@@ -120,7 +120,7 @@ function BodyHome() {
                                                 <img
                                                     src={`/images/${item.image}`}
                                                     alt=""
-                                                    className="w-full h-auto max-h-[300px] object-cover rounded-lg"
+                                                    className="w-full h-auto max-h-[200px] object-cover rounded-lg"
                                                 />
                                             </div>
                                             <div className="text-center text-lg lg:text-xl font-semibold mt-2 text-black">{item.name}</div>

@@ -2,7 +2,7 @@ export interface Product {
     id: number;
     name: string;
     price: number;
-    description: string;
+    description?: string;
     category: string;
     images: string[];
 }
@@ -11,10 +11,12 @@ export interface CartItem {
   id: number;
   name: string;
   price: number;
+  salePrice: number;
   quantity: number;
   discount: number;
   images: string[];
   description?: string; // Added optional description field
+  select: boolean; // Added optional description field
 }
 
 export interface Category {

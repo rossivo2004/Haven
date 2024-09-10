@@ -87,19 +87,25 @@ function BodyProduct() {
 
     const handleAddToCart = () => {
         if (product) {
-          dispatch(addItem({
-            id: product.id,
-            name: product.name,
-            images: product.images,
-            price: product.price - (product.price * product.discount) / 100,
-            quantity: quantity,
-          }));
-          toast.success('Thêm sản phẩm thành công')
-          setQuantity(1)
+            const salePrice = product.price - (product.price * product.discount) / 100;
+    
+            dispatch(addItem({
+                id: product.id,
+                name: product.name,
+                images: product.images,
+                price: product.price, 
+                salePrice: salePrice, 
+                quantity: quantity,
+                select: false,
+            }));
+    
+            toast.success('Thêm sản phẩm thành công');
+            setQuantity(1);
         } else {
-            toast.error('Thêm sản phẩm thất bại')
+            toast.error('Thêm sản phẩm thất bại');
         }
-      };
+    };
+    
       
 
     return (
@@ -136,10 +142,10 @@ function BodyProduct() {
 
                     <div className='flex gap-5 items-center mb-4'>
                         <div className='font-bold text-3xl text-price'>
-                            {priceDiscount} đ
+                            {priceDiscount.toLocaleString('vi-VN')} đ
                         </div>
                         <div className='flex flex-col font-normal text-base'>
-                            <div>{product?.price} đ</div>
+                            <div className='line-through'>{product?.price.toLocaleString('vi-VN')} đ</div>
                             {product?.discount !== undefined && product.discount > 0 ? (
                                 <div className='text-price'>
                                     Khuyến mãi <span>{product.discount}%</span>

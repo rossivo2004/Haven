@@ -138,7 +138,9 @@ export const DUMP_PRODUCTS = [
     name: "4K UHD LED Smart TV with Chromecast Built-in 1",
     price: 799000,
     images: [
-      "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain"
+      "https://th.bing.com/th/id/OIP.tbtNZFbXc4MIatG0eTbDxAHaFQ?w=1748&h=1240&rs=1&pid=ImgDetMain",
+      "https://th.bing.com/th?id=OIP.Xs9KysdysEhbkQJk981WVgHaE8&w=306&h=204&c=8&rs=1&qlt=90&o=6&cb=13&dpr=1.3&pid=3.1&rm=2",
+      "https://th.bing.com/th?id=OIF.bz62QooaFDVBa6O%2bydqmBw&w=273&h=192&c=7&r=0&o=5&dpr=1.3&pid=1.7"
     ],
     discount: 23,
     category: "Smart Phone",
@@ -394,8 +396,6 @@ export const DUMP_PRODUCTS = [
     category: "Smart Phone",
   },
 ];
-
-
 
 export const DUMP_NEWS = [
   {

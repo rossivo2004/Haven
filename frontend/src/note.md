@@ -1,11 +1,10 @@
-'use client';
+'use client'
 import React, { useState, useEffect } from 'react';
 import { Checkbox } from "@nextui-org/react";
 import { useDispatch, useSelector } from 'react-redux';
-import { selectTotalItems, removeItem, updateQuantity, setPoints, selectAllItems, toggleSelectItem } from '@/src/store/cartSlice';
+import { selectTotalItems, removeItem, updateQuantity, setSelectedItems, setPoints, toggleSelectItem } from '@/src/store/cartSlice';
 import { CartItem } from '@/src/interface';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Link from 'next/link';
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -13,6 +12,7 @@ const Body_Cart = () => {
     const totalItems = useSelector(selectTotalItems);
     const point = useSelector((state: { cart: { point: number } }) => state.cart.point);
 
+    const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -22,43 +22,89 @@ const Body_Cart = () => {
         }
     };
 
+
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
+    const handleCheckSelected = (id: number) => {
+        setSelectedItems(prevSelected => {
+            const updatedCart = cart.map(item => {
+                if (item.id === id) {
+                    dispatch(toggleSelectItem(id)); // Dispatch the action to toggle the select state
+                    return { ...item, select: !item.select };
+                }
+                return item;
+            });
+
+            if (prevSelected.includes(id)) {
+                return prevSelected.filter(item => item !== id);
+            } else {
+                return [...prevSelected, id];
+            }
+        });
+    };
+
+
+    // Hàm check select
+    const checkSelect = () => {
+
+    }
+
+    const handleRemoveSelectedItems = () => {
+        selectedItems.forEach(id => {
+            dispatch(removeItem(id));
+        });
+        setSelectedItems([]); // Clear selection after deleting
+    };
+
+    // Hàm xử lý chọn hoặc bỏ chọn tất cả sản phẩm
+    const handleSelectAll = () => {
+        if (selectedItems.length === cart.length) {
+            setSelectedItems([]); // Bỏ chọn tất cả
+        } else {
+            setSelectedItems(cart.map((item) => item.id)); // Chọn tất cả
+        }
+    };
+
+    // Cập nhật tổng giá trị các sản phẩm được chọn
     useEffect(() => {
-        const total = cart.reduce((acc: number, item: CartItem) => {
-            if (item.select) {
+        const total = cart.reduce((acc: number, item: any) => {
+            if (selectedItems.includes(item.id)) {
                 return acc + item.salePrice * item.quantity;
             }
             return acc;
         }, 0);
 
         const pointS = total * 0.01;
-        const integerPoints = Math.floor(pointS);
+        const finalTotal = total - pointS;
+
+        // Convert pointS to an integer value
+        const integerPoints = Math.floor(pointS); // or use Math.round(pointS) to round to the nearest whole number
+
+        // Update the Redux store with the integer point value
         dispatch(setPoints(integerPoints));
 
         setTotalSelectedPrice(total);
-    }, [cart, dispatch]);
+    }, [selectedItems, cart, dispatch]);
 
-    const handleSelectAllChange = () => {
-        const allSelected = !cart.every(item => item.select);
-        dispatch(selectAllItems(allSelected));
-    };
+
 
     if (!isMounted) return null;
+
+    console.log(cart);
+
 
     return (
         <div className="max-w-7xl mx-auto p-6">
             <h1 className="text-4xl font-bold mb-6 text-center">Giỏ Hàng</h1>
             {cart.length > 0 ? (
                 <Checkbox
-                    isSelected={cart.every(item => item.select)}
-                    onChange={handleSelectAllChange}
+                    isSelected={selectedItems.length === cart.length}
+                    onChange={handleSelectAll}
                     className='pl-42'
-                >
-                    Chọn tất cả
-                </Checkbox>
+                />
             ) : null}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -69,8 +115,8 @@ const Body_Cart = () => {
                                 <div className="flex justify-between items-center border-b pb-4 mb-4">
                                     <div className="flex items-center">
                                         <Checkbox
-                                            isSelected={item.select}
-                                            onChange={() => dispatch(toggleSelectItem(item.id))}
+                                            isSelected={selectedItems.includes(item.id)}
+                                            onChange={() => handleCheckSelected(item.id)}
                                             className="mr-4"
                                         />
                                         <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
@@ -90,9 +136,13 @@ const Body_Cart = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="text-red-500 font-bold">{item.salePrice.toLocaleString()} đ</span><br />
+                                        {/* <span className="text-xs text-gray-500 line-through">{item.price.toLocaleString('vi-VN')} đ</span><br /> */}
                                         <div className='flex items-center justify-end' onClick={() => dispatch(removeItem(item.id))}>
                                             <DeleteIcon className='hover:text-red-600 cursor-pointer' />
                                         </div>
+                                        {item.discount && (
+                                            <div className="text-sm text-gray-500 line-through">{item.discount.toLocaleString()} đ đã giảm giá</div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -103,9 +153,9 @@ const Body_Cart = () => {
 
                     <div className='flex justify-between items-center'>
                         <div>
-                            {cart.some(item => item.select) && (
+                            {selectedItems.length > 0 && (
                                 <div className="flex justify-end">
-                                    <div onClick={() => cart.forEach(item => item.select && dispatch(removeItem(item.id)))} className="text-red-600 cursor-pointer">
+                                    <div onClick={handleRemoveSelectedItems} className="text-red-600 cursor-pointer">
                                         <DeleteIcon className='hover:text-red-600 cursor-pointer' />
                                         <span>Xóa sản phẩm đã chọn</span>
                                     </div>
@@ -134,6 +184,12 @@ const Body_Cart = () => {
                     </div>
 
                     <div className="mb-4">
+                        <label className="block text-lg font-medium pb-2">Ghi chú đơn hàng</label>
+                        <textarea className="w-full p-2 border rounded" placeholder="Nhập nội dung"></textarea>
+                        <hr className="border-t-1 border-black mt-2" />
+                    </div>
+
+                    <div className="mb-4">
                         <p className="block text-lg font-medium">Thời gian giao hàng dự kiến</p>
                         <p>5 ngày làm việc</p>
                         <hr className="border-t-1 border-black mt-2" />
@@ -142,11 +198,15 @@ const Body_Cart = () => {
                     <div className="py-4">
                         <div className="flex justify-between mb-2">
                             <span>Tổng tiền</span>
-                            <span>{totalSelectedPrice.toLocaleString()} đ</span>
+                            <span>{totalSelectedPrice.toLocaleString()} đ</span> {/* Correctly display total */}
                         </div>
                         <div className="flex justify-between mb-2">
                             <span>Khuyến mãi (Điểm tích lũy)</span>
-                            <span>0 đ</span>
+                            <span>0 đ</span> {/* Correctly display points-based discount */}
+                        </div>
+                        <div className="flex justify-between mb-2">
+                            <span>Phí vận chuyển</span>
+                            <span>00,000,000</span>
                         </div>
                         <div className="flex justify-between mb-2">
                             <span>Số điểm tích lũy</span>
@@ -158,18 +218,9 @@ const Body_Cart = () => {
                         </div>
                     </div>
 
-                    {cart.some(item => item.select) ? (
-                        <Link href={'/checkout'}>
-                            <button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
-                                Tiếp tục
-                            </button>
-                        </Link>
-                    ) : (
-                        <button disabled className='w-full bg-gray-500 text-white p-3 rounded mt-4 font-bold'>
-                            Vui lòng chọn sản phẩm để thanh toán
-                        </button>
-                    )}
-
+                    <button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
+                        Tiếp tục
+                    </button>
                 </div>
             </div>
         </div>

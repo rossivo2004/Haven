@@ -22,8 +22,8 @@ function BoxProduct({ product }: { product: ProductProps }) {
                 <div className="font-semibold lg:text-xl text-base text-start group-hover:text-main">
                     {name}
                 </div>
-                <div className="flex justify-between items-center mt-4 gap-2">
-                    <div className="font-bold lg:text-[22px] text-base text-red-600 flex-nowrap">
+                <div className="flex justify-between items-center gap-2">
+                    <div className="font-bold lg:text-[18px] text-base text-red-600 flex-nowrap">
                     {formatVND(parseFloat(discountedPrice.toFixed(0)))} <span className="underline"></span>
                     </div>
                     {discount > 0 && ( 

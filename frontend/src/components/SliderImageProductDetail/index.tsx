@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Import the carousel styles
 import './style.css';
+import {Spinner} from "@nextui-org/react";
 
 interface ImageSwiperProps {
     imgDemo: string[]; // Assure this is an array of strings
@@ -12,7 +13,7 @@ const ImageSwiper: React.FC<ImageSwiperProps> = ({ imgDemo }) => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     if (!imgDemo || imgDemo.length === 0) {
-        return <div>No images available</div>; // Optional: Show a message if no images are provided
+        return <div className='w-full h-full flex items-center justify-center'><Spinner/></div>;
     }
 
     return (
