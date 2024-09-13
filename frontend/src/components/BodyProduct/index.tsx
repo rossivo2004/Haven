@@ -22,16 +22,16 @@ function BodyProduct() {
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [priceDiscount, setPriceDiscount] = useState(0);
 
-    const [quantity, setQuantity] = useState(1); 
+    const [quantity, setQuantity] = useState(1);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
 
     const handleQuantityChange = (value: number) => {
         if (value > 0) {
-          setQuantity(value);
+            setQuantity(value);
         }
-      };
+    };
 
     useEffect(() => {
         if (id_product) {
@@ -82,25 +82,26 @@ function BodyProduct() {
     const handleAddToCart = () => {
         if (product) {
             const salePrice = product.price - (product.price * product.discount) / 100;
-    
+
             dispatch(addItem({
                 id: product.id,
                 name: product.name,
                 images: product.images,
-                price: product.price, 
-                salePrice: salePrice, 
+                price: product.price,
+                salePrice: salePrice,
                 quantity: quantity,
                 select: false,
+                // stock: product.stock,
             }));
-    
+
             toast.success('Thêm sản phẩm thành công');
             setQuantity(1);
         } else {
             toast.error('Thêm sản phẩm thất bại');
         }
     };
-    
-      
+
+
 
     return (
         <div className="max-w-screen-xl lg:mx-auto mx-4">
@@ -132,17 +133,20 @@ function BodyProduct() {
                         <p className="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">5</p>
                     </div>
 
-                    <div className='lg:text-base text-[13px] font-normal mb-4'>Tình trạng: <span className='text-red-600 font-bold'>Còn hàng</span></div>
+                    <div className='lg:text-base text-[13px] font-normal mb-4'>Tình trạng: <span className='text-red-600 font-bold'>{product && product.stock !== undefined && product.stock > 0 ? 'còn hàng' : 'hết hàng'}
+                    </span></div>
 
                     <div className='flex gap-5 items-center mb-4'>
                         <div className='font-bold text-3xl text-price'>
                             {priceDiscount.toLocaleString('vi-VN')} đ
                         </div>
                         <div className='flex flex-col font-normal text-base'>
-                            <div className='line-through'>{product?.price.toLocaleString('vi-VN')} đ</div>
                             {product?.discount !== undefined && product.discount > 0 ? (
-                                <div className='text-price'>
-                                    Khuyến mãi <span>{product.discount}%</span>
+                                <div>
+                                    <div className='line-through'>{product?.price.toLocaleString('vi-VN')} đ</div>
+                                    <div className='text-price'>
+                                        Khuyến mãi <span>{product.discount}%</span>
+                                    </div>
                                 </div>
                             ) : null}
 
@@ -162,25 +166,25 @@ function BodyProduct() {
                     <div className="flex items-center gap-7 text-black py-5">
                         <span className="text-base sm:text-xl font-semibold">Số lượng</span>
                         <div className="flex items-center border border-gray-300">
-  <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
-  <Divider orientation="vertical" />
-  <input
-    type="text"
-    value={quantity}
-    onChange={(e) => handleQuantityChange(Number(e.target.value))}
-    min={1}
-    className="w-16 text-center border-none outline-none"
-  />
-  <Divider orientation="vertical" />
-  <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
-</div>
+                            <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
+                            <Divider orientation="vertical" />
+                            <input
+                                type="text"
+                                value={quantity}
+                                onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                                min={1}
+                                className="w-16 text-center border-none outline-none"
+                            />
+                            <Divider orientation="vertical" />
+                            <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
+                        </div>
 
                     </div>
                     <div className="flex flex-row gap-3">
                         <Button className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
                             Mua ngay
                         </Button>
-                        <Button  onClick={handleAddToCart} className="flex flex-1 bg-[#fff] border border-black text-base text-black font-semibold rounded py-7">
+                        <Button onClick={handleAddToCart} className="flex flex-1 bg-[#fff] border border-black text-base text-black font-semibold rounded py-7">
                             Thêm vào giỏ hàng
                         </Button>
                     </div>

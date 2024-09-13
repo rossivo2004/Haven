@@ -12,6 +12,9 @@ import { DUMP_SHIPPING_METHOD } from '@/src/dump';
 import { CartItem } from '@/src/interface';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { selectTotalItems, removeItem, updateQuantity, setSelectedItems, setPoints, toggleSelectItem } from '@/src/store/cartSlice';
+import { Switch } from "@nextui-org/react"
+import Link from 'next/link';
+import { IUser } from '@/src/interface';
 
 interface Province {
     id: string;
@@ -49,6 +52,8 @@ const CustomRadio = (props: any) => {
 
 function BodyCheckout() {
     const dispatch = useDispatch();
+    const [isMounted, setIsMounted] = useState(false);
+    const [usePoints, setUsePoints] = useState(false);
 
     const cart = useSelector((state: { cart: { items: CartItem[] } }) => state.cart.items);
     const [cartData, setCartData] = useState<CartItem[]>([]);
@@ -62,15 +67,23 @@ function BodyCheckout() {
     const [pointMM, setPointMM] = useState<number>(0);
     const [ship, setShip] = useState<number>(0);
     const [sum, setSum] = useState<number>(0);
-    const [disscount, setDisscount] = useState<number>(0);
+    const [discount, setDiscount] = useState<number>(0);
+    const [user, setUser] = useState<IUser | null>(null);
 
 
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
-    
+
     const selectedItems = cart.filter(item => item.select);
 
     const priceDisscount = useSelector((state: { cart: { priceDisscount: number } }) => state.cart.priceDisscount);
-const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.sum);
+    const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.sum);
+
+console.log(selectedItems);
+
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         setCartData(selectedItems);
@@ -82,6 +95,7 @@ const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.su
             .then(response => {
                 if (response.data.error === 0) {
                     setProvinces(response.data.data);
+                    
                 }
             })
             .catch(error => console.error('Error fetching provinces:', error));
@@ -94,6 +108,8 @@ const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.su
                 .then(response => {
                     if (response.data.error === 0) {
                         setDistricts(response.data.data);
+                    console.log(response.data.data);
+                        
                         setWards([]); // Clear wards when district changes
                         setSelectedDistrict(''); // Reset selected district
                     }
@@ -140,16 +156,34 @@ const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.su
         } else {
             setShip(30000)
         }
-        
+
     }, [selectedProvince]);
 
 
     useEffect(() => {
-        setSum(totalSum + ship);
-    }, [totalSelectedPrice, ship]);
-    
-    console.log(selectedProvince);
-    console.log(ship);
+        setSum(totalSelectedPrice + ship - discount);
+    }, [totalSelectedPrice, ship, discount]);
+
+    // console.log(selectedProvince);
+    // console.log(ship);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (usePoints && user) {
+            const pointsValue: number = user?.point ?? 0; // Số điểm người dùng hiện có
+            const maxDiscount = totalSelectedPrice * 0.5; // Giới hạn giảm giá là 50% giá trị đơn hàng
+            const applicableDiscount = Math.min(pointsValue, maxDiscount); // Giảm giá tối đa là 50% hoặc số điểm người dùng có
+            setDiscount(applicableDiscount);
+        } else {
+            setDiscount(0);
+        }
+    }, [usePoints, user, totalSelectedPrice]);
     
 
     return (
@@ -310,45 +344,63 @@ const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.su
                                 <ul>
                                     {cartData.map((item, index) => (
                                         <li key={index} className="flex justify-between items-center border-b pb-4 mb-4">
-                                              <div className="flex items-start h-full">
-                                            <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
-                                            <div className='flex flex-col justify-between h-full'>
-                                                <p className="font-semibold">{item.name}</p>
-                                                <p className="text-sm text-gray-600"> x{item.quantity}</p>
+                                            <div className="flex items-start h-full">
+                                                <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
+                                                <div className='flex flex-col justify-center h-[96px] w-full'>
+                                                    <p className="font-semibold">{item.name}</p>
+                                                    <p className="text-sm text-gray-600"> x{item.quantity}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="text-red-500 font-bold">{item.price.toLocaleString()} đ</span><br />
-                                            <span className="text-xs text-gray-500 "><span className='line-through'>{item.price.toLocaleString()}</span> đ đã giảm giá</span>
-                                        </div>
+                                            <div className="text-right">
+                                                <span className="text-red-500 font-bold">{item.price.toLocaleString()} đ</span><br />
+                                                <span className="text-xs text-gray-500 "><span className='line-through'>{item.price.toLocaleString()}</span> đ đã giảm giá</span>
+                                            </div>
                                         </li>
                                     ))}
                                 </ul>
                                 <div className="py-4">
-                                <div className="flex justify-between mb-2">
-                                    <span>Tổng tiền</span>
-                                    <span>{totalSum.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between mb-2">
-                                    <span>Khuyến mãi</span>
-                                    <span>{priceDisscount.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between mb-2">
-                                    <span>Phí vận chuyển</span>
-                                    <span>
-    {ship === 0 ? 'Miễn phí' : ship.toLocaleString()}
-</span>
+                                    <div className="flex justify-between mb-2">
+                                        <span>Tổng tiền</span>
+                                        {/* Check if component has mounted to render the correct value */}
+                                        <span>{isMounted ? totalSum.toLocaleString() : 0}</span>
+                                    </div>
 
+                                    <div className="flex justify-between mb-2">
+                                        <span>Phí vận chuyển</span>
+                                        <span>{isMounted ? (ship === 0 ? 'Miễn phí' : ship.toLocaleString()) : '...'}</span>
+                                    </div>
+                                    <div className="flex justify-between mb-2">
+                                        <span>Số điểm tích lũy</span>
+                                        <span>{isMounted ? pointMM : 0}</span>
+                                    </div>
+                                    <div className='mb-2 flex justify-between items-center'>
+                                        {user ? (
+                                            <>
+                                                <div className='flex items-center'>
+                                                    Dùng <span className='mx-1 font-semibold'>{user.point}</span> điểm
+                                                </div>
+                                                <div>
+                                                    <Switch
+                                                        size='sm'
+                                                        checked={usePoints}
+                                                        onChange={(e) => setUsePoints(e.target.checked)}
+                                                        aria-label="Use points to reduce order total"
+                                                        className='mr-0'
+                                                    />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div>
+                                                Vui lòng <Link href={'#'} className='underline'>Đăng nhập</Link> để sử dụng điểm.
+                                            </div>
+                                        )}
+
+                                    </div>
+                                    <div className="flex justify-between font-bold text-lg">
+                                        <span>Tổng thanh toán</span>
+                                        <span className='text-2xl text-price'>{isMounted ? sum.toLocaleString() : 0}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between mb-2">
-                                    <span>Số điểm tích lũy</span>
-                                    <span>{pointMM}</span>
-                                </div>
-                                <div className="flex justify-between font-bold text-lg">
-                                    <span>Tổng thanh toán</span>
-                                    <span>{sum.toLocaleString()}</span>
-                                </div>
-                            </div>
                                 <Button className="w-full mt-4 bg-main font-semibold text-white">Đặt hàng</Button>
                             </div>
                         </div>

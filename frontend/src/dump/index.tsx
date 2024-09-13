@@ -56,7 +56,8 @@ export const USER: IUser = {
   email: "nguyenvana@example.com",
   username: "nguyenvana",
   password: "password123",
-  avatar: "/images/8951e533806bc54e0828a60a67c4c731.png"
+  avatar: "/images/8951e533806bc54e0828a60a67c4c731.png",
+  point: 0
 }
 
 export const GENDER = [
@@ -144,6 +145,7 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 23,
     category: "Smart Phone",
+    stock: 10
   },
   {
     id: 2,
@@ -154,6 +156,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 13,
     category: "Smart Phone",
+    stock: 1
+
   },
   {
     id: 3,
@@ -164,6 +168,7 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 10,
     category: "Smart Phone",
+    stock: 0
   },
   {
     id: 4,
@@ -174,6 +179,7 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 10,
     category: "Smart Phone",
+    stock: 20
   },
   {
     id: 5,
@@ -184,6 +190,7 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "Laptop",
+    stock: 10
   },
   {
     id: 6,
@@ -204,6 +211,7 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "Laptop",
+    stock: 10
   },
   {
     id: 8,
@@ -214,6 +222,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "Laptop",
+    stock: 10
+
   },
   {
     id: 9,
@@ -224,6 +234,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "Laptop",
+    stock: 10
+
   },
   {
     id: 10,
@@ -234,6 +246,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 30,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 11,
@@ -244,6 +258,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 30,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 12,
@@ -254,6 +270,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 230000,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 13,
@@ -264,6 +282,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 320000,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 14,
@@ -274,6 +294,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 30,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 15,
@@ -284,6 +306,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 16,
@@ -294,6 +318,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 17,
@@ -304,6 +330,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 18,
@@ -314,6 +342,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 19,
@@ -324,6 +354,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 20,
@@ -334,6 +366,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 21,
@@ -344,6 +378,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 50,
     category: "Smart Phone",
+    stock: 10
+
   },
   {
     id: 22,
@@ -354,6 +390,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 50,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 23,
@@ -364,6 +402,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 50,
     category: "TV",
+    stock: 10
+
   },
   {
     id: 24,
@@ -374,6 +414,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 50,
     category: "Laptop",
+    stock: 10
+
   },
   {
     id: 25,
@@ -384,6 +426,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 0,
     category: "Headphone",
+    stock: 10
+
   },
   {
     id: 26,
@@ -394,6 +438,8 @@ export const DUMP_PRODUCTS = [
     ],
     discount: 50,
     category: "Smart Phone",
+    stock: 10
+
   },
 ];
 

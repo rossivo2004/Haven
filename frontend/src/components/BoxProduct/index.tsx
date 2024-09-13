@@ -10,7 +10,7 @@ function BoxProduct({ product }: { product: ProductProps }) {
 
     return (
         <Link href={`/product/${id}`}>
-        <div className="w-full h-auto lg:h-[380px] flex flex-col group">
+        <div className="w-full h-auto lg:h-[360px] flex flex-col group">
             <div className="w-full h-[140px] object-cover lg:h-[250px] flex items-center justify-center overflow-hidden rounded-lg">
                 <img
                     src={images[0]}
@@ -23,7 +23,7 @@ function BoxProduct({ product }: { product: ProductProps }) {
                     {name}
                 </div>
                 <div className="flex justify-between items-center gap-2">
-                    <div className="font-bold lg:text-[18px] text-base text-red-600 flex-nowrap">
+                    <div className="font-bold lg:text-2xl text-base text-red-600 flex-nowrap">
                     {formatVND(parseFloat(discountedPrice.toFixed(0)))} <span className="underline"></span>
                     </div>
                     {discount > 0 && ( 

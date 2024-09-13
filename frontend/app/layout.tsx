@@ -11,6 +11,7 @@ import Header from "@/src/components/Header";
 import Footer from "@/src/components/Footer";
 
 import { StoreProvider } from "@/src/store/StoreProvider";
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -38,6 +39,7 @@ export default function RootLayout({
          <Header />
          <ToastContainer />
               {children}
+              <Analytics />
            <Footer />
         </Providers>
       </body>

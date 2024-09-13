@@ -7,10 +7,10 @@ import { CartItem } from '@/src/interface';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Link from 'next/link';
 import { Chip } from "@nextui-org/react";
-
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import VoucherSelector from '../VoucherSelector';
 import { Voucher } from '@/src/interface';
-
+import CloseIcon from '@mui/icons-material/Close';
 const availableVouchers: Voucher[] = [
     { id: '1', code: 'DISCOUNT10', discount: 10 },
     { id: '2', code: 'DISCOUNT20', discount: 20 },
@@ -24,7 +24,7 @@ const Body_Cart = () => {
     const point = useSelector((state: { cart: { point: number } }) => state.cart.point);
 
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
-    const [disscount, setDisscount] = useState<number>(0);
+    // const [disscount, setDisscount] = useState<number>(0);
     const [totalAfterDiscount, setTotalAfterDiscount] = useState<number>(0);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -60,32 +60,32 @@ const Body_Cart = () => {
         dispatch(selectAllItems(allSelected));
     };
 
-    const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+    // const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
 
-    const handleVoucherSelected = (voucher: Voucher | null) => {
-        setSelectedVoucher(voucher);
-        if (voucher) {
-            // Calculate discount
-            const discountAmount = (totalSelectedPrice * voucher.discount) / 100;
-            const newTotalAfterDiscount = totalSelectedPrice - discountAmount;
+    // const handleVoucherSelected = (voucher: Voucher | null) => {
+    //     setSelectedVoucher(voucher);
+    //     if (voucher) {
+    //         // Calculate discount
+    //         const discountAmount = (totalSelectedPrice * voucher.discount) / 100;
+    //         const newTotalAfterDiscount = totalSelectedPrice - discountAmount;
     
-            // Set component state
-            setTotalAfterDiscount(newTotalAfterDiscount);
-            setDisscount(discountAmount);
+    //         // Set component state
+    //         setTotalAfterDiscount(newTotalAfterDiscount);
+    //         setDisscount(discountAmount);
     
-            // Update Redux state
-            dispatch(setPriceDisscount(discountAmount));
-            dispatch(setSum(newTotalAfterDiscount)); // Update total sum after discount
-        } else {
-            // Reset discount if no voucher is selected
-            setTotalAfterDiscount(totalSelectedPrice);
-            setDisscount(0);
+    //         // Update Redux state
+    //         dispatch(setPriceDisscount(discountAmount));
+    //         dispatch(setSum(newTotalAfterDiscount)); // Update total sum after discount
+    //     } else {
+    //         // Reset discount if no voucher is selected
+    //         setTotalAfterDiscount(totalSelectedPrice);
+    //         setDisscount(0);
     
-            // Reset Redux state
-            dispatch(setPriceDisscount(0));
-            dispatch(setSum(totalSelectedPrice)); // Reset sum to original total
-        }
-    };
+    //         // Reset Redux state
+    //         dispatch(setPriceDisscount(0));
+    //         dispatch(setSum(totalSelectedPrice)); // Reset sum to original total
+    //     }
+    // };
     
 
     if (!isMounted) return null;
@@ -117,7 +117,7 @@ const Body_Cart = () => {
                                         />
                                         <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
                                         <div>
-                                            <p className="font-semibold">{item.name}</p>
+                                            <p className="text-xl font-semibold">{item.name}</p>
                                             {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
                                             <div className="flex items-center mt-2">
                                                 <button
@@ -130,10 +130,13 @@ const Body_Cart = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="text-red-500 font-bold">{item.salePrice.toLocaleString()} đ</span><br />
+                                    <div className="text-right flex gap-2">
+                                        <div>
+                                        <span className="text-gray-500 text-sm">{item.salePrice.toLocaleString()} đ</span>
+<div className='text-2xl text-price font-bold'>{(item.salePrice * item.quantity).toLocaleString()} đ</div>
+                                        </div>
                                         <div className='flex items-center justify-end' onClick={() => dispatch(removeItem(item.id))}>
-                                            <DeleteIcon className='hover:text-red-600 cursor-pointer' />
+                                            <CloseIcon className='hover:text-red-600 cursor-pointer' />
                                         </div>
                                     </div>
                                 </div>
@@ -154,27 +157,28 @@ const Body_Cart = () => {
                                 </div>
                             )}
                         </div>
-                        {cart.length > 0 ? (
+                        {/* {cart.length > 0 ? (
                             <div className="text-right font-semibold">
                                 Tổng Khối Lượng Giỏ Hàng: <span className="text-black">0.5Kg</span>
                             </div>
-                        ) : null}
+                        ) : null} */}
                     </div>
                 </div>
 
                 <div className="bg-white p-6 rounded shadow-sm">
-                    <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
+                    <h2 className="text-2xl font-semibold mb-4">Cộng Giỏ Hàng</h2>
 
-                    <div className="mb-4">
+
+                    {/* <div className="mb-4">
                         <div className="flex flex-col w-full">
                             <VoucherSelector availableVouchers={availableVouchers} onVoucherSelected={handleVoucherSelected} />
                         </div>
                         <hr className="border-t-1 border-black mt-2" />
-                    </div>
+                    </div> */}
 
                     <div className="mb-4">
                         <p className="block text-lg font-medium">Thời gian giao hàng dự kiến</p>
-                        <p>5 ngày làm việc</p>
+                        <p>1 - 2 ngày sau khi đặt hàng</p>
                         <hr className="border-t-1 border-black mt-2" />
                     </div>
 
@@ -183,17 +187,17 @@ const Body_Cart = () => {
                             <span>Tổng tiền</span>
                             <span>{totalSelectedPrice.toLocaleString()} đ</span>
                         </div>
-                        <div className="flex justify-between mb-2">
+                        {/* <div className="flex justify-between mb-2">
                             <span>Khuyến mãi</span>
                             <span>{disscount.toLocaleString()} đ</span>
-                        </div>
+                        </div> */}
                         <div className="flex justify-between mb-2">
                             <span>Số điểm tích lũy</span>
-                            <span>{point}</span>
+                            <span>{point} điểm</span>
                         </div>
                         <div className="flex justify-between font-bold text-lg">
                             <span>Tổng thanh toán</span>
-                            <span>{totalAfterDiscount.toLocaleString()} đ</span>
+                            <span className='text-2xl text-price'>{totalAfterDiscount.toLocaleString()} đ</span>
                         </div>
                     </div>
 
@@ -203,7 +207,7 @@ const Body_Cart = () => {
                         </Link>
                     ) : (
                         <div className="w-full text-center">
-                            <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm để thanh toán</p>
+                            <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm <br/> để thanh toán</p>
                         </div>
                     )}
                 </div>

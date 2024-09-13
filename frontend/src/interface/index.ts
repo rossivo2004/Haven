@@ -17,6 +17,7 @@ export interface CartItem {
   images: string[];
   description?: string; // Added optional description field
   select: boolean; // Added optional description field
+  stock: number; // Added optional
 }
 
 export interface Category {
@@ -70,23 +71,28 @@ export interface IPromotion {
     email?: string,
     username?: string,
     password?: string,
-    avatar?: string
-  }
+    avatar?: string,
+    point?: number
+}
   
   export interface ProductProps {
-    id: number;
-    name: string;
-    images: string[];
-    price: number;
-    discount: number;
-    category: string;
-    
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  salePrice?: number;
+  quantity?: number;
+  discount: number;
+  images: string[];
+  description?: string; // Added optional description field
+  select?: boolean; // Added optional description field
+  stock?: number; // Added optional
   }
   
   export interface ItemCart {
     product: ProductProps,
     quantity: number,
-    selected?: boolean
+    selected?: boolean,
   }
   
   export interface IOrders {
