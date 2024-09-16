@@ -74,25 +74,15 @@ const BobyBanner: React.FC = () => {
                 </div>
                 <div>
                     {/* Button to open the "Thêm mới" modal */}
-                    <Button onPress={() => setAddModalOpen(true)}>Thêm thương hiệu</Button>
+                    <Button onPress={() => setAddModalOpen(true)}>Thêm banner</Button>
 
                     {/* "Thêm mới" Modal */}
                     <Modal size="5xl" scrollBehavior="inside" isOpen={addModalOpen} onOpenChange={setAddModalOpen} isDismissable={false} isKeyboardDismissDisabled={true}>
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader className="flex flex-col gap-1">Thêm mới thương hiệu</ModalHeader>
+                                    <ModalHeader className="flex flex-col gap-1">Thêm mới banner</ModalHeader>
                                     <ModalBody>
-                                        <div className="flex gap-5 lg:flex-row flex-col mb-5">
-                                            <div className="lg:w-1/2 w-full">
-                                                <label htmlFor="">Tên thương hiệu</label>
-                                                <Input placeholder="Tên thương hiệu" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label htmlFor="">Tag thương hiệu</label>
-                                                <Input placeholder="Tag thương hiệu" />
-                                            </div>
-                                        </div>
                                         <div>
                                             <label htmlFor="">Hình ảnh</label>
                                             <Input type="file" accept="image/*" className="mb-2" onChange={handleImageChange} />
@@ -169,7 +159,7 @@ const BobyBanner: React.FC = () => {
                                         {/* Display the old image */}
                                         <div>
                                             <label>Hình ảnh cũ:</label>
-                                            {oldImage && <img src={oldImage} alt="Old" className="mt-2 h-32 w-32 object-cover" />}
+                                            {oldImage && <img src={oldImage} alt="Old" className="mt-2 h-32 w-auto object-cover" />}
                                         </div>
                                         
                                         {/* Upload and preview new image */}
@@ -177,7 +167,7 @@ const BobyBanner: React.FC = () => {
                                             <label>Chọn hình ảnh mới:</label>
                                             <Input type="file" accept="image/*" className="mb-4" onChange={handleNewImageChange} />
                                             {/* Preview the newly selected image */}
-                                            {newImage && <img src={newImage} alt="New" className="mt-2 h-32 w-32 object-cover" />}
+                                            {newImage && <img src={newImage} alt="New" className="mt-2 h-32 w-auto object-cover" />}
                                         </div>
                                     </div>
                                 </ModalBody>

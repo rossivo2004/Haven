@@ -10,7 +10,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDi
 import { Input } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/input";
-
+import { Link } from "@nextui-org/react";
 const statusColorMap: Record<string, ChipProps["color"]> = {
     active: "success",
     paused: "danger",
@@ -132,7 +132,9 @@ export default function TableProduct() {
                     <div className="relative flex items-center gap-2 justify-center">
                         <Tooltip content="Details">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+<Link href="/shop" isExternal>
                                 <EyeIcon />
+</Link>
                             </span>
                         </Tooltip>
                         <Tooltip content="Edit product">
