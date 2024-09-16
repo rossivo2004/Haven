@@ -1,5 +1,5 @@
 // components/Sidebar/Sidebar.tsx
-'use client'
+'use client';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -10,6 +10,8 @@ import WidgetsIcon from '@mui/icons-material/Widgets';
 import PeopleIcon from '@mui/icons-material/People';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import DiscountIcon from '@mui/icons-material/Discount';
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,9 +83,16 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/discounts">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/discounts' ? 'sidebar_active' : ''}`}>
-                    <DiscountIcon className="mr-2" /> Mã giảm giá
+                <Link href="/brand">
+                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/brand' ? 'sidebar_active' : ''}`}>
+                    <BrandingWatermarkIcon className="mr-2" /> Thương hiệu
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link href="/banner">
+                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/banner' ? 'sidebar_active' : ''}`}>
+                    <ViewCarouselIcon className="mr-2" /> Banner
                   </div>
                 </Link>
               </li>
@@ -92,6 +101,15 @@ const Sidebar: React.FC = () => {
         </div>
       </aside>
 
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
+          onClick={() => setIsOpen(false)} // Close sidebar when clicking on the overlay
+        ></div>
+      )}
+
+      {/* Toggle button */}
       <button className="fixed top-4 right-4 text-black z-30 md:hidden" onClick={() => setIsOpen(!isOpen)}>
         <DehazeIcon />
       </button>

@@ -1,0 +1,35 @@
+.mySwiper {
+    position: relative;
+}
+
+.swiper-button-prev, 
+.swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 40px; /* Adjust as needed */
+    height: 40px;
+    border-radius: 50%; /* Makes the button circular */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.swiper-button-prev {
+    left: 10px; /* Adjust based on design */
+}
+
+.swiper-button-next {
+    right: 10px; /* Adjust based on design */
+}
+
+/* Optional media queries for responsiveness */
+@media (max-width: 768px) {
+    .swiper-button-prev, 
+    .swiper-button-next {
+        width: 30px;
+        height: 30px;
+    }
+}

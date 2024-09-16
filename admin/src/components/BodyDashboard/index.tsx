@@ -94,6 +94,17 @@ const BodyDashboard: React.FC = () => {
             <div>
                 <Chart_Price />
             </div>
+
+            <div>
+            <iframe
+  src="https://vercel.com/duys-projects-07028252/haven/analytics"
+  width="100%"
+  height="600"
+  frameBorder="0"
+></iframe>
+
+
+            </div>
         </div>
 
     );

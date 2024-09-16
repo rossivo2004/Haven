@@ -5,12 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectTotalItems, removeItem, updateQuantity, setPoints, selectAllItems, toggleSelectItem, setSum, setPriceDisscount } from '@/src/store/cartSlice';
 import { CartItem } from '@/src/interface';
 import DeleteIcon from '@mui/icons-material/Delete';
+import BreadcrumbNav from '../Breadcrum';
 import Link from 'next/link';
 import { Chip } from "@nextui-org/react";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import VoucherSelector from '../VoucherSelector';
 import { Voucher } from '@/src/interface';
 import CloseIcon from '@mui/icons-material/Close';
+import Button from '@nextui-org/react';
+
 const availableVouchers: Voucher[] = [
     { id: '1', code: 'DISCOUNT10', discount: 10 },
     { id: '2', code: 'DISCOUNT20', discount: 20 },
@@ -91,7 +94,14 @@ const Body_Cart = () => {
     if (!isMounted) return null;
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-7xl mx-auto ">
+             <div className="flex justify-between items-center">
+                <div className="py-5 h-[62px]">
+                    <BreadcrumbNav
+                        items={[{ name: 'Trang chủ', link: '/' }, { name: 'Giỏ hàng', link: '#' }]}
+                    />
+                </div>
+            </div>
             <h1 className="text-4xl font-bold mb-6 text-center">Giỏ Hàng</h1>
             {cart.length > 0 ? (
                 <Checkbox
@@ -143,7 +153,17 @@ const Body_Cart = () => {
                             </div>
                         ))
                     ) : (
-                        <div className='w-full h-[400px] flex items-center justify-center text-xl'>Giỏ hàng trống</div>
+                        <div className='w-full h-[400px] flex flex-col items-center justify-center text-xl'>
+                            <div className='mb-4'>
+                                <img src="/images/cartnot.png" alt="" className='w-[220px] object-cover'/>
+                            </div>
+                            <div className='text-4xl font-medium mb-4'>Chưa có sản phẩm nào trong giỏ hàng</div>
+                            <div>
+                                <Link href={'/shop'}>
+                                    <button className='bg-main p-2 rounded-lg text-white'>QUAY TRỞ LẠI CỬA HÀNG</button>
+                                </Link>
+                            </div>
+                        </div>
                     )}
 
                     <div className='flex justify-between items-center'>

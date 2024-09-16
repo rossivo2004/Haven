@@ -61,6 +61,9 @@ function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const totalItems = useSelector(selectTotalItems);
     const [isMouseOver, setIsMouseOver] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
+    const [isDropdownVisible, setIsDropdownVisible] = useState(true); // Controls the dropdown visibility
 
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
@@ -71,6 +74,19 @@ function Header() {
         }
     };
 
+    const handleScroll = () => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            // Cuộn xuống, ẩn header
+            setIsVisible(false);
+        } else {
+            // Cuộn lên, hiện header
+            setIsVisible(true);
+        }
+
+        setLastScrollY(currentScrollY);
+    };
 
 
     const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
@@ -110,99 +126,123 @@ function Header() {
 
     useEffect(() => {
         if (debouncedSearch) {
-            const filtered = products.filter(product =>
-                product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-            );
-            setFilteredProducts(filtered);
-
-
+          const filtered = products.filter(product =>
+            product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+          );
+          setFilteredProducts(filtered);
+          setIsDropdownVisible(true); // Show dropdown when search changes
         } else {
-            setFilteredProducts([]);
+          setFilteredProducts([]);
+          setIsDropdownVisible(false); // Hide dropdown if search is empty
         }
-    }, [debouncedSearch, products]);
+      }, [debouncedSearch, products]);
+    
 
     useEffect(() => {
         setCartCount(totalItems);
     }, [totalItems]);
 
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            
+        };
+    }, [lastScrollY]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+          setIsDropdownVisible(false); // Hide dropdown on scroll
+          
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+    
+        return () => {
+          window.removeEventListener('scroll', handleScroll); // Clean up event listener
+        };
+      }, []);
+
 
     return (
         <div>
-            <div className="w-full bg-secondary lg:block hidden">
-                <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
-                    <Link href={"/"} className="cursor-pointer">
-                        <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" />
-                    </Link>
-                    <div
-                        className="relative flex-1 px-20"
-                        onMouseLeave={() => setIsMouseOver(false)}
-                        onMouseEnter={() => setIsMouseOver(true)}
-                    >
-                        <div className="relative w-full">
-                            <input
-                                value={search}
-                                onChange={(event) => setSearch(event.target.value)}
-                                onFocus={() => setIsFocused(true)}
-                                onBlur={() => {
-                                    // Chỉ ẩn nếu người dùng không hover vào kết quả tìm kiếm
-                                    if (!isMouseOver) {
-                                        setIsFocused(false);
-                                        setSearch('')
-                                    }
-                                }}
-                                className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm..."
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
-                                <SearchIcon />
-                            </div>
-                        </div>
-                        {(isFocused || isMouseOver) && search && (
-                            <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-                                <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
-                                <div className='flex gap-5 p-5'>
-                                    <div className='w-1/4'>
-                                        <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
-                                    </div>
-                                    <div className='flex-1'>
-                                        {loading ? (
-                                            <div className="flex items-center justify-center h-full"><Spinner /></div>
-                                        ) : filteredProducts.length > 0 ? (
-                                            <ul className='overflow-scroll h-[400px]'>
-                                                {filteredProducts.map((product) => (
-                                                    <li key={product.id} className="p-2 border-b hover:bg-gray-100 ">
-                                                        <a href={`/product/${product.id}`} className="flex gap-4 items-center ">
-                                                            <div className='w-14 h-14'>
-                                                                <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
-                                                            </div>
-                                                            <div>
-                                                                {product.name}
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        ) : (
-                                            <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
-                                        )}
+            <div className='lg:h-[130px]'>
+                <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
+                    }`}>
+                    <div className="w-full bg-secondary lg:block hidden">
+                        <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
+                            <Link href={"/"} className="cursor-pointer">
+                                <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" />
+                            </Link>
+                            <div
+                                className="relative flex-1 px-20"
+                                onMouseLeave={() => setIsMouseOver(false)}
+                                onMouseEnter={() => setIsMouseOver(true)}
+                            >
+                                <div className="relative w-full">
+                                    <input
+                                        value={search}
+                                        onChange={(event) => setSearch(event.target.value)}
+                                        onFocus={() => setIsFocused(true)}
+                                        onBlur={() => {
+                                            // Chỉ ẩn nếu người dùng không hover vào kết quả tìm kiếm
+                                            if (!isMouseOver) {
+                                                setIsFocused(false);
+                                                setSearch('')
+                                            }
+                                        }}
+                                        className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        type="text"
+                                        placeholder="Tìm kiếm sản phẩm..."
+                                    />
+                                    <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
+                                        <SearchIcon />
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-
-
-                    <div className="text-white flex gap-4 xl:text-sm lg:text-[10px]">
-                        <div className="flex items-center gap-1">
-                            <div><LocalPhoneIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
-                            <div className="xl:text-sm lg:text-[10px]">
-                                <div>Hotline</div>
-                                <div className="font-semibold">0326 482 490</div>
-                            </div>
+                                {(isDropdownVisible && (isFocused || isMouseOver) && debouncedSearch) && (
+        <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
+          <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
+          <div className='flex gap-5 p-5'>
+            <div className='w-1/4'>
+              <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
+            </div>
+            <div className='flex-1'>
+              {loading ? (
+                <div className="flex items-center justify-center h-full"><Spinner /></div>
+              ) : filteredProducts.length > 0 ? (
+                <ul className='overflow-scroll h-[400px]'>
+                  {filteredProducts.map((product) => (
+                    <li key={product.id} className="p-2 border-b hover:bg-gray-100">
+                      <a href={`/product/${product.id}`} className="flex gap-4 items-center">
+                        <div className='w-14 h-14'>
+                          <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
                         </div>
-                        <div className="flex items-center gap-1">
-                            {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
+                        <div>{product.name}</div>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+                            </div>
+
+
+                            <div className="text-white flex gap-4 xl:text-sm lg:text-[10px]">
+                                <div className="flex items-center gap-1">
+                                    <div><LocalPhoneIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
+                                    <div className="xl:text-sm lg:text-[10px]">
+                                        <div>Hotline</div>
+                                        <div className="font-semibold">0326 482 490</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
                             <div className="xl:text-sm lg:text-[10px]">
                                 <div>
                                     <Link href={'/signin'}>Đăng nhập</Link>
@@ -211,178 +251,180 @@ function Header() {
                                     <Link href={'/signup'}>Đăng kí</Link>
                                 </div>
                             </div> */}
-                            <div>
-                                <Dropdown placement="bottom-end">
-                                    <DropdownTrigger>
-                                        <Avatar
-                                            isBordered
-                                            size='sm'
-                                            as="button"
-                                            className="transition-transform"
-                                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                                        />
-                                    </DropdownTrigger>
-                                    <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                        <DropdownItem key="profile" className="h-14 gap-2">
-                                            <p className="font-semibold">Signed in as</p>
-                                            <p className="font-semibold">zoey@example.com</p>
-                                        </DropdownItem>
-                                        <DropdownItem key="settings">
-                                            <Link href={'/profile'}>
-                                                Trang cá nhân
-                                            </Link>
-                                        </DropdownItem>
-                                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                                        <DropdownItem key="analytics">
-                                        <Link href={'/profile/notify'}>
-                                                Thông báo
-                                            </Link>
-                                        </DropdownItem>
-                                        <DropdownItem key="system">
-                                        <Link href={'/profile/order'}>
-                                                Quản lí đơn hàng
-                                            </Link>
-                                        </DropdownItem>
-                                        <DropdownItem key="configurations">
-                                        <Link href={'/profile/promotion'}>
-                                                Mã giảm giá
-                                            </Link>
-                                        </DropdownItem>
-                                        <DropdownItem key="logout" color="danger">
-                                            Đăng xuất
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </Dropdown>
+                                    <div>
+                                        <Dropdown placement="bottom-end">
+                                            <DropdownTrigger>
+                                                <Avatar
+                                                    isBordered
+                                                    size='sm'
+                                                    as="button"
+                                                    className="transition-transform"
+                                                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                                                />
+                                            </DropdownTrigger>
+                                            <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                                <DropdownItem key="profile" className="h-14 gap-2">
+                                                    <p className="font-semibold">Signed in as</p>
+                                                    <p className="font-semibold">zoey@example.com</p>
+                                                </DropdownItem>
+                                                <DropdownItem key="settings">
+                                                    <Link href={'/profile'}>
+                                                        Trang cá nhân
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                                <DropdownItem key="analytics">
+                                                    <Link href={'/profile/notify'}>
+                                                        Thông báo
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="system">
+                                                    <Link href={'/profile/order'}>
+                                                        Quản lí đơn hàng
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="configurations">
+                                                    <Link href={'/profile/promotion'}>
+                                                        Mã giảm giá
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="logout" color="danger">
+                                                    Đăng xuất
+                                                </DropdownItem>
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                    </div>
+                                </div>
+
+                                <Tooltip 
+                                showArrow={true} 
+                                placement='bottom-end' 
+                                
+                                content={
+                                    <div>
+                                        <div className='p-4 min-w-[460px] max-w-[460px]'>
+                                            <div className='flex justify-end mb-4 items-center'>
+                                                <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
+                                            </div>
+
+                                            <div>
+                                                <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2'>
+                                                    {cart.length > 0 ? (
+                                                        cart.map((item: any) => (
+                                                            <li key={item.id} className='flex items-center gap-4 mb-2'>
+                                                                <div>
+                                                                    <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
+                                                                </div>
+                                                                <div>
+                                                                    <div className='max-w-[220px]'>{item.name}</div>
+                                                                    <div className="flex items-center">
+                                                                        <button
+                                                                            className="px-3 py-1 border rounded"
+                                                                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                                                        >
+                                                                            -
+                                                                        </button>
+                                                                        <span className="px-4">{item.quantity}</span>
+                                                                        <button
+                                                                            className="px-3 py-1 border rounded"
+                                                                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                                                        >
+                                                                            +
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div className='flex-1 text-right'>
+                                                                    <div className='text-price font-semibold'>
+                                                                        {item.price.toLocaleString('vi-VN')} VND
+                                                                    </div>
+                                                                    <div onClick={() => dispatch(removeItem(item.id))}>
+                                                                        <DeleteIcon className='hover:text-red-600 cursor-pointer' />
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        ))
+                                                    ) : (
+                                                        <div className='text-center py-4'>Giỏ hàng trống</div>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                            <div className='flex items-center justify-between mt-6'>
+                                                <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
+                                                {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
+                                            </div>
+                                        </div>
+                                    </div>
+                                }>
+                                    <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative">
+                                        <div className="relative">
+                                            <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
+                                            <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
+                                                {cartCount}
+                                            </span>
+                                        </div>
+                                        <Link href={'/cart'}>
+                                            <div>
+                                                <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
+                                                <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                </Tooltip>
                             </div>
                         </div>
-
-                        <Tooltip showArrow={true} placement='bottom-end' content={
-                            <div>
-
-                                <div className='p-4 min-w-[460px] max-w-[460px]'>
-                                    <div className='flex justify-end mb-4 items-center'>
-                                        <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
-                                    </div>
-
-                                    <div>
-                                        <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2'>
-
-
-                                            {cart.length > 0 ? (
-                                                cart.map((item: any) => (
-                                                    <li key={item.id} className='flex items-center gap-4 mb-2'>
-                                                        <div>
-                                                            <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
-                                                        </div>
-                                                        <div>
-                                                            <div className='max-w-[220px]'>{item.name}</div>
-                                                            <div className="flex items-center">
-                                                                <button
-                                                                    className="px-3 py-1 border rounded"
-                                                                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                                                >
-                                                                    -
-                                                                </button>
-                                                                <span className="px-4">{item.quantity}</span>
-                                                                <button
-                                                                    className="px-3 py-1 border rounded"
-                                                                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                                                >
-                                                                    +
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div className='flex-1 text-right'>
-                                                            <div className='text-price'>
-                                                                {item.price.toLocaleString('vi-VN')} VND
-                                                            </div>
-                                                            <div onClick={() => dispatch(removeItem(item.id))}>
-                                                                <DeleteIcon className='hover:text-red-600 cursor-pointer' />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))
-                                            ) : (
-                                                <div className='text-center py-4'>Giỏ hàng trống</div>
-                                            )}
-
-                                        </ul>
-                                    </div>
-                                    <div className='flex items-center justify-between mt-6'>
-                                        <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
-                                        {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
-                                    </div>
-                                </div>
-                            </div>
-                        }>
-                            <div className="flex items-center gap-1 max-w-[120px] min-w-[120px]">
-                                <div className="relative">
-                                    <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
-                                    <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
-                                        {cartCount}
-                                    </span>
-                                </div>
-                                <Link href={'/cart'}>
-                                    <div>
-                                        <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
-                                        <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
-                                    </div>
-                                </Link>
-                            </div>
-                        </Tooltip>
                     </div>
-                </div>
-            </div>
-            <div className='w-full lg:block bg-main hidden'>
-                <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
-                    <ul className='flex gap-10'>
-                        <li className='flex items-center'>
-                            <Link href={'/'}>TRANG CHỦ</Link>
-                        </li>
-                        <li className='flex items-center'>
-                            <Link href={'/blog'}>TIN TỨC</Link>
-                        </li>
-                        <li>
-                            <Tooltip
-                                isDismissable
-                                color="default"
-                                placement="bottom-end"
-                                content={
-                                    <div className="px-1 py-2 grid grid-cols-4 gap-4">
-                                        <div className='row-span-4'>
-                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[160px] rounded-lg h-auto object-cover' />
-                                        </div>
-                                        {CATEGORY.map((item, index) => (
-                                            <Link key={index} href={`/shop?category=${item.tag}`}>
-                                                <div className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                    <div className='mr-2'>
-                                                        <img src={`/images/${item.image}`} alt={item.name} className="w-8 h-8 object-cover rounded-lg" />
-                                                    </div>
-                                                    <div>{item.name}</div>
+                    <div className='w-full lg:block bg-main hidden'>
+                        <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
+                            <ul className='flex gap-10'>
+                                <li className='flex items-center'>
+                                    <Link href={'/'}>TRANG CHỦ</Link>
+                                </li>
+                                <li className='flex items-center'>
+                                    <Link href={'/blog'}>TIN TỨC</Link>
+                                </li>
+                                <li>
+                                    <Tooltip
+                                        isDismissable
+                                        color="default"
+                                        placement="bottom-end"
+                                        content={
+                                            <div className="px-1 py-2 grid grid-cols-4 gap-4">
+                                                <div className='row-span-4'>
+                                                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[160px] rounded-lg h-auto object-cover' />
                                                 </div>
+                                                {CATEGORY.map((item, index) => (
+                                                    <Link key={index} href={`/shop?category=${item.tag}`}>
+                                                        <div className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                            <div className='mr-2'>
+                                                                <img src={`/images/${item.image}`} alt={item.name} className="w-8 h-8 object-cover rounded-lg" />
+                                                            </div>
+                                                            <div>{item.name}</div>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        }
+                                    >
+                                        <div className='flex items-center sp_ar '>
+                                            <Link href={'/shop'}>
+                                                SẢN PHẨM
                                             </Link>
-                                        ))}
-                                    </div>
-                                }
-                            >
-                                <div className='flex items-center sp_ar '>
-                                    <Link href={'/shop'}>
-                                        SẢN PHẨM
-                                    </Link>
-                                    <div className='sp_ar__down'>
-                                        <KeyboardArrowDownIcon />
-                                    </div>
-                                </div>
-                            </Tooltip>
+                                            <div className='sp_ar__down'>
+                                                <KeyboardArrowDownIcon />
+                                            </div>
+                                        </div>
+                                    </Tooltip>
 
-                        </li>
-                        <li className='flex items-center'>
-                            <Link href={'/contact'}>LIÊN HỆ</Link>
-                        </li>
-                        <li className='flex items-center'>
-                            <Link href={'/tracking'}>TRA CỨU</Link>
-                        </li>
-                    </ul>
+                                </li>
+                                <li className='flex items-center'>
+                                    <Link href={'/contact'}>LIÊN HỆ</Link>
+                                </li>
+                                <li className='flex items-center'>
+                                    <Link href={'/tracking'}>TRA CỨU</Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -461,7 +503,7 @@ function Header() {
                                         </DropdownItem>
                                         <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                         <DropdownItem key="analytics">
-                                        <Link href={'/profile'}>
+                                            <Link href={'/profile'}>
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>

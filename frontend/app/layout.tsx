@@ -9,9 +9,12 @@ import { Providers } from "./providers";
 
 import Header from "@/src/components/Header";
 import Footer from "@/src/components/Footer";
+import BtnToTop from "@/src/components/BtnToTop";
 
 import { StoreProvider } from "@/src/store/StoreProvider";
+
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -37,9 +40,11 @@ export default function RootLayout({
       <body>
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
          <Header />
-         <ToastContainer />
+         <ToastContainer className='mt-18'/>
+         <BtnToTop />
               {children}
               <Analytics />
+              <SpeedInsights />
            <Footer />
         </Providers>
       </body>

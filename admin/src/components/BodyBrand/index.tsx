@@ -1,15 +1,24 @@
-'use client'
+'use client';
+import { useState, ChangeEvent } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import TableCategory from "../TableCategory";
+import TableBrand from "../TableBrand";
 import CustomPagination from "@/components/Pagination";
 import { Pagination } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/input";
 
-function BodyCategories() {
+const BodyBrand: React.FC = () => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [image, setImage] = useState<string[]>([]); // Image state
+
+    // Function to handle file input change (if you want to store the image as base64 or file path)
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files) {
+            const fileArray = Array.from(files).map(file => URL.createObjectURL(file)); // Preview images
+            setImage(fileArray);
+        }
+    };
 
     return (
         <div>
@@ -18,31 +27,34 @@ function BodyCategories() {
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
-                            { name: 'Phân loại', link: '#' },
+                            { name: 'Thương hiệu', link: '#' },
                         ]}
                     />
                 </div>
                 <div>
-                    <Button onPress={onOpen}>Thêm phân loại</Button>
+                    <Button onPress={onOpen}>Thêm thương hiệu</Button>
                     <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader className="flex flex-col gap-1">Thêm mới phân loại</ModalHeader>
+                                    <ModalHeader className="flex flex-col gap-1">Thêm mới thương hiệu</ModalHeader>
                                     <ModalBody>
                                         <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                             <div className="lg:w-1/2 w-full">
-                                                <label htmlFor="">Tên phân loại</label>
-                                                <Input placeholder="Tên phân loại" />
+                                                <label htmlFor="">Tên thương hiệu</label>
+                                                <Input placeholder="Tên thương hiệu" />
                                             </div>
                                             <div className="flex-1">
-                                                <label htmlFor="">Tag phân loại</label>
-                                                <Input placeholder="Tag phân loại" />
+                                                <label htmlFor="">Tag thương hiệu</label>
+                                                <Input placeholder="Tag thương hiệu" />
                                             </div>
                                         </div>
                                         <div>
                                             <label htmlFor="">Hình ảnh</label>
-                                            <Input type="file" />
+                                            <Input type="file" className="mb-2" onChange={handleImageChange} />
+                                            <div className="">
+                                                {image.length > 0 && <img src={image[0]} alt="Preview" className="h-20 w-20 object-cover" />}
+                                            </div>
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>
@@ -60,24 +72,25 @@ function BodyCategories() {
                 </div>
             </div>
 
-            <div className="mb-4 text-xl font-bold">Bảng phân loại</div>
-
             <div>
                 <div className="mb-4">
-                    <TableCategory />
+                    <TableBrand />
                 </div>
                 <div className="flex justify-end w-full">
-                    {/* <CustomPagination
-                    totalItems={filteredProducts.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={(page: number) => setCurrentPage(page)}
-                /> */}
+                    {/* Custom pagination component */}
+                    {/* 
+                        <CustomPagination
+                            totalItems={filteredProducts.length}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={(page: number) => setCurrentPage(page)}
+                        /> 
+                    */}
                     <Pagination showControls total={10} initialPage={1} />
                 </div>
             </div>
         </div>
     );
-}
+};
 
-export default BodyCategories;
+export default BodyBrand;

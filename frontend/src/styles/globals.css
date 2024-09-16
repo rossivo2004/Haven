@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,9 +7,17 @@
 
 
 *{
-    font-family: "Cabin", sans-serif;
+    font-family: "Exo 2", sans-serif;
 }
 
 span.px-1.relative.inline-flex.items-center.justify-start.flex-shrink-0.overflow-hidden.bg-default-200.rounded-full.outline-none.group-data-\[focus-visible\=true\]\:z-10.group-data-\[focus-visible\=true\]\:ring-2.group-data-\[focus-visible\=true\]\:ring-focus.group-data-\[focus-visible\=true\]\:ring-offset-2.group-data-\[focus-visible\=true\]\:ring-offset-background.group-data-\[selected\=true\]\:bg-primary.group-data-\[selected\=true\]\:text-primary-foreground.w-10.h-6.mr-2.rtl\:ml-2.rtl\:mr-\[unset\].transition-background{
     margin-right: 0;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

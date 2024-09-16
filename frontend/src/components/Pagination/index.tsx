@@ -18,6 +18,7 @@ function CustomPagination({ totalItems, itemsPerPage, currentPage, onPageChange 
                 initialPage={currentPage} 
                 onChange={(page) => onPageChange(page)}
                 className="text-main"
+                color="warning"
             />
         </div>
     );

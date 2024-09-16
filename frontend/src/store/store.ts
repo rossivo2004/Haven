@@ -1,10 +1,12 @@
 // store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import cartSlice from './cartSlice';
+import recentlyViewedSlice from './recentlyViewedSlice';
 
 export const store = configureStore({
   reducer: {
     cart: cartSlice,
+    recentlyViewed: recentlyViewedSlice,
   },
 });
 

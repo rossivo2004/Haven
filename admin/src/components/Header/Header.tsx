@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   const [isInvisible, setIsInvisible] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-10 bg-white dark:bg-[#0F172A] p-2 flex items-center justify-between h-16 shadow-md pr-14 lg:pr-0 md:pr-0">
+    <header className="fixed top-0 left-0 w-full z-10 bg-white dark:bg-[#0F172A] p-2 flex items-center justify-between h-16 shadow-md pr-14 lg:pr-4 md:pr-4">
       <div className="flex items-center">
         <div className="text-xl font-bold dark:text-white">NERVE</div>
       </div>

@@ -41,7 +41,7 @@ const CustomRadio = (props: any) => {
                 base: cn(
                     "inline-flex m-0 bg-content1 hover:bg-content2 items-center justify-between",
                     "flex-row-reverse min-w-[290px] cursor-pointer rounded-lg gap-4 p-4 border-2 border-transparent",
-                    "data-[selected=true]:border-primary"
+                    "data-[selected=true]:border-primary lg:w-[300px]"
                 ),
             }}
         >
@@ -314,10 +314,10 @@ console.log(selectedItems);
 
                                 {/* Payment method */}
                                 <div className="mb-4 ww-full">
-                                    <label className="block">Hình thức thanh toán</label>
+                                    <label className="block font-bold text-lg">Hình thức thanh toán</label>
                                     <RadioGroup orientation="horizontal" className='w-full' defaultValue="pay-cash">
                                         <CustomRadio value="pay-momo">
-                                            <div className='flex items-center gap-5'>
+                                            <div className='flex items-center gap-5 h-14'>
                                                 <div>
                                                     <img src="/images/momo.png" alt="Momo payment" className='w-10 h-10' />
                                                 </div>
@@ -325,7 +325,7 @@ console.log(selectedItems);
                                             </div>
                                         </CustomRadio>
                                         <CustomRadio value="pay-cash">
-                                            <div className='flex items-center gap-5'>
+                                            <div className='flex items-center gap-5 h-14'>
                                                 <div>
                                                     <MonetizationOnIcon />
                                                 </div>
@@ -343,7 +343,7 @@ console.log(selectedItems);
                             <div className='shadow-md border rounded-md p-6'>
                                 <ul>
                                     {cartData.map((item, index) => (
-                                        <li key={index} className="flex justify-between items-center border-b pb-4 mb-4">
+                                        <li key={index} className="flex justify-between items-center border-b pb-4 mb-4 gap-2">
                                             <div className="flex items-start h-full">
                                                 <img src={item.images[0]} alt={item.name} className="w-24 h-24 mr-4 rounded" />
                                                 <div className='flex flex-col justify-center h-[96px] w-full'>
@@ -351,9 +351,9 @@ console.log(selectedItems);
                                                     <p className="text-sm text-gray-600"> x{item.quantity}</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <span className="text-red-500 font-bold">{item.price.toLocaleString()} đ</span><br />
-                                                <span className="text-xs text-gray-500 "><span className='line-through'>{item.price.toLocaleString()}</span> đ đã giảm giá</span>
+                                            <div className="text-right w-24">
+                                                <span className="text-red-500 font-bold">{item.salePrice.toLocaleString()} đ</span><br />
+                                                <span className="text-xs text-gray-500 "><span className='line-through w-max'>{item.price.toLocaleString()}</span> đ</span>
                                             </div>
                                         </li>
                                     ))}

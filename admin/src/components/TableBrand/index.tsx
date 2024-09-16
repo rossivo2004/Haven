@@ -19,13 +19,13 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 
 type User = typeof users[0];
 
-export default function TableCategory() {
+export default function TableBrand() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const handleDelete = (userId: number) => {
         confirmAlert({
-            title: 'Xóa phân loại',
-            message: 'Bạn có chắc muốn xóa phân loại?',
+            title: 'Xóa thương hiệu',
+            message: 'Bạn có chắc muốn xóa thương hiệu?',
             buttons: [
                 {
                     label: 'Yes',
@@ -106,16 +106,16 @@ export default function TableCategory() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Sửa phân loại</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Sửa thương hiệu</ModalHeader>
                             <ModalBody>
                                 <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                     <div className="lg:w-1/2 w-full">
-                                        <label htmlFor="">Tên phân loại</label>
-                                        <Input type="text" placeholder="Tên phân loại" />
+                                        <label htmlFor="">Tên thương hiệu</label>
+                                        <Input type="text" placeholder="Tên thương hiệu" />
                                     </div>
                                     <div className="flex-1">
-                                        <label htmlFor="">Tag phân loại</label>
-                                        <Input type="text" placeholder="Tag phân loại" />
+                                        <label htmlFor="">Tag thương hiệu</label>
+                                        <Input type="text" placeholder="Tag thương hiệu" />
                                     </div>
                                 </div>
                                 <div>

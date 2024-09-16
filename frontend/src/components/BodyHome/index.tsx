@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from "react";
+import { useState, useEffect, CSSProperties  } from "react";
 import { Link } from "@nextui-org/link";
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
@@ -23,6 +23,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
+import './style.scss'
 
 import { fetchProducts } from "@/src/api/productApi";
 
@@ -37,29 +38,69 @@ interface ProductIn {
 function BodyHome() {
     const [productData, setProductData] = useState<ProductIn | null>(null);
 
+    const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCounter((prevCounter) => (prevCounter > 0 ? prevCounter - 1 : 59)); // Nếu đạt 0, reset về 59
+      }, 1000); // Cập nhật mỗi giây
+  
+      return () => clearInterval(interval); // Dọn dẹp interval khi component bị unmount
+    }, []);
+  
+    // Định nghĩa kiểu CSS tùy chỉnh để sử dụng "--value"
+    const customStyle: CSSProperties & { "--value"?: number } = {
+      "--value": counter,
+    };
+
     useEffect(() => {
         const getProducts = async () => {
             const data = await fetchProducts();
             const dataNew = data.slice(0, 60);
-            setProductData(dataNew); 
+            setProductData(dataNew);
         };
 
         getProducts();
     }, []);
 
     //   console.log(productData);
-      
+
 
     return (
         <div className="">
             <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
-                <Image
-                    className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                    src={`/images/bn-11.png`}
-                    alt="Banner"
-                    layout="fill"
-                    priority
-                />
+                <>
+                    <Swiper modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]} className="mySwiper w-full h-full" loop  autoplay={{ delay: 3000, disableOnInteraction: false }}>
+                        <SwiperSlide>
+                            <Image
+                                className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
+                                src={`/images/bn-11.png`}
+                                alt="Banner"
+                                layout="fill"
+                                priority
+                            />
+                        </SwiperSlide>
+                        <SwiperSlide>
+                            <Image
+                                className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
+                                src={`/images/bn-20.png`}
+                                alt="Banner"
+                                layout="fill"
+                                priority
+                            />
+                        </SwiperSlide>
+                        <SwiperSlide>
+                            <Image
+                                className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
+                                src={`/images/bn-21.png`}
+                                alt="Banner"
+                                layout="fill"
+                                priority
+                            />
+                        </SwiperSlide>
+                    </Swiper>
+                </>
+
             </div>
 
             <div className="lg:mt-20 mt-10">
@@ -68,20 +109,38 @@ function BodyHome() {
                     <div className="flex items-center">
                         <div className="font-semibold lg:text-lg text-xs mr-2">Kết thúc sau:</div>
                         <div>
-                            <div className="flex items-center justify-center lg:space-x-4 space-x-2 lg:p-4">
-                                {['Ngày', 'Giờ', 'Phút', 'Giây'].map((unit, index) => (
-                                    <div key={index} className="flex flex-col items-center justify-center bg-yellow-400 text-white font-bold text-sm lg:w-10 lg:h-10 w-8 h-8 rounded-md">
-                                        <div>{index === 0 ? '01' : '10'}</div>
-                                        <div className="text-xs font-normal">{unit}</div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+        <span className="countdown font-mono text-sm">
+          <span style={{ "--value": 15 } as CSSProperties}></span>
+        </span>
+        Ngày
+      </div>
+      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+        <span className="countdown font-mono text-sm">
+          <span style={{ "--value": 10 } as CSSProperties}></span>
+        </span>
+        Giờ
+      </div>
+      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+        <span className="countdown font-mono text-sm">
+          <span style={{ "--value": 24 } as CSSProperties}></span>
+        </span>
+        Phút
+      </div>
+      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+        <span className="countdown font-mono text-sm">
+          <span style={customStyle}></span>
+        </span>
+        Giây
+      </div>
+    </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-14">
-                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
+                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-10">
                         {DUMP_PRODUCTS.slice(0, 8).map((product) => (
                             <BoxProduct key={product.id} product={product} />
                         ))}
@@ -89,7 +148,7 @@ function BodyHome() {
                 </div>
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-14 ">
-                    <div className="font-bold text-4xl mb-6">Category</div>
+                    <div className="font-bold text-4xl mb-6">Phân Loại</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
@@ -137,13 +196,17 @@ function BodyHome() {
 
                     <div className="flex gap-4">
                         <div className="lg:w-1/4 lg:block hidden">
-                            <div className="font-bold lg:text-4xl text-2xl mb-6">Sản Phẩm Nổi Bật</div>
-                            <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden" />
+                            <div className="font-bold lg:text-4xl w-max text-2xl mb-6">Sản Phẩm Nổi Bật</div>
+                            <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden w-full h-[800px] object-cover rounded-lg" />
                         </div>
                         <div className="flex-1">
                             <div className="flex w-full flex-col items-center lg:items-end">
                                 <div className="font-bold lg:text-4xl text-2xl lg:hidden">Sản Phẩm Nổi Bật</div>
-                                <Tabs aria-label="Disabled Options" className="mb-6" variant="underlined">
+                                <Tabs aria-label="Disabled Options" className="mb-6" variant="bordered" color="warning"
+                                    classNames={{
+                                        tabContent: "group-data-[selected=true]:text-white"
+                                    }}
+                                >
                                     <Tab key="photos" title="Photos" className="py-0">
                                         <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full">
                                             {DUMP_PRODUCTS.slice(0, 6).map((product) => (
@@ -178,7 +241,7 @@ function BodyHome() {
                         </div>
                     </div>
                     <div className="flex-1 h-full">
-                        <img src={`/images/bn-6.png`} alt="A cat sitting on a chair" className="w-full h-full object-fill min-h-[320px] max-h-[500px]" />
+                        <img src={`/images/bn-6.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-fill min-h-[320px] max-h-[500px] rounded-lg" />
                     </div>
                 </div>
 
@@ -191,7 +254,7 @@ function BodyHome() {
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2 gap-4">
                         <div className="lg:col-span-2 md:col-span-3 col-span-2">
-                            <img src={`/images/bn-7.png`} alt="A cat sitting on a chair" className="w-full h-full object-cover" />
+                            <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                         </div>
                         {DUMP_PRODUCTS.slice(0, 6).map((product) => (
                             <BoxProduct key={product.id} product={product} />
@@ -203,7 +266,7 @@ function BodyHome() {
 
                 <div className="w-full gap-10 max-w-screen-xl mx-auto flex lg:flex-row flex-col lg:h-[500px] mb-16 px-4">
                     <div className="lg:w-1/2 w-full h-full">
-                        <img src={`/images/bn-6.png`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px]" />
+                        <img src={`/images/bn-9.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px] rounded-lg" />
                     </div>
                     <div className="flex-1 h-full flex flex-col justify-center">
                         <div className="text-4xl font-semibold mb-3">Giảm giá <span className="text-[40px] text-main">10%</span><br />cho tất cả các sản phẩm</div>

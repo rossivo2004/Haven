@@ -8,6 +8,7 @@ import ImageSwiper from '../SliderImageProductDetail';
 import { DUMP_PRODUCTS } from '@/src/dump';
 import BoxProduct from '../BoxProduct';
 import { ProductProps } from '@/src/interface';
+import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
 
 import { addItem } from '@/src/store/cartSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -163,7 +164,9 @@ function BodyProduct() {
                         Ba chỉ bò (short plate) là phần thịt được lấy ở bụng con bò...
                     </div>
 
-                    <div className="flex items-center gap-7 text-black py-5">
+                    {product && product.stock !== undefined && product.stock > 0 ? 
+                    <div>
+                          <div className="flex items-center gap-7 text-black py-5">
                         <span className="text-base sm:text-xl font-semibold">Số lượng</span>
                         <div className="flex items-center border border-gray-300">
                             <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
@@ -188,6 +191,12 @@ function BodyProduct() {
                             Thêm vào giỏ hàng
                         </Button>
                     </div>
+                    </div>
+                    : 
+                    <div></div>
+                    }
+
+                  
                 </div>
                 <div className='flex-1'>
                     <ImageSwiper imgDemo={product?.images || []} />
@@ -276,10 +285,12 @@ function BodyProduct() {
                     <div className="flex-grow border-t border-black ml-4" />
                 </div>
                 <div>
-                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                        {DUMP_PRODUCTS.slice(0, 4).map((product) => (
+                    <div>
+                      {/* <  {DUMP_PRODUCTS.slice(0, 4).map((product) => (
                             <BoxProduct key={product.id} product={product} />
-                        ))}
+                        ))}> */}
+                      <RecentlyViewed />
+
                     </div>
                 </div>
             </div>

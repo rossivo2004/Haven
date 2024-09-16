@@ -1,8 +1,8 @@
-import BodyDiscount from "@/components/BodyDiscount";
+import BodyOrderDetail from "@/components/BodyOrderDetail";
 function pages() {
     return ( 
         <div>
-            <BodyDiscount />
+            <BodyOrderDetail />
         </div>
      );
 }
