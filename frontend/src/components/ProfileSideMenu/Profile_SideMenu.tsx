@@ -60,16 +60,6 @@ function Profile_SideMenu() {
                                 </div>
                             </Link>
                         </li>
-                        <li className="py-4">
-                            <Link href={`${hiddenMenuPaths[4]}`}>
-                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[4]}`  ? 'active_nav_profile' : ''}`}>
-                                    <div><RemoveRedEyeOutlinedIcon /></div>
-                                    <div>Mã giảm giá</div>
-                                </div>
-                            </Link>
-                        </li>
-                    
-
                     </ul>
                 </nav>
             </aside>

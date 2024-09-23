@@ -32,7 +32,7 @@ const OrderSession = () => {
     const start = sizePage * (Number(currentPage) - 1);
     const end = sizePage * Number(currentPage) - 1;
 
-    console.log('currentPage', currentPage)
+    // console.log('currentPage', currentPage)
 
     useEffect(() => {
         setOrders(DUMP_ORDERS);

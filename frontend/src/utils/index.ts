@@ -55,4 +55,4 @@ export const convertBirthdayToString = (birthday: any) => {
     return `${birthday.year}-${month}-${day}`;
   };
 
-export const hiddenMenuPaths = ['/profile/account', '/profile/address', '/profile/notify', '/profile/order', '/profile/promotion'];
+export const hiddenMenuPaths = ['/profile/account', '/profile/address', '/profile/notify', '/profile/order'];

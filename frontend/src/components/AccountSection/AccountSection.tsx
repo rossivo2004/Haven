@@ -233,7 +233,7 @@ const AccountSection = () => {
                 </div>
 
                 {/* Giới tính */}
-                <div className="flex flex-row  gap-5 items-center">
+                {/* <div className="flex flex-row  gap-5 items-center">
                   <div className="text-nowrap font-bold">Giới tính</div>
                   <Controller
                     name="gender"
@@ -254,10 +254,10 @@ const AccountSection = () => {
                       </RadioGroup>
                     )}
                   />
-                </div>
+                </div> */}
 
                 {/* Quốc tịch */}
-                <div className="flex flex-row gap-5 items-center">
+                {/* <div className="flex flex-row gap-5 items-center">
                   <div className="text-nowrap font-bold">Quốc tịch</div>
                   <Controller
                     name="country"
@@ -289,7 +289,7 @@ const AccountSection = () => {
                       </Select>
                     )}
                   />
-                </div>
+                </div> */}
 
                 <Button
                   type="submit"
@@ -388,7 +388,7 @@ const AccountSection = () => {
                 <Security />
 
                 {/* Liên kết mạng xã hội */}
-                <div className="flex flex-col gap-3">
+                {/* <div className="flex flex-col gap-3">
                   <div className="text-base font-bold">
                     Liên kết mạng xã hội
                   </div>
@@ -405,7 +405,7 @@ const AccountSection = () => {
                       Liên kết
                     </Button>
                   </div>
-                </div>
+                </div> */}
 
                 <Divider />
 

@@ -25,6 +25,7 @@ import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
 import { Checkbox } from "@nextui-org/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
+import { Divider } from "@nextui-org/divider";
 
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
@@ -35,6 +36,7 @@ import { removeItem } from '@/src/store/cartSlice';
 
 import './style.scss'
 import { log } from 'console';
+import TooltipCu from '../ui/Tootip';
 
 import { updateQuantity } from '@/src/store/cartSlice';
 import { DUMP_PRODUCTS } from '@/src/dump';
@@ -126,17 +128,17 @@ function Header() {
 
     useEffect(() => {
         if (debouncedSearch) {
-          const filtered = products.filter(product =>
-            product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-          );
-          setFilteredProducts(filtered);
-          setIsDropdownVisible(true); // Show dropdown when search changes
+            const filtered = products.filter(product =>
+                product.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+            );
+            setFilteredProducts(filtered);
+            setIsDropdownVisible(true); // Show dropdown when search changes
         } else {
-          setFilteredProducts([]);
-          setIsDropdownVisible(false); // Hide dropdown if search is empty
+            setFilteredProducts([]);
+            setIsDropdownVisible(false); // Hide dropdown if search is empty
         }
-      }, [debouncedSearch, products]);
-    
+    }, [debouncedSearch, products]);
+
 
     useEffect(() => {
         setCartCount(totalItems);
@@ -147,23 +149,23 @@ function Header() {
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
-            
+
         };
     }, [lastScrollY]);
 
     useEffect(() => {
         const handleScroll = () => {
-          setIsDropdownVisible(false); // Hide dropdown on scroll
-          
-        };
-    
-        window.addEventListener('scroll', handleScroll);
-    
-        return () => {
-          window.removeEventListener('scroll', handleScroll); // Clean up event listener
-        };
-      }, []);
+            setIsDropdownVisible(false); // Hide dropdown on scroll
 
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll); // Clean up event listener
+        };
+    }, []);
+    const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
 
     return (
         <div>
@@ -189,7 +191,7 @@ function Header() {
                                             // Chỉ ẩn nếu người dùng không hover vào kết quả tìm kiếm
                                             if (!isMouseOver) {
                                                 setIsFocused(false);
-                                                setSearch('')
+                                                setSearch('');
                                             }
                                         }}
                                         className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -197,39 +199,52 @@ function Header() {
                                         placeholder="Tìm kiếm sản phẩm..."
                                     />
                                     <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
-                                        <SearchIcon />
+                                        {search && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setSearch('')}
+                                                className="text-gray-500 hover:text-gray-700"
+                                                aria-label="Clear search"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        )}
+                                        <SearchIcon className="ml-2" />
                                     </div>
                                 </div>
+
                                 {(isDropdownVisible && (isFocused || isMouseOver) && debouncedSearch) && (
-        <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-          <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
-          <div className='flex gap-5 p-5'>
-            <div className='w-1/4'>
-              <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
-            </div>
-            <div className='flex-1'>
-              {loading ? (
-                <div className="flex items-center justify-center h-full"><Spinner /></div>
-              ) : filteredProducts.length > 0 ? (
-                <ul className='overflow-scroll h-[400px]'>
-                  {filteredProducts.map((product) => (
-                    <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                      <a href={`/product/${product.id}`} className="flex gap-4 items-center">
-                        <div className='w-14 h-14'>
-                          <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
-                        </div>
-                        <div>{product.name}</div>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                                    <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
+                                        <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
+                                        <div className='flex gap-5 p-5'>
+                                            <div className='w-1/4'>
+                                                <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
+                                            </div>
+                                            <div className='flex-1'>
+                                                {loading ? (
+                                                    <div className="flex items-center justify-center h-full"><Spinner /></div>
+                                                ) : filteredProducts.length > 0 ? (
+                                                    <ul className='overflow-scroll h-[400px]'>
+                                                        {filteredProducts.map((product) => (
+                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100">
+                                                                <a href={`/product/${product.id}`} className="flex gap-4 items-center">
+                                                                    <div className='w-14 h-14'>
+                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
+                                                                    </div>
+                                                                    <div>{product.name}</div>
+                                                                </a>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
 
@@ -242,16 +257,16 @@ function Header() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
-                            <div className="xl:text-sm lg:text-[10px]">
-                                <div>
-                                    <Link href={'/signin'}>Đăng nhập</Link>
-                                </div>
-                                <div>
-                                    <Link href={'/signup'}>Đăng kí</Link>
-                                </div>
-                            </div> */}
-                                    <div>
+                                    <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
+                                    <div className="xl:text-sm lg:text-[10px]">
+                                        <div>
+                                            <Link href={'/signin'}>Đăng nhập</Link>
+                                        </div>
+                                        <div>
+                                            <Link href={'/signup'}>Đăng kí</Link>
+                                        </div>
+                                    </div>
+                                    {/* <div>
                                         <Dropdown placement="bottom-end">
                                             <DropdownTrigger>
                                                 <Avatar
@@ -293,74 +308,18 @@ function Header() {
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
-                                    </div>
+                                    </div> */}
                                 </div>
 
-                                <Tooltip 
-                                showArrow={true} 
-                                placement='bottom-end' 
-                                
-                                content={
-                                    <div>
-                                        <div className='p-4 min-w-[460px] max-w-[460px]'>
-                                            <div className='flex justify-end mb-4 items-center'>
-                                                <div className='text-xl mb-2 font-semibold'>Giỏ hàng của bạn</div>
-                                            </div>
 
-                                            <div>
-                                                <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2'>
-                                                    {cart.length > 0 ? (
-                                                        cart.map((item: any) => (
-                                                            <li key={item.id} className='flex items-center gap-4 mb-2'>
-                                                                <div>
-                                                                    <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
-                                                                </div>
-                                                                <div>
-                                                                    <div className='max-w-[220px]'>{item.name}</div>
-                                                                    <div className="flex items-center">
-                                                                        <button
-                                                                            className="px-3 py-1 border rounded"
-                                                                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                                                        >
-                                                                            -
-                                                                        </button>
-                                                                        <span className="px-4">{item.quantity}</span>
-                                                                        <button
-                                                                            className="px-3 py-1 border rounded"
-                                                                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                                                        >
-                                                                            +
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div className='flex-1 text-right'>
-                                                                    <div className='text-price font-semibold'>
-                                                                        {item.price.toLocaleString('vi-VN')} VND
-                                                                    </div>
-                                                                    <div onClick={() => dispatch(removeItem(item.id))}>
-                                                                        <DeleteIcon className='hover:text-red-600 cursor-pointer' />
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        ))
-                                                    ) : (
-                                                        <div className='text-center py-4'>Giỏ hàng trống</div>
-                                                    )}
-                                                </ul>
-                                            </div>
-                                            <div className='flex items-center justify-between mt-6'>
-                                                <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
-                                                {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
-                                            </div>
-                                        </div>
-                                    </div>
-                                }>
+
+                                <TooltipCu position='right' title={
                                     <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative">
                                         <div className="relative">
                                             <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
-                                            <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
-                                                {cartCount}
-                                            </span>
+                                            {/* <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
+                                             {cartCount}
+                                         </span> */}
                                         </div>
                                         <Link href={'/cart'}>
                                             <div>
@@ -369,13 +328,76 @@ function Header() {
                                             </div>
                                         </Link>
                                     </div>
-                                </Tooltip>
+                                }>
+                                    {isVisible ? (
+                                        <div>
+                                            <div className='p-4 min-w-[460px] max-w-[460px]'>
+                                                <div className='flex justify-end mb-4 items-center'>
+                                                    <div className='text-xl mb-2 font-semibold text-black'>Giỏ hàng của bạn</div>
+                                                </div>
+
+                                                <div>
+                                                    <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2 text-black'>
+                                                        {cart.length > 0 ? (
+                                                            cart.map((item: any) => (
+                                                                <li key={item.id} className='flex items-center gap-4 mb-2'>
+                                                                    <div>
+                                                                        <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className='max-w-[220px]'>{item.name}</div>
+
+                                                                        <div>aaaa</div>
+
+                                                                        <div className="flex items-center">
+                                                                            <button
+                                                                                className="px-3 py-1 border rounded"
+                                                                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                                                            >
+                                                                                -
+                                                                            </button>
+                                                                            <span className="px-4">{item.quantity}</span>
+                                                                            <button
+                                                                                className="px-3 py-1 border rounded"
+                                                                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                                                            >
+                                                                                +
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className='flex-1 text-right'>
+                                                                        <div className='text-price font-semibold'>
+                                                                            {item.price.toLocaleString('vi-VN')} VND
+                                                                        </div>
+                                                                        <div onClick={() => dispatch(removeItem(item.id))}>
+                                                                            <DeleteIcon className='hover:text-red-600 cursor-pointer' />
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        ) : (
+                                                            <div className='text-center py-4'>Giỏ hàng trống</div>
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                                <div className='flex items-center justify-between mt-6'>
+                                                    <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
+                                                    {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        null
+                                    )
+                                    }
+                                </TooltipCu>
+
                             </div>
                         </div>
                     </div>
-                    <div className='w-full lg:block bg-main hidden'>
+                    <div className='w-full lg:block bg-main hidden sticky top-0'>
                         <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
-                            <ul className='flex gap-10'>
+                            <ul className='flex gap-16 text-white font-medium'>
                                 <li className='flex items-center'>
                                     <Link href={'/'}>TRANG CHỦ</Link>
                                 </li>
@@ -383,20 +405,50 @@ function Header() {
                                     <Link href={'/blog'}>TIN TỨC</Link>
                                 </li>
                                 <li>
+
+
+                                    <TooltipCu position='left' title={<div className='flex items-center transition-all '>  <Link href={'/shop'}>
+                                        SẢN PHẨM
+                                    </Link> <KeyboardArrowDownIcon /></div>}>
+                                        {
+                                            isVisible ? (
+                                                <div className="px-1 py-2 grid grid-cols-4 gap-1 relative">
+                                                    <div className='row-span-4'>
+                                                        <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
+                                                    </div>
+                                                    {CATEGORY.map((item, index) => (
+                                                        <Link key={index} href={`/shop?category=${item.tag}`}>
+                                                            <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                <div className='mr-2'>
+                                                                    <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                </div>
+                                                                <div>{item.name}</div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                null
+                                            )
+                                        }
+                                    </TooltipCu>
+
+                                </li>
+                                {/* <li className='relative'>
                                     <Tooltip
                                         isDismissable
                                         color="default"
                                         placement="bottom-end"
                                         content={
-                                            <div className="px-1 py-2 grid grid-cols-4 gap-4">
+                                            <div className="px-1 py-2 grid grid-cols-4 gap-1 relative">
                                                 <div className='row-span-4'>
-                                                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[160px] rounded-lg h-auto object-cover' />
+                                                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
                                                 </div>
                                                 {CATEGORY.map((item, index) => (
                                                     <Link key={index} href={`/shop?category=${item.tag}`}>
                                                         <div className="flex py-2 px-5 cursor-pointer rounded-lg hover:bg-slate-200 items-center">
                                                             <div className='mr-2'>
-                                                                <img src={`/images/${item.image}`} alt={item.name} className="w-8 h-8 object-cover rounded-lg" />
+                                                                <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                             </div>
                                                             <div>{item.name}</div>
                                                         </div>
@@ -404,6 +456,7 @@ function Header() {
                                                 ))}
                                             </div>
                                         }
+                                        className='!relative'
                                     >
                                         <div className='flex items-center sp_ar '>
                                             <Link href={'/shop'}>
@@ -415,12 +468,15 @@ function Header() {
                                         </div>
                                     </Tooltip>
 
-                                </li>
+                                </li> */}
                                 <li className='flex items-center'>
                                     <Link href={'/contact'}>LIÊN HỆ</Link>
                                 </li>
                                 <li className='flex items-center'>
                                     <Link href={'/tracking'}>TRA CỨU</Link>
+                                </li>
+                                <li className='flex items-center'>
+                                    <Link href={'/tracking'}>VỀ CHÚNG TÔI</Link>
                                 </li>
                             </ul>
                         </div>

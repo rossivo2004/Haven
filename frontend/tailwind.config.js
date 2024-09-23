@@ -14,8 +14,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)'],
-        mono: ['var(--font-mono)'],
+        'svn-gilroy': ['SVN-Gilroy', 'sans-serif'],
       },
       colors: {
         main: '#FFC535',

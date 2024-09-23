@@ -1,0 +1,39 @@
+.navItem {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  /* .navTitle {
+    font-weight: bold;
+    color: #333;
+  } */
+  
+  .dropdown {
+    position: absolute;
+    top: 120%;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: max-content;
+    border-radius: 8px;
+  }
+  
+  .dropdown ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .dropdownItem {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: black;
+  }
+  
+  .dropdownItem:hover {
+    background-color: #f0f0f0;
+  }
+  

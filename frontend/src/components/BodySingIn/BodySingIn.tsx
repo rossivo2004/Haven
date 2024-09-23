@@ -66,7 +66,7 @@ function BodySignIn() {
                             }}
                         >
                             {() => (
-                                <Form className="flex flex-col gap-10">
+                                <Form className="flex flex-col gap-8">
                                     <div>
                                         <Field
                                         required
@@ -97,7 +97,7 @@ function BodySignIn() {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-main text-white py-4 rounded mb-4"
+                                        className="w-full bg-main text-white py-2 rounded mb-4"
                                     >
                                         Đăng nhập
                                     </button>
@@ -105,6 +105,19 @@ function BodySignIn() {
                             )}
                         </Formik>
                     </div>
+                <div className="flex items-center mb-2">
+  <div className="flex-1 border-t border-gray-300" />
+  <span className="mx-2">Hoặc</span>
+  <div className="flex-1 border-t border-gray-300" />
+</div>
+
+<div className="text-center mb-2">
+    <button>
+        <img src="/images/google-logo.png" alt="" className="w-8 h-8"/>
+    </button>
+</div>
+
+
                     <div className="text-center text-base font-normal">
                     <Link href={'/forgotpassword'}>
                         <div className="mb-2">Quên mật khẩu?</div>

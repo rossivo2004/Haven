@@ -1,9 +1,12 @@
 'use client'
-import { useState, useEffect, CSSProperties  } from "react";
+import { motion } from "framer-motion";
+
+import { useState, useEffect, CSSProperties } from "react";
 import { Link } from "@nextui-org/link";
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
 import { button as buttonStyles } from "@nextui-org/theme";
+// React
 
 import { siteConfig } from "@/src/config/site";
 import { title, subtitle } from "@/src/components/primitives";
@@ -34,23 +37,22 @@ interface ProductIn {
     images: string[];
 }
 
-
 function BodyHome() {
     const [productData, setProductData] = useState<ProductIn | null>(null);
 
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
     useEffect(() => {
-      const interval = setInterval(() => {
-        setCounter((prevCounter) => (prevCounter > 0 ? prevCounter - 1 : 59)); // Nếu đạt 0, reset về 59
-      }, 1000); // Cập nhật mỗi giây
-  
-      return () => clearInterval(interval); // Dọn dẹp interval khi component bị unmount
+        const interval = setInterval(() => {
+            setCounter((prevCounter) => (prevCounter > 0 ? prevCounter - 1 : 59)); // Nếu đạt 0, reset về 59
+        }, 1000); // Cập nhật mỗi giây
+
+        return () => clearInterval(interval); // Dọn dẹp interval khi component bị unmount
     }, []);
-  
+
     // Định nghĩa kiểu CSS tùy chỉnh để sử dụng "--value"
     const customStyle: CSSProperties & { "--value"?: number } = {
-      "--value": counter,
+        "--value": counter,
     };
 
     useEffect(() => {
@@ -70,7 +72,7 @@ function BodyHome() {
         <div className="">
             <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
                 <>
-                    <Swiper modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]} className="mySwiper w-full h-full" loop  autoplay={{ delay: 3000, disableOnInteraction: false }}>
+                    <Swiper modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]} className="mySwiper w-full h-full" loop autoplay={{ delay: 3000, disableOnInteraction: false }}>
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
@@ -109,45 +111,45 @@ function BodyHome() {
                     <div className="flex items-center">
                         <div className="font-semibold lg:text-lg text-xs mr-2">Kết thúc sau:</div>
                         <div>
-                        <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-        <span className="countdown font-mono text-sm">
-          <span style={{ "--value": 15 } as CSSProperties}></span>
-        </span>
-        Ngày
-      </div>
-      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-        <span className="countdown font-mono text-sm">
-          <span style={{ "--value": 10 } as CSSProperties}></span>
-        </span>
-        Giờ
-      </div>
-      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-        <span className="countdown font-mono text-sm">
-          <span style={{ "--value": 24 } as CSSProperties}></span>
-        </span>
-        Phút
-      </div>
-      <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-        <span className="countdown font-mono text-sm">
-          <span style={customStyle}></span>
-        </span>
-        Giây
-      </div>
-    </div>
+                            <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+                                <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                    <span className="countdown font-mono text-sm">
+                                        <span style={{ "--value": 15 } as CSSProperties}></span>
+                                    </span>
+                                    Ngày
+                                </div>
+                                <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                    <span className="countdown font-mono text-sm">
+                                        <span style={{ "--value": 10 } as CSSProperties}></span>
+                                    </span>
+                                    Giờ
+                                </div>
+                                <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                    <span className="countdown font-mono text-sm">
+                                        <span style={{ "--value": 24 } as CSSProperties}></span>
+                                    </span>
+                                    Phút
+                                </div>
+                                <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                    <span className="countdown font-mono text-sm">
+                                        <span style={customStyle}></span>
+                                    </span>
+                                    Giây
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-14">
-                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-10">
+                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
                         {DUMP_PRODUCTS.slice(0, 8).map((product) => (
                             <BoxProduct key={product.id} product={product} />
                         ))}
                     </div>
                 </div>
 
-                <div className="max-w-screen-xl mx-auto px-4 mb-14 ">
+                <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
                     <div className="font-bold text-4xl mb-6">Phân Loại</div>
                     <div>
                         <Swiper
@@ -229,21 +231,50 @@ function BodyHome() {
                     </div>
                 </div>
 
-                <div className="w-ful max-w-screen-xl gap-10 flex lg:flex-row flex-col-reverse lg:h-[500px] mb-16 px-4 mx-auto">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.5 }}
+                    variants={{
+                        hidden: { opacity: 0, x: -50 },
+                        visible: { opacity: 1, x: 0 }
+                    }}
+                    className="w-full max-w-screen-xl gap-10 flex lg:flex-row flex-col-reverse lg:h-[500px] mb-16 px-4 mx-auto"
+                >
                     <div className="lg:w-1/2 w-full flex flex-col justify-center">
-                        <div className="lg:text-4xl text-2xl font-semibold mb-3">Giảm giá <span className="text-[40px] text-main">10%</span><br />cho tất cả các sản phẩm</div>
+                        <div className="lg:text-4xl text-2xl font-semibold mb-3">
+                            Giảm giá <span className="text-[40px] text-main">10%</span><br />cho các sản phẩm ưa thích
+                        </div>
                         <div className="mb-6 font-normal text-lg">
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                            It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+                            Chúng tôi đang cung cấp ưu đãi đặc biệt giảm giá 10% cho các sản phẩm ưa thích. Đây là cơ hội tuyệt vời để bạn sở hữu những sản phẩm yêu thích với giá hấp dẫn. Nhanh tay để không bỏ lỡ!
                         </div>
                         <div>
-                            <Button variant="bordered" className="border-main text-main">Xem thêm</Button>
+                            <Link href="/shop">
+                                <Button variant="bordered" className="border-main text-main">
+                                    Xem thêm
+                                </Button>
+                            </Link>
                         </div>
                     </div>
-                    <div className="flex-1 h-full">
-                        <img src={`/images/bn-6.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-fill min-h-[320px] max-h-[500px] rounded-lg" />
-                    </div>
-                </div>
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5 }}
+                        variants={{
+                            hidden: { opacity: 0, x: 100 },
+                            visible: { opacity: 1, x: 0 }
+                        }}
+                        className="flex-1 h-full"
+                    >
+                        <img
+                            src={`/images/bn-6.jpg`}
+                            alt="A cat sitting on a chair"
+                            className="w-full h-full object-fill min-h-[320px] max-h-[500px] rounded-lg"
+                        />
+                    </motion.div>
+                </motion.div>
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex justify-between items-center mb-6">
@@ -263,22 +294,36 @@ function BodyHome() {
 
 
                 </div>
+                
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 3 }}
+                    variants={{
+                        hidden: { opacity: 0, x: 0 }, // Bạn có thể điều chỉnh giá trị x để tạo hiệu ứng trượt
+                        visible: { opacity: 1, x: 0 },
+                    }}
+                >
+                    <div className="w-full gap-10 max-w-screen-xl mx-auto flex lg:flex-row flex-col lg:h-[500px] mb-16 px-4">
+                        <div className="lg:w-1/2 w-full h-full">
+                            <img src={`/images/bn-9.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px] rounded-lg" />
+                        </div>
+                        <div className="flex-1 h-full flex flex-col justify-center">
+                            <div className="text-4xl font-semibold mb-3">Ưu Đãi Hấp Dẫn – Mua Nhiều Tiết Kiệm Nhiều</div>
+                            <div className="mb-6 font-normal text-lg">
+                                Chúng tôi luôn có những chương trình khuyến mãi đặc biệt giúp bạn tiết kiệm chi phí. Đừng bỏ lỡ cơ hội nhận ngay những ưu đãi độc quyền khi mua sắm trên trang web của chúng tôi.
+                            </div>
+                            <div>
+                                <Link href="/shop">
+                                    <Button variant="bordered" className="border-main text-main">Xem thêm</Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
 
-                <div className="w-full gap-10 max-w-screen-xl mx-auto flex lg:flex-row flex-col lg:h-[500px] mb-16 px-4">
-                    <div className="lg:w-1/2 w-full h-full">
-                        <img src={`/images/bn-9.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px] rounded-lg" />
-                    </div>
-                    <div className="flex-1 h-full flex flex-col justify-center">
-                        <div className="text-4xl font-semibold mb-3">Giảm giá <span className="text-[40px] text-main">10%</span><br />cho tất cả các sản phẩm</div>
-                        <div className="mb-6 font-normal text-lg">
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                            It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-                        </div>
-                        <div>
-                            <Button variant="bordered" className="border-main text-main">Xem thêm</Button>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex justify-between mb-6 items-center">

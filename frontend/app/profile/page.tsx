@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import AccountSection from '@/src/components/AccountSection/AccountSection';
 const Profile = () => {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState<boolean | null>(null); 
@@ -27,7 +27,7 @@ const Profile = () => {
 
   return (
     <div>
-      <h1>Profile Page</h1>
+      <AccountSection />
     </div>
   );
 };

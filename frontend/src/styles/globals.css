@@ -1,13 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 
+/* Example for SVN-Gilroy Regular */
+@font-face {
+    font-family: 'SVN-Gilroy';
+    src: url('../assets/fonts/SVN-Gilroy\ Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  /* Bold Font */
+  @font-face {
+    font-family: 'SVN-Gilroy';
+    src: url('../assets/fonts/SVN-Gilroy\ Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+  }
+  
+
 *{
-    font-family: "Exo 2", sans-serif;
+    font-family: "SVN-Gilroy", sans-serif;
 }
 
 span.px-1.relative.inline-flex.items-center.justify-start.flex-shrink-0.overflow-hidden.bg-default-200.rounded-full.outline-none.group-data-\[focus-visible\=true\]\:z-10.group-data-\[focus-visible\=true\]\:ring-2.group-data-\[focus-visible\=true\]\:ring-focus.group-data-\[focus-visible\=true\]\:ring-offset-2.group-data-\[focus-visible\=true\]\:ring-offset-background.group-data-\[selected\=true\]\:bg-primary.group-data-\[selected\=true\]\:text-primary-foreground.w-10.h-6.mr-2.rtl\:ml-2.rtl\:mr-\[unset\].transition-background{
@@ -20,4 +36,8 @@ span.px-1.relative.inline-flex.items-center.justify-start.flex-shrink-0.overflow
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.shd-1{
+    box-shadow: 0px 10px 15px 0px rgba(0,0,0,0.1);
 }

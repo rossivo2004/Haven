@@ -31,6 +31,11 @@ interface Ward {
     full_name: string;
 }
 
+interface ShipMethod {
+    id: string;
+    name: string;
+}
+
 const CustomRadio = (props: any) => {
     const { children, ...otherProps } = props;
 
@@ -61,12 +66,17 @@ function BodyCheckout() {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
     const [wards, setWards] = useState<Ward[]>([]);
+    const [shipMethod, setShipMethod] = useState<string>('');
+    const [payMethod, setPayMethod] = useState<string>('');
+
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+    const [selectedWard, setSelectedWard] = useState<string>('');
     const point = useSelector((state: { cart: { point: number } }) => state.cart.point);
     const [pointMM, setPointMM] = useState<number>(0);
     const [ship, setShip] = useState<number>(0);
     const [sum, setSum] = useState<number>(0);
+    const [vat, setVat] = useState<number>(0);
     const [discount, setDiscount] = useState<number>(0);
     const [user, setUser] = useState<IUser | null>(null);
 
@@ -78,7 +88,7 @@ function BodyCheckout() {
     const priceDisscount = useSelector((state: { cart: { priceDisscount: number } }) => state.cart.priceDisscount);
     const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.sum);
 
-console.log(selectedItems);
+// console.log(selectedItems);
 
 
     useEffect(() => {
@@ -184,10 +194,50 @@ console.log(selectedItems);
             setDiscount(0);
         }
     }, [usePoints, user, totalSelectedPrice]);
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Prevent default form submission behavior
+    
+        // Find the name for province, district, and ward
+        const provinceName = provinces.find(province => province.id === selectedProvince)?.full_name || '';
+        const districtName = districts.find(district => district.id === selectedDistrict)?.full_name || '';
+        const wardName = wards.find(ward => ward.id === selectedWard)?.full_name || '';
+    
+        // Get selected shipping and payment methods
+        const shippingMethod = (document.getElementById('ship') as HTMLSelectElement).value;
+        const paymentMethod = (document.querySelector('input[name="pay"]:checked') as HTMLInputElement)?.value;
+    
+        // Calculate the total amount
+        const totalAmount = sum;
+    
+        // Log the form data with names
+        const formData = {
+            fullName: (document.getElementById('full-name') as HTMLInputElement).value,
+            phoneNumber: (document.getElementById('phone-user') as HTMLInputElement).value,
+            email: (document.getElementById('email-user') as HTMLInputElement).value,
+            address: (document.getElementById('address') as HTMLTextAreaElement).value,
+            province: provinceName,
+            district: districtName,
+            ward: wardName,
+            shippingMethod: shipMethod,
+            paymentMethod: payMethod,
+            poin: pointMM,
+            totalAmount // Add the total amount here
+        };
+    
+        console.log('Form Data:', formData);
+    
+        // Log the cart data
+        console.log('Cart Data:', cartData);
+    
+        // Additional actions can be added here, like dispatching a form submission or API call
+    }
+    
+    
     
 
     return (
-        <div className="max-w-screen-xl lg:mx-auto mx-4">
+        <div className="max-w-screen-xl lg:mx-auto mx-4 px-4">
             <div className="py-5 h-[62px]">
                 <BreadcrumbNav
                     items={[
@@ -200,7 +250,7 @@ console.log(selectedItems);
 
             <div>
                 {/* Main form without nesting another form */}
-                <form className="max-w-7xl mx-auto p-6">
+                <form className="max-w-7xl mx-auto" onSubmit={handleSubmit}>
                     <h1 className="text-4xl font-bold mb-6 text-center">Checkout</h1>
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                         <div className="lg:col-span-2">
@@ -208,17 +258,17 @@ console.log(selectedItems);
 
                             <div className='flex flex-col gap-5'>
                                 <div>
-                                    <label htmlFor="">Họ và tên người nhận</label>
-                                    <Input size='lg' variant='bordered' placeholder='Họ và tên người nhận' />
+                                    <label htmlFor="full-name">Họ và tên người nhận</label>
+                                    <Input required id='full-name' size='lg' variant='bordered' placeholder='Họ và tên người nhận' />
                                 </div>
                                 <div className='flex gap-5'>
                                     <div className='w-1/2'>
-                                        <label htmlFor="">Số điện thoại</label>
-                                        <Input size='lg' variant='bordered' placeholder='Số điện thoại' />
+                                        <label htmlFor="phone-user">Số điện thoại</label>
+                                        <Input required id='phone-user' size='lg' variant='bordered' placeholder='Số điện thoại' />
                                     </div>
                                     <div className='flex-1'>
-                                        <label htmlFor="">Email</label>
-                                        <Input size='lg' variant='bordered' placeholder='Email' />
+                                        <label htmlFor="email-user">Email</label>
+                                        <Input required id='email-user' size='lg' variant='bordered' placeholder='Email' />
                                     </div>
                                 </div>
 
@@ -228,6 +278,7 @@ console.log(selectedItems);
                                             Tỉnh/Thành phố (<span className='text-red-600'>*</span>)
                                         </div>
                                         <Select
+                                        isRequired
                                             placeholder='Tỉnh/Thành phố'
                                             aria-label="Tỉnh/Thành phố"
                                             size='lg'
@@ -236,7 +287,7 @@ console.log(selectedItems);
                                             onChange={(e) => setSelectedProvince(e.target.value)}
                                         >
                                             {provinces.map((province) => (
-                                                <SelectItem key={province.id} value={province.id}>
+                                                <SelectItem key={province.id} value={province.full_name}>
                                                     {province.full_name}
                                                 </SelectItem>
                                             )) as any}
@@ -248,6 +299,7 @@ console.log(selectedItems);
                                             Quận/Huyện (<span className='text-red-600'>*</span>)
                                         </div>
                                         <Select
+                                        isRequired
                                             placeholder='Quận/Huyện'
                                             aria-label="Quận/Huyện"
                                             size='lg'
@@ -259,7 +311,7 @@ console.log(selectedItems);
                                             {districts.map((district) => (
                                                 <SelectItem
                                                     key={district.id}
-                                                    value={district.id}
+                                                    value={district.full_name}
                                                 >
                                                     {district.full_name}
                                                 </SelectItem>
@@ -273,16 +325,17 @@ console.log(selectedItems);
                                             Phường/Xã (<span className='text-red-600'>*</span>)
                                         </div>
                                         <Select
+                                        isRequired
                                             placeholder='Phường/Xã'
                                             aria-label="Phường/Xã"
                                             size='lg'
                                             variant='bordered'
-                                            value={selectedDistrict}
-                                            onChange={(e) => setSelectedDistrict(e.target.value)}
+                                            value={selectedWard}
+                                            onChange={(e) => setSelectedWard(e.target.value)}
                                             isDisabled={!selectedDistrict} // Disable if no district is selected
                                         >
                                             {wards.map((ward) => (
-                                                <SelectItem key={ward.id} value={ward.id}>
+                                                <SelectItem key={ward.id} value={ward.full_name}>
                                                     {ward.full_name}
                                                 </SelectItem>
                                             )) as any}
@@ -292,8 +345,8 @@ console.log(selectedItems);
 
 
                                 <div>
-                                    <label htmlFor="">Địa chỉ nhận hàng</label>
-                                    <Textarea disableAutosize disableAnimation classNames={{
+                                    <label htmlFor="addresss">Địa chỉ nhận hàng</label>
+                                    <Textarea required id='address' disableAutosize disableAnimation classNames={{
                                         base: "",
                                         input: "resize-y min-h-[40px]",
                                     }} placeholder='Địa chỉ chi tiết' variant='bordered' />
@@ -301,8 +354,8 @@ console.log(selectedItems);
 
                                 {/* Shipping method */}
                                 <div className="">
-                                    <label className="block">Phương thức vận chuyển</label>
-                                    <Select size='lg' className="w-full mb-4" isRequired placeholder='Phương thức vận chuyển' variant='bordered'>
+                                    <label htmlFor='ship' className="block">Phương thức vận chuyển</label>
+                                    <Select onChange={(e) => setShipMethod(e.target.value)} id='ship' size='lg' className="w-full mb-4" isRequired placeholder='Phương thức vận chuyển' variant='bordered'>
                                         {
                                             DUMP_SHIPPING_METHOD.map((item, index) => (
                                                 <SelectItem key={index} value={item.id}>{item.name}</SelectItem>
@@ -314,8 +367,8 @@ console.log(selectedItems);
 
                                 {/* Payment method */}
                                 <div className="mb-4 ww-full">
-                                    <label className="block font-bold text-lg">Hình thức thanh toán</label>
-                                    <RadioGroup orientation="horizontal" className='w-full' defaultValue="pay-cash">
+                                    <label htmlFor='pay' className="block font-bold text-lg">Hình thức thanh toán</label>
+                                    <RadioGroup onChange={(e) => setPayMethod(e.target.value)} id='pay' orientation="horizontal" className='w-full' defaultValue="pay-cash">
                                         <CustomRadio value="pay-momo">
                                             <div className='flex items-center gap-5 h-14'>
                                                 <div>
@@ -330,6 +383,14 @@ console.log(selectedItems);
                                                     <MonetizationOnIcon />
                                                 </div>
                                                 <span>Thanh toán khi nhận hàng</span>
+                                            </div>
+                                        </CustomRadio>
+                                        <CustomRadio value="pay-vnpay">
+                                            <div className='flex items-center gap-5 h-14'>
+                                                <div>
+                                                    <img src="/images/VNPAY.png" alt="VNPay payment" className='w-10 h-10' />
+                                                </div>
+                                                <span>VN PAY</span>
                                             </div>
                                         </CustomRadio>
                                     </RadioGroup>
@@ -401,7 +462,7 @@ console.log(selectedItems);
                                         <span className='text-2xl text-price'>{isMounted ? sum.toLocaleString() : 0}</span>
                                     </div>
                                 </div>
-                                <Button className="w-full mt-4 bg-main font-semibold text-white">Đặt hàng</Button>
+                                <Button type='submit' className="w-full mt-4 bg-main font-semibold text-white">Đặt hàng</Button>
                             </div>
                         </div>
                     </div>

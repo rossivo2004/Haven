@@ -18,22 +18,22 @@ function BodySingUp() {
         password: Yup.string()
             .required("Vui lòng nhập mật khẩu")
             .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-            repassword: Yup.string()
+        repassword: Yup.string()
             .required("Vui lòng xác nhận mật khẩu")
             .oneOf([Yup.ref('password')], 'Mật khẩu không khớp')
-        
+
     });
 
     const handleCheckSignup = async (values: SignUpValues) => {
         try {
-            const response = await fetch('/api/signup', { 
+            const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(values),
             });
-    
+
             if (response.ok) {
                 toast.success('Đăng kí thành công!');
                 window.location.href = '/signin';
@@ -45,7 +45,7 @@ function BodySingUp() {
             toast.error('Đăng kí thất bại! Vui lòng thử lại.');
         }
     };
-    
+
     return (
         <div className="my-20 max-w-screen-xl mx-auto px-4 h-auto">
             <div className="flex lg:flex-row flex-col lg:h-[680px] gap-10">
@@ -120,9 +120,20 @@ function BodySingUp() {
                             )}
                         </Formik>
                     </div>
+                    <div className="flex items-center mb-2">
+                        <div className="flex-1 border-t border-gray-300" />
+                        <span className="mx-2">Hoặc</span>
+                        <div className="flex-1 border-t border-gray-300" />
+                    </div>
+
+                    <div className="text-center mb-2">
+                        <button>
+                            <img src="/images/google-logo.png" alt="" className="w-8 h-8" />
+                        </button>
+                    </div>
                     <div className="text-center text-base font-normal">
                         <Link href={'/forgotpassword'}>
-                        <div className="mb-2">Quên mật khẩu?</div>
+                            <div className="mb-2">Quên mật khẩu?</div>
                         </Link>
                         <div>
                             <Link href={"/signin"}>

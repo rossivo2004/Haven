@@ -1,9 +1,10 @@
 import BodyProducts from "@/components/BodyProducts";
+import BodyProductsV2 from "@/components/BodyProducts";
 
 function page() {
     return ( 
         <div>
-            <BodyProducts />
+            <BodyProductsV2 />
            
         </div>
      );

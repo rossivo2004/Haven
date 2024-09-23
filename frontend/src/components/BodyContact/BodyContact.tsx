@@ -1,30 +1,40 @@
+'use client'
 import React from 'react';
 import '../../styles/globals.css'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import MailIcon from '@mui/icons-material/Mail';
+import BreadcrumbNav from '../Breadcrum';
 
 function BodyContact() {
   return (
-    <div className="flex flex-col items-center bg-gray-50 py-8 px-4">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row justify-between">
+    <div className="flex flex-col max-w-screen-xl px-4 mx-auto">
+      <div className="py-5 h-[62px]">
+        <BreadcrumbNav
+          items={[
+            { name: 'Trang chủ', link: '/' },
+            { name: 'Liên hệ', link: '#' },
+          ]}
+        />
+      </div>
+      <div className="w-full  flex flex-col lg:flex-row justify-between">
         {/* bên trái */}
         <div className="w-full lg:w-2/3 pr-0 lg:pr-16">
-          <h2  className="text-3xl font-bold text-gray-800 mb-4">Liên hệ</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">Liên hệ</h2>
           <p className="text-gray-600 mb-8">Để lại tin nhắn cho chúng tôi</p>
-          <form className="px-8 pt-6 pb-8 mb-4">
+          <form className="pb-8 mb-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
               <div>
                 <label className="block text-sm font-bold mb-2" htmlFor="fullname">
                   Họ và tên <span className="text-red-500">*</span>
                 </label>
                 <input
-  className="appearance-none border border-gray-300 rounded-md w-full py-2 px-4 bg-gray-50  text-clip font-light placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-  id="fullname"
-  type="text"
-  placeholder="Vui lòng nhập"
-/>
+                  className="appearance-none border border-gray-300 rounded-md w-full py-2 px-4 bg-gray-50  text-clip font-light placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+                  id="fullname"
+                  type="text"
+                  placeholder="Vui lòng nhập"
+                />
 
               </div>
               <div>
@@ -77,32 +87,32 @@ function BodyContact() {
         <div className="w-full lg:w-2/5 h-1/2  bg-gray p-8 shadow-md rounded mb-8 lg:mb-0">
           <h3 className="text-lg font-bold text-gray-800 mb-4 uppercase">Công Ty TNHH Phát Triển Việt Quốc Tế</h3>
           <div className="flex items-center">
-  <LocationOnIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
-  <div className="font-semibold">Địa chỉ:</div>
-</div>
+            <LocationOnIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
+            <div className="font-semibold">Địa chỉ:</div>
+          </div>
           <p className="pl-8 text-gray-700 mb-2 xl:text-sm lg:text-[10px]">
-             Tầng 1 - Phòng 102, 11Bis Nguyễn Gia Thiều, Phường Võ Thị Sáu, Quận 3, TPHCM
+            Tầng 1 - Phòng 102, 11Bis Nguyễn Gia Thiều, Phường Võ Thị Sáu, Quận 3, TPHCM
           </p>
           <div className="flex items-center">
-  <LocalPhoneIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
-  <div className="font-semibold">Hotline:</div>
-</div>
-<p className="pl-8 text-gray-700 mb-2 xl:text-sm lg:text-[10px]">
-             0326 482 490
+            <LocalPhoneIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
+            <div className="font-semibold">Hotline:</div>
+          </div>
+          <p className="pl-8 text-gray-700 mb-2 xl:text-sm lg:text-[10px]">
+            0326 482 490
           </p>
           <div className="flex items-center">
-  <AccessTimeFilledIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
-  <div className="font-semibold">Giờ hoạt động:</div>
-</div>
-<p className="pl-8 text-gray-700 mb-2 xl:text-sm lg:text-[10px]">
-             8:00 - 17:00
+            <AccessTimeFilledIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
+            <div className="font-semibold">Giờ hoạt động:</div>
+          </div>
+          <p className="pl-8 text-gray-700 mb-2 xl:text-sm lg:text-[10px]">
+            8:00 - 17:00
           </p>
           <div className="flex items-center">
-  < MailIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
-  <div className="font-semibold">E-mail:</div>
-</div>
-<p className="pl-8 text-blue-700 mb-2 xl:text-sm lg:text-[10px]">
-             info@bviettintergroup.com
+            < MailIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
+            <div className="font-semibold">E-mail:</div>
+          </div>
+          <p className="pl-8 text-blue-700 mb-2 xl:text-sm lg:text-[10px]">
+            info@bviettintergroup.com
           </p>
         </div>
       </div>

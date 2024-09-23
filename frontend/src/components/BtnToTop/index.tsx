@@ -31,7 +31,7 @@ function BtnToTop() {
     }, []);
 
     return (
-        <div className="fixed bottom-10 right-10 z-50">
+        <div className="fixed lg:bottom-10 lg:right-10 bottom-20 right-6 z-50">
             {isVisible && (
                 <button
                     onClick={scrollToTop}

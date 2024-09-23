@@ -9,10 +9,47 @@ import { DUMP_PRODUCTS } from '@/src/dump';
 import BoxProduct from '../BoxProduct';
 import { ProductProps } from '@/src/interface';
 import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
 
 import { addItem } from '@/src/store/cartSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { number } from 'yup';
+import Link from 'next/link';
+
+const CustomRadio = (props: RadioProps) => {
+    const {
+        Component,
+        children,
+        isSelected,
+        getBaseProps,
+        getWrapperProps,
+        getInputProps,
+        getLabelProps,
+        getLabelWrapperProps,
+        getControlProps,
+    } = useRadio(props);
+
+    return (
+        <Component
+            {...getBaseProps()}
+            className={cn(
+                "group flex items-center justify-between hover:bg-content2",
+                "w-min cursor-pointer border-2 border-default rounded-lg gap-4 p-1 pr-3",
+                "data-[selected=true]:border-primary",
+            )}
+        >
+            <VisuallyHidden>
+                <input {...getInputProps()} />
+            </VisuallyHidden>
+            <div {...getLabelWrapperProps()}>
+                {children && <span {...getLabelProps()}>{children}</span>}
+            </div>
+        </Component>
+    );
+};
 
 function BodyProduct() {
     const { id: id_product } = useParams(); // get id product
@@ -156,47 +193,78 @@ function BodyProduct() {
                         </div>
                     </div>
 
+                    <div className='mb-4'>
+                        <RadioGroup label="" orientation="horizontal">
+                            <CustomRadio description="Up to 20 items" value="free" isDisabled>
+                                Free
+                            </CustomRadio>
+                            <CustomRadio description="Unlimited items. $10 per month." value="pro">
+                                Pro
+                            </CustomRadio>
+                            <CustomRadio
+                                description="24/7 support. Contact us for pricing."
+                                value="enterprise"
+                            >
+                                Enterprise
+                            </CustomRadio>
+                        </RadioGroup>
+                    </div>
+
                     <div className='font-normal text-sm mb-4'>
                         Mã sản phẩm: 2320320320
                     </div>
 
-                    <div className='font-normal text-sm'>
+                    <div className='font-normal text-sm mb-5'>
                         Ba chỉ bò (short plate) là phần thịt được lấy ở bụng con bò...
                     </div>
 
-                    {product && product.stock !== undefined && product.stock > 0 ? 
-                    <div>
-                          <div className="flex items-center gap-7 text-black py-5">
-                        <span className="text-base sm:text-xl font-semibold">Số lượng</span>
-                        <div className="flex items-center border border-gray-300">
-                            <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
-                            <Divider orientation="vertical" />
-                            <input
-                                type="text"
-                                value={quantity}
-                                onChange={(e) => handleQuantityChange(Number(e.target.value))}
-                                min={1}
-                                className="w-16 text-center border-none outline-none"
-                            />
-                            <Divider orientation="vertical" />
-                            <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
-                        </div>
+                    {product && product.stock !== undefined && product.stock > 0 ?
+                        <div>
 
-                    </div>
-                    <div className="flex flex-row gap-3">
-                        <Button className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
-                            Mua ngay
-                        </Button>
-                        <Button onClick={handleAddToCart} className="flex flex-1 bg-[#fff] border border-black text-base text-black font-semibold rounded py-7">
-                            Thêm vào giỏ hàng
-                        </Button>
-                    </div>
-                    </div>
-                    : 
-                    <div></div>
+                            <div className="flex gap-2">
+                                <Link href={'/'}>
+                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">Đồ khô</span>
+                                </Link>
+                                <Link href={'/'}>
+                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">PepsiCO</span>
+                                </Link>
+                            </div>
+
+                            <div className="flex items-center gap-7 text-black py-5">
+                                <span className="text-base sm:text-xl font-semibold">Số lượng</span>
+                                <div className="flex items-center border border-gray-300">
+                                    <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
+                                    <Divider orientation="vertical" />
+                                    <input
+                                        type="text"
+                                        value={quantity}
+                                        onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                                        min={1}
+                                        className="w-16 text-center border-none outline-none"
+                                    />
+                                    <Divider orientation="vertical" />
+                                    <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
+                                </div>
+
+                            </div>
+
+                            <div className="flex flex-row gap-3">
+                                <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
+                                    <AddShoppingCartIcon /> Thêm vào giỏ hàng
+                                </Button>
+                                {/* <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
+                            <FavoriteBorderIcon />Yêu thích
+                        </Button> */}
+                                {/* <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
+                            <FavoriteIcon />Đã thích
+                        </Button> */}
+                            </div>
+                        </div>
+                        :
+                        <div></div>
                     }
 
-                  
+
                 </div>
                 <div className='flex-1'>
                     <ImageSwiper imgDemo={product?.images || []} />
@@ -286,10 +354,10 @@ function BodyProduct() {
                 </div>
                 <div>
                     <div>
-                      {/* <  {DUMP_PRODUCTS.slice(0, 4).map((product) => (
+                        {/* <  {DUMP_PRODUCTS.slice(0, 4).map((product) => (
                             <BoxProduct key={product.id} product={product} />
                         ))}> */}
-                      <RecentlyViewed />
+                        <RecentlyViewed />
 
                     </div>
                 </div>
