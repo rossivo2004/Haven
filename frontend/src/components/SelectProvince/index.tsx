@@ -99,7 +99,7 @@ function BodyCheckout() {
     }, [selectedDistrict]);
 
     return (
-        <div className="max-w-screen-xl lg:mx-auto mx-4">
+        <div className="max-w-screen-xl lg:mx-auto mx-4 px-4">
             <div className="py-5 h-[62px]">
                 <BreadcrumbNav
                     items={[

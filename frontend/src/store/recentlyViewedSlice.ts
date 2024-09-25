@@ -1,23 +1,10 @@
 // store/recentlyViewedSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  salePrice?: number;
-  quantity?: number;
-  discount: number;
-  images: string[];
-  description?: string; // Added optional description field
-  select?: boolean; // Added optional description field
-  stock?: number; // Added optional
-  
-}
+import { SingleProduct } from '../interface';
 
 interface RecentlyViewedState {
-  products: Product[];
+  products: SingleProduct[];
 }
 
 const initialState: RecentlyViewedState = {
@@ -28,7 +15,7 @@ const recentlyViewedSlice = createSlice({
   name: 'recentlyViewed',
   initialState,
   reducers: {
-    addProduct: (state, action: PayloadAction<Product>) => {
+    addProduct: (state, action: PayloadAction<SingleProduct>) => {
       const productExists = state.products.find((p) => p.id === action.payload.id);
 
       if (!productExists) {

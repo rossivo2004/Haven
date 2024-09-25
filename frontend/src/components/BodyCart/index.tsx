@@ -9,16 +9,8 @@ import BreadcrumbNav from '../Breadcrum';
 import Link from 'next/link';
 import { Chip } from "@nextui-org/react";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import VoucherSelector from '../VoucherSelector';
-import { Voucher } from '@/src/interface';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@nextui-org/react';
-
-const availableVouchers: Voucher[] = [
-    { id: '1', code: 'DISCOUNT10', discount: 10 },
-    { id: '2', code: 'DISCOUNT20', discount: 20 },
-    // Thêm voucher khác nếu cần
-];
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -185,7 +177,8 @@ const Body_Cart = () => {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded shadow-sm">
+<div className='relative top-0'>
+                <div className="bg-white p-6 rounded shadow-sm sticky top-[100px]">
                     <h2 className="text-2xl font-semibold mb-4">Cộng Giỏ Hàng</h2>
 
 
@@ -231,6 +224,7 @@ const Body_Cart = () => {
                         </div>
                     )}
                 </div>
+</div>
             </div>
         </div>
     );

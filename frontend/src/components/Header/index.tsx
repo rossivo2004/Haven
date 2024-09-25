@@ -4,6 +4,8 @@ import '../../styles/globals.css'
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+
 import SearchIcon from '@mui/icons-material/Search';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PersonIcon from '@mui/icons-material/Person';
@@ -17,7 +19,6 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { useDispatch, useSelector } from 'react-redux';
 import { Spinner } from "@nextui-org/react";
 import { Tooltip, Button } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
@@ -170,8 +171,9 @@ function Header() {
     return (
         <div>
             <div className='lg:h-[130px]'>
-                <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
-                    }`}>
+                <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 `}>
+                {/* <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
+                    }`}> */}
                     <div className="w-full bg-secondary lg:block hidden">
                         <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
                             <Link href={"/"} className="cursor-pointer">
@@ -231,7 +233,7 @@ function Header() {
                                                             <li key={product.id} className="p-2 border-b hover:bg-gray-100">
                                                                 <a href={`/product/${product.id}`} className="flex gap-4 items-center">
                                                                     <div className='w-14 h-14'>
-                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} />
+                                                                        {/* <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} /> */}
                                                                     </div>
                                                                     <div>{product.name}</div>
                                                                 </a>
@@ -607,7 +609,7 @@ function Header() {
                                                                     <div className="w-14 h-14">
                                                                         <img
                                                                             className="w-full h-full object-cover"
-                                                                            src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'}
+                                                                            // src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'}
                                                                             alt={product.name}
                                                                         />
                                                                     </div>

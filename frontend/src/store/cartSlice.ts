@@ -9,7 +9,10 @@ interface CartItem {
   quantity: number;
   images: string[];
   select: boolean;
+  variantId: string; // Thêm ID của biến thể
+  variantName: string; // Tên của biến thể (ví dụ: "500g" hoặc "Màu đỏ")
 }
+
 
 interface CartState {
   items: CartItem[];
@@ -112,7 +115,7 @@ const cartSlice = createSlice({
 
     setSum: (state, action: PayloadAction<number>) => {
       state.sum = action.payload;
-      saveState(state);
+      saveState(state);1111
     },
 
     setPriceDisscount: (state, action: PayloadAction<number>) => {

@@ -1,7 +1,7 @@
 .navItem {
     position: relative;
     display: inline-block;
-    cursor: pointer;
+    transition: 1s linear;
   }
   
   /* .navTitle {

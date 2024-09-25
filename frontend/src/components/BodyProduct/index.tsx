@@ -1,35 +1,42 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { useParams } from "next/navigation";
-import { ToastContainer, toast } from 'react-toastify';
-import { Button, Divider } from '@nextui-org/react';
-import BreadcrumbNav from '../Breadcrum';
-import ImageSwiper from '../SliderImageProductDetail';
-import { DUMP_PRODUCTS } from '@/src/dump';
-import BoxProduct from '../BoxProduct';
-import { ProductProps } from '@/src/interface';
-import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
-
-import { addItem } from '@/src/store/cartSlice';
+import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { number } from 'yup';
 import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import { number } from 'yup';
 
-const CustomRadio = (props: RadioProps) => {
+import { DUMP_PRODUCTS } from '@/src/dump';
+import { ProductProps } from '@/src/interface';
+import { SingleProduct } from '@/src/interface';
+import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
+import { addItem } from '@/src/store/cartSlice';
+import { Button, Divider } from '@nextui-org/react';
+
+import { useProducts } from '@/src/hooks/product';
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+
+import ImageSwiper from '../SliderImageProductDetail';
+import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
+import BoxProduct from '../BoxProduct';
+import Loading from '../ui/Loading';
+import BreadcrumbNav from '../Breadcrum';
+
+interface CustomRadioProps extends RadioProps {
+    isSelected: boolean;
+}
+
+const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
     const {
         Component,
-        children,
-        isSelected,
         getBaseProps,
-        getWrapperProps,
         getInputProps,
         getLabelProps,
         getLabelWrapperProps,
-        getControlProps,
     } = useRadio(props);
 
     return (
@@ -37,8 +44,8 @@ const CustomRadio = (props: RadioProps) => {
             {...getBaseProps()}
             className={cn(
                 "group flex items-center justify-between hover:bg-content2",
-                "w-min cursor-pointer border-2 border-default rounded-lg gap-4 p-1 pr-3",
-                "data-[selected=true]:border-primary",
+                "w-max cursor-pointer border-2 border-default rounded-lg gap-4 p-1 pr-3",
+                isSelected ? "data-[selected=true]:border-primary" : "border-gray-300" // Điều chỉnh kiểu khi được chọn
             )}
         >
             <VisuallyHidden>
@@ -52,18 +59,22 @@ const CustomRadio = (props: RadioProps) => {
 };
 
 function BodyProduct() {
-    const { id: id_product } = useParams(); // get id product
-    const [product, setProduct] = useState<ProductProps | null>(null);
-    const image = product?.images || [];
+    const { id } = useParams(); // get id product
+    const [product, setProduct] = useState<SingleProduct | null>(null);
+    const [activeVariant, setActiveVariant] = useState<string | null>(null);
+    const router = useRouter();
+    // const image = product?.images || [];
 
     const [activeTab, setActiveTab] = useState<number>(0);
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [priceDiscount, setPriceDiscount] = useState(0);
 
     const [quantity, setQuantity] = useState(1);
+    const [loading, setLoading] = useState(true);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
+    const { flatProducts } = useProducts(); // Use updated hook without filters
 
     const handleQuantityChange = (value: number) => {
         if (value > 0) {
@@ -71,21 +82,27 @@ function BodyProduct() {
         }
     };
 
-    useEffect(() => {
-        if (id_product) {
-            const data_product = DUMP_PRODUCTS.find(
-                (product) => product.id === Number(id_product)
-            );
-
-            if (data_product) {
-                const discount = data_product.discount ? data_product.price * (1 - data_product.discount / 100) : data_product.price;
-
-
-                setPriceDiscount(discount);
-                setProduct(data_product);
+useEffect(() => {
+    const fetchData = async () => {
+        if (id) {
+            const selectedVariant = flatProducts.find((variant) => variant.id === id);
+            
+            if (selectedVariant) {
+                setProduct(selectedVariant);
+                setActiveVariant(selectedVariant.id);
+            } else {
+                console.warn("Không tìm thấy biến thể cho ID:", id);
             }
         }
-    }, [id_product]);
+        setLoading(false); // Dữ liệu đã được tải
+    };
+
+    fetchData();
+}, [id, flatProducts]);
+
+    
+    
+    
 
 
 
@@ -121,16 +138,16 @@ function BodyProduct() {
         if (product) {
             const salePrice = product.price - (product.price * product.discount) / 100;
 
-            dispatch(addItem({
-                id: product.id,
-                name: product.name,
-                images: product.images,
-                price: product.price,
-                salePrice: salePrice,
-                quantity: quantity,
-                select: false,
-                // stock: product.stock,
-            }));
+            // dispatch(addItem({
+            //     id: product.id,
+            //     name: product.name,
+            //     images: product.images,
+            //     price: product.price,
+            //     salePrice: salePrice,
+            //     quantity: quantity,
+            //     select: false,
+            //     // stock: product.stock,
+            // }));
 
             toast.success('Thêm sản phẩm thành công');
             setQuantity(1);
@@ -139,10 +156,42 @@ function BodyProduct() {
         }
     };
 
+  const handleVariantChange = (variantId: string) => {
+    const selectedVariant = product?.variants.find((variant) => variant.id === variantId);
+    if (selectedVariant) {
+
+        setActiveVariant(selectedVariant.id);
+        
+        // Update the URL without a full page reload
+        const newUrl = `/product/${selectedVariant.id}`;
+        router.push(newUrl, undefined);
+
+
+    }
+};
+
+useEffect(() => {
+    if (product && activeVariant) {
+        const selectedVariant = product.variants.find(variant => variant.id === activeVariant);
+        if (selectedVariant) {
+            const discount = selectedVariant.discount ? selectedVariant.price * (1 - selectedVariant.discount / 100) : selectedVariant.price;
+            setPriceDiscount(discount);
+        }
+    }
+}, [activeVariant, product]);
+
+if (loading) {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <Loading />
+        </div>
+    );
+}
+
 
 
     return (
-        <div className="max-w-screen-xl lg:mx-auto mx-4">
+        <div className="max-w-screen-xl lg:mx-auto mx-4 px-4">
             <div className="py-5 h-[62px]">
                 <BreadcrumbNav
                     items={[
@@ -194,20 +243,20 @@ function BodyProduct() {
                     </div>
 
                     <div className='mb-4'>
-                        <RadioGroup label="" orientation="horizontal">
-                            <CustomRadio description="Up to 20 items" value="free" isDisabled>
-                                Free
-                            </CustomRadio>
-                            <CustomRadio description="Unlimited items. $10 per month." value="pro">
-                                Pro
-                            </CustomRadio>
-                            <CustomRadio
-                                description="24/7 support. Contact us for pricing."
-                                value="enterprise"
-                            >
-                                Enterprise
-                            </CustomRadio>
+                        <RadioGroup label="" orientation="horizontal" value={activeVariant}>
+                            {product?.variants.map((item) => (
+                                <CustomRadio
+                                    key={item.id}
+                                    value={item.id}
+                                    onChange={() => handleVariantChange(item.id)}
+                                    isSelected={activeVariant === item.id} // Xác định biến thể đang được chọn
+                                >
+                                    {item.name}
+                                </CustomRadio>
+                            ))}
                         </RadioGroup>
+
+
                     </div>
 
                     <div className='font-normal text-sm mb-4'>
@@ -340,7 +389,7 @@ function BodyProduct() {
                 </div>
                 <div>
                     <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                        {DUMP_PRODUCTS.slice(0, 4).map((product) => (
+                        {flatProducts.slice(0, 4).map((product) => (
                             <BoxProduct key={product.id} product={product} />
                         ))}
                     </div>

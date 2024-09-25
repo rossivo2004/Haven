@@ -126,9 +126,12 @@ function BodySingUp() {
                         <div className="flex-1 border-t border-gray-300" />
                     </div>
 
-                    <div className="text-center mb-2">
+                    <div className="text-center mb-2 flex gap-3 items-center justify-center">
                         <button>
                             <img src="/images/google-logo.png" alt="" className="w-8 h-8" />
+                        </button>
+                        <button>
+                            <img src="/images/facebook-logo.png" alt="" className="w-8 h-8" />
                         </button>
                     </div>
                     <div className="text-center text-base font-normal">

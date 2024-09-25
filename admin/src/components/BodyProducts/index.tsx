@@ -19,6 +19,7 @@ interface Animal {
 
 interface Variant {
     name: string;
+    tag: string; // Thêm trường tag
     price: string;
     salePrice: string;
     quantity: string;
@@ -30,14 +31,16 @@ interface FormData {
     category: string;
     brand: string;
     description: string;
+    images: string[]; // Thêm trường images cho sản phẩm chung
     variants: Variant[];
 }
 
 const BodyProductsV2: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [variants, setVariants] = useState<Variant[]>([]);
-    const [newVariant, setNewVariant] = useState<Variant>({ name: "", price: "", salePrice: "", quantity: "", images: [] });
+    const [newVariant, setNewVariant] = useState<Variant>({ name: "", tag: "", price: "", salePrice: "", quantity: "", images: [] });
     const [hasVariants, setHasVariants] = useState(false); // Trạng thái để theo dõi số lượng biến thể
+    const [productImages, setProductImages] = useState<string[]>([]); // Trạng thái cho ảnh sản phẩm chung
 
     const animals: Animal[] = [
         { key: "beverage", label: "Beverage" },
@@ -57,15 +60,18 @@ const BodyProductsV2: React.FC = () => {
             category: "",
             brand: "",
             description: "",
+            images: [], // Khởi tạo ảnh sản phẩm chung
             variants: [],
         },
         onSubmit: (values) => {
             const formData = {
                 ...values,
                 variants: variants,
+                images: productImages, // Thêm ảnh sản phẩm chung vào formData
             };
             console.log("Form Data Submitted:", formData);
             onClose();
+            // Thực hiện các thao tác gửi dữ liệu đến backend tại đây
         },
     });
 
@@ -91,11 +97,32 @@ const BodyProductsV2: React.FC = () => {
         });
     };
 
+    const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const previews = files.map((file) => {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (reader.result) {
+                        resolve(reader.result as string);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file); // Convert image to base64
+            });
+        });
+
+        Promise.all(previews).then((images) => {
+            setProductImages(images); // Cập nhật ảnh sản phẩm chung
+            formik.setFieldValue("images", images); // Cập nhật vào formik
+        });
+    };
+
     const handleAddVariant = () => {
-        if (newVariant.name && newVariant.price && newVariant.salePrice && newVariant.quantity) {
+        if (newVariant.name && newVariant.tag && newVariant.price && newVariant.salePrice && newVariant.quantity) {
             setVariants([...variants, newVariant]);
             setHasVariants(true); // Cập nhật trạng thái khi thêm biến thể
-            setNewVariant({ name: "", price: "", salePrice: "", quantity: "", images: [] });
+            setNewVariant({ name: "", tag: "", price: "", salePrice: "", quantity: "", images: [] });
         } else {
             alert("Vui lòng điền đầy đủ thông tin biến thể.");
         }
@@ -118,8 +145,9 @@ const BodyProductsV2: React.FC = () => {
     };
 
     const removeVariant = (index: number) => {
-        setVariants(variants.filter((_, i) => i !== index));
-        formik.setFieldValue("variants", variants.filter((_, i) => i !== index));
+        const updatedVariants = variants.filter((_, i) => i !== index);
+        setVariants(updatedVariants);
+        formik.setFieldValue("variants", updatedVariants);
     };
 
     const handleDelete = (userId: number) => {
@@ -131,6 +159,7 @@ const BodyProductsV2: React.FC = () => {
                     label: 'Yes',
                     onClick: () => {
                         console.log('Deleted user with id:', userId);
+                        // Thực hiện xóa sản phẩm tại đây
                     }
                 },
                 {
@@ -153,7 +182,7 @@ const BodyProductsV2: React.FC = () => {
                 </div>
             </div>
 
-{/* Form thêm sản phẩm */}
+            {/* Form thêm sản phẩm */}
             <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onClose={onClose} isDismissable={false} isKeyboardDismissDisabled={true}>
                 <form onSubmit={formik.handleSubmit}>
                     <ModalContent>
@@ -164,6 +193,7 @@ const BodyProductsV2: React.FC = () => {
                                     <label htmlFor="name" className="block mb-1">Tên sản phẩm</label>
                                     <Input
                                         id="name"
+                                        name="name"
                                         placeholder="Tên sản phẩm"
                                         onChange={formik.handleChange}
                                         value={formik.values.name}
@@ -175,6 +205,7 @@ const BodyProductsV2: React.FC = () => {
                                     <Select
                                         isRequired
                                         id="category"
+                                        name="category"
                                         className="w-full"
                                         placeholder="Phân loại"
                                         aria-label="Chọn phân loại"
@@ -194,6 +225,7 @@ const BodyProductsV2: React.FC = () => {
                                     <label htmlFor="brand-select" className="block mb-1">Thương hiệu</label>
                                     <Select
                                         id="brand-select"
+                                        name="brand"
                                         className="w-full"
                                         placeholder="Thương hiệu"
                                         onChange={(value) => formik.setFieldValue("brand", value)}
@@ -208,10 +240,35 @@ const BodyProductsV2: React.FC = () => {
                                     </Select>
                                 </div>
                             </div>
+                            
+                            {/* Ảnh sản phẩm chung */}
+                            <div className="mb-5">
+                                <label htmlFor="product-images" className="block mb-1">Ảnh sản phẩm</label>
+                                <Input
+                                    id="product-images"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleProductImageChange}
+                                />
+                                {/* Hiển thị ảnh preview cho sản phẩm chung */}
+                                <div className="flex gap-2 mt-2">
+                                    {productImages.map((img, imgIndex) => (
+                                        <img
+                                            key={imgIndex}
+                                            src={img}
+                                            alt={`product-img-${imgIndex}`}
+                                            className="w-16 h-16 object-cover"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
                             <div>
                                 <label htmlFor="description">Mô tả sản phẩm</label>
                                 <Textarea
                                     id="description"
+                                    name="description"
                                     rows={6}
                                     required
                                     placeholder="Nhập mô tả sản phẩm"
@@ -225,6 +282,7 @@ const BodyProductsV2: React.FC = () => {
                                     value={formik.values.description}
                                 />
                             </div>
+                           
 
                             {/* Section for Variants */}
                             <div className="mb-5">
@@ -232,9 +290,15 @@ const BodyProductsV2: React.FC = () => {
                                 <div className="flex flex-col gap-3 mb-3">
                                     <div className="flex gap-3 mb-3">
                                         <Input
-                                            placeholder="Tên biến thể (e.g., Lon, Lốc)"
+                                            placeholder="Tên biến thể"
                                             value={newVariant.name}
                                             onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
+                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
+                                        />
+                                        <Input
+                                            placeholder="Tag biến thể (e.g., Lon, Lốc)"
+                                            value={newVariant.tag}
+                                            onChange={(e) => setNewVariant({ ...newVariant, tag: e.target.value })}
                                             required={!hasVariants} // Bỏ required nếu đã có biến thể
                                         />
                                         <Input
@@ -306,12 +370,18 @@ const BodyProductsV2: React.FC = () => {
                                 {/* Display existing variants */}
                                 <div className="mt-4">
                                     {variants.map((variant, index) => (
-                                        <div key={index} className="flex flex-col gap-3 mb-2">
+                                        <div key={index} className="flex flex-col gap-3 mb-2 border p-3 rounded">
                                             <div className="flex gap-3 items-center">
                                                 <Input
                                                     placeholder="Tên biến thể"
                                                     value={variant.name}
                                                     onChange={(e) => handleVariantChange(index, "name", e.target.value)}
+                                                    required
+                                                />
+                                                <Input
+                                                    placeholder="Tag biến thể"
+                                                    value={variant.tag}
+                                                    onChange={(e) => handleVariantChange(index, "tag", e.target.value)}
                                                     required
                                                 />
                                                 <Input
@@ -370,9 +440,9 @@ const BodyProductsV2: React.FC = () => {
                     </ModalContent>
                 </form>
             </Modal>
-{/* ///////////////////*/}
+            {/* ///////////////////*/}
             <div className="mt-5">
-              <TableProduct />
+                <TableProduct />
                 <div className="mt-5 flex justify-center">
                     <Pagination total={5} initialPage={1} />
                 </div>

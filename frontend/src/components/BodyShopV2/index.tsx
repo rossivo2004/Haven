@@ -12,10 +12,12 @@ import CustomPagination from '../Pagination';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { DUMP_PRODUCTS } from '@/src/dump';
 import { ProductProps } from '@/src/interface';
+import { SingleProduct } from '@/src/interface';
 import { formatVND } from '@/src/utils';
 import Menu from '../Test';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import type { Selection } from "@nextui-org/react";
+import { useProducts } from '@/src/hooks/product';
 
 import { CustomCheckbox } from './components/CustomCheckbox';
 
@@ -27,6 +29,7 @@ function BodyShopV2() {
     const [cateFilter, setCateFilter] = useState<string[]>([]);
     const [groupSelected, setGroupSelected] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(["text"]));
+    const { flatProducts } = useProducts(); // Use updated hook without filters
 
     const selectedValue = useMemo(
         () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
@@ -73,7 +76,7 @@ function BodyShopV2() {
         setCurrentPage(1);
     };
 
-    const filterByPrice = (product: ProductProps) => {
+    const filterByPrice = (product: SingleProduct) => {
         if (priceFilter.length === 0) return true;
 
         const discountedPrice = product.price * (1 - product.discount / 100);
@@ -87,12 +90,12 @@ function BodyShopV2() {
         });
     };
 
-    const filterByCategory = (product: ProductProps) => {
+    const filterByCategory = (product: SingleProduct) => {
         if (cateFilter.length === 0) return true;
         return cateFilter.includes(product.category.toLowerCase());
     };
 
-    const filteredProducts = DUMP_PRODUCTS.filter(product => filterByPrice(product) && filterByCategory(product));
+    const filteredProducts = flatProducts.filter(product => filterByPrice(product) && filterByCategory(product));
     const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
