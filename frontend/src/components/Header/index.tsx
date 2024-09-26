@@ -77,19 +77,19 @@ function Header() {
         }
     };
 
-    const handleScroll = () => {
-        const currentScrollY = window.scrollY;
+    // const handleScroll = () => {
+    //     const currentScrollY = window.scrollY;
 
-        if (currentScrollY > lastScrollY && currentScrollY > 100) {
-            // Cuộn xuống, ẩn header
-            setIsVisible(false);
-        } else {
-            // Cuộn lên, hiện header
-            setIsVisible(true);
-        }
+    //     if (currentScrollY > lastScrollY && currentScrollY > 100) {
+    //         // Cuộn xuống, ẩn header
+    //         setIsVisible(false);
+    //     } else {
+    //         // Cuộn lên, hiện header
+    //         setIsVisible(true);
+    //     }
 
-        setLastScrollY(currentScrollY);
-    };
+    //     setLastScrollY(currentScrollY);
+    // };
 
 
     const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
@@ -145,14 +145,14 @@ function Header() {
         setCartCount(totalItems);
     }, [totalItems]);
 
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
+    // useEffect(() => {
+    //     window.addEventListener('scroll', handleScroll);
 
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
+    //     return () => {
+    //         window.removeEventListener('scroll', handleScroll);
 
-        };
-    }, [lastScrollY]);
+    //     };
+    // }, [lastScrollY]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -259,16 +259,16 @@ function Header() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
-                                    <div className="xl:text-sm lg:text-[10px]">
+                                    {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div> */}
+                                    {/* <div className="xl:text-sm lg:text-[10px]">
                                         <div>
                                             <Link href={'/signin'}>Đăng nhập</Link>
                                         </div>
                                         <div>
                                             <Link href={'/signup'}>Đăng kí</Link>
                                         </div>
-                                    </div>
-                                    {/* <div>
+                                    </div> */}
+                                    <div>
                                         <Dropdown placement="bottom-end">
                                             <DropdownTrigger>
                                                 <Avatar
@@ -310,7 +310,7 @@ function Header() {
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
-                                    </div> */}
+                                    </div>
                                 </div>
 
 
@@ -414,7 +414,7 @@ function Header() {
                                     </Link> <KeyboardArrowDownIcon /></div>}>
                                         {
                                             isVisible ? (
-                                                <div className="px-1 py-2 grid grid-cols-4 gap-1 relative">
+                                                <div className="p-2 grid grid-cols-4 gap-1 relative">
                                                     <div className='row-span-4'>
                                                         <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
                                                     </div>

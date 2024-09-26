@@ -21,7 +21,7 @@ const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', childre
   const hideDropdown = () => {
     const timeoutId = setTimeout(() => {
       setIsOpen(false);
-    }, 500); // Delay of 0.5 second
+    }, 300); // Thay đổi thời gian này nếu cần
     setHideTimeout(timeoutId); // Store the timeout ID
   };
 
@@ -32,14 +32,12 @@ const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', childre
       onMouseLeave={hideDropdown}
     >
       <span className={styles.navTitle}>{title}</span>
-      {isOpen && (
-        <div 
-          className={styles.dropdown} 
-          style={{ left: position === 'left' ? '0' : 'auto', right: position === 'right' ? '0' : 'auto' }}
-        >
-          {children} {/* Render custom content */}
-        </div>
-      )}
+      <div 
+        className={`${styles.dropdown} ${isOpen ? styles.show : styles.hide}`} 
+        style={{ left: position === 'left' ? '0' : 'auto', right: position === 'right' ? '0' : 'auto' }}
+      >
+        {children} {/* Render custom content */}
+      </div>
     </div>
   );
 };

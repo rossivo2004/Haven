@@ -27,11 +27,13 @@ function BoxProduct({ product }: { product: SingleProduct }) {
             <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 px-2 pt-2 pb-3 rounded-lg">
                 <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                     <Image
+                    loading="lazy"
                         src={product.images[0] }
                         alt={name}
                         width={500}
                         height={500}
                         className="w-full lg:h-[260px] h-full object-cover group-hover:scale-110 transition-all"
+                        
                     />
                 </div>
                 <div className="w-full h-auto flex flex-col justify-between mt-4">

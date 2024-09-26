@@ -155,8 +155,8 @@ function BodyShop() {
 
 
                 {/* Product Listing */}
-                <div className="flex-1">
-                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start">
+                <div className="flex-1 relative">
+                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start sticky top-[120px] bg-white z-20">
                         <div className="mr-4 mb-2 flex lg:justify-between justify-end items-center h-full w-full gap-2">
                             {filter.length > 0 || priceFilter.length > 0 ? (
                                 <div className="flex-1 flex items-center">
