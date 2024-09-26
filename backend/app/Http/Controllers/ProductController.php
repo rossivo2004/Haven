@@ -27,7 +27,10 @@ class ProductController extends Controller
         $query = Product::query();
         $products = $query->get();
         
-
+        if(request()->has('search') || request('search') != null ){
+            $search = request('search');
+            $query->where('name','like', '%'. $search . '%')->get();
+         }
         // return view('Product.home', [
         //     'product' =>   $products,
         //     'categories' => $categories::orderBy('id', 'desc')->get(),
@@ -73,7 +76,7 @@ class ProductController extends Controller
                 $query->orWhereBetween('price', [$item->min, $item->max]);
             }
         }
-        $productVariants = $query->paginate(1)->appends([
+        $productVariants = $query->paginate(10)->appends([
             'priceRanges' => request('priceRanges'),
             'category' => request('category'),
             'brand' => request('brand'),
@@ -96,14 +99,14 @@ class ProductController extends Controller
     {
         $brands = new Brand();
         $categories = new Category();
-        // return response()->json([
-        //     'categories' => $categories::orderBy('id', 'desc')->get(),
-        //     'brands' => $brands::orderBy('id', 'desc')->get(),
-        // ]);  
-        return view('Product.store', [
+        return response()->json([
             'categories' => $categories::orderBy('id', 'desc')->get(),
             'brands' => $brands::orderBy('id', 'desc')->get(),
-        ]);    
+        ]);  
+        // return view('Product.store', [
+        //     'categories' => $categories::orderBy('id', 'desc')->get(),
+        //     'brands' => $brands::orderBy('id', 'desc')->get(),
+        // ]);    
     }
 
     /**

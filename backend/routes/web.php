@@ -32,7 +32,8 @@ route::group([
 });
 
 route::group([
-    'prefix' => 'api/brand'
+    'prefix' => 'api/brand',
+    'middleware' => '',
 ],function(){
     Route::get('/', [BrandController::class, 'index'])->name('Brand.index');
     Route::get('/create', [BrandController::class, 'create'])->name('Brand.create');
@@ -41,4 +42,8 @@ route::group([
     Route::put('/update/{brand}', [BrandController::class, 'update'])->name('Brand.update');
     Route::delete('/delete/{brand}', [BrandController::class, 'destroy'])->name('Brand.delete');
     Route::get('/getBrandByTag/{tag}', [BrandController::class, 'getBrandByTag'])->name('Brand.getBrandByTag');
+});
+
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
 });
