@@ -33,7 +33,6 @@ route::group([
 
 route::group([
     'prefix' => 'api/brand',
-    'middleware' => '',
 ],function(){
     Route::get('/', [BrandController::class, 'index'])->name('Brand.index');
     Route::get('/create', [BrandController::class, 'create'])->name('Brand.create');
