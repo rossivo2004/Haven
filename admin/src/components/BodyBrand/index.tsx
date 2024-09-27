@@ -1,15 +1,21 @@
 'use client';
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import TableBrand from "../TableBrand";
 import CustomPagination from "@/components/Pagination";
 import { Pagination } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
+import axios from "axios";
+import { Brand } from "@/interface";
 
 const BodyBrand: React.FC = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [image, setImage] = useState<string[]>([]); // Image state
+    const [brand, setBrand] = useState<Brand[]>([]);
+    
 
     // Function to handle file input change (if you want to store the image as base64 or file path)
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +25,22 @@ const BodyBrand: React.FC = () => {
             setImage(fileArray);
         }
     };
+
+    const fetch = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/api/brand`, { withCredentials: true });
+            setBrand(response.data.categories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    console.log(brand);
+    
+
+    useEffect(() => {
+        fetch();
+    }, []);
 
     return (
         <div>
