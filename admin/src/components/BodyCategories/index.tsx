@@ -10,6 +10,7 @@ import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Category } from "@/interface";
 import {Pagination} from "@nextui-org/react";
+import useCsrfToken from "@/configs/csrfToken";
 
 function BodyCategories() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -21,6 +22,7 @@ function BodyCategories() {
     const [successMessage, setSuccessMessage] = useState("");
     const [categories, setCategories] = useState<Category[]>([]);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const csrf_Token = useCsrfToken();
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -39,6 +41,9 @@ function BodyCategories() {
     }, []);
 
     const handleSubmit = async () => {
+        console.log(csrf_Token);
+        
+        
         if (!categoryName || !categoryTag) {
             alert('Please fill in all fields.');
             return;
@@ -61,13 +66,11 @@ function BodyCategories() {
         }
 
         try {
-            const csrfResponse = await axios.get(`${baseUrl}/csrf-token`, { withCredentials: true });
-            const csrfToken = csrfResponse.data.token;
 
             const response = await axios.post(`${baseUrl}/api/category/store`, formData, {
                 headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
+                    accept: 'application/json',
+                    'X-CSRF-TOKEN': csrf_Token,
                 },
                 withCredentials: true,
             });
@@ -84,6 +87,16 @@ function BodyCategories() {
             setLoading(false);
         }
     };
+
+    function getCookie(name: string): string | null {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop()?.split(';').shift() || null;
+        }
+        return null;
+    }
+    
 
     const handleDelete = (categoryId: string) => {
         confirmAlert({
