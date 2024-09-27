@@ -54,12 +54,12 @@ class CategoryController extends Controller
             // Return a success response
             return response()->json([
                 'success' => true,
-                'message' => 'Category đã được cập nhật thành công',
+                'message' => 'Category đã được thêm thành công',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xảy ra lỗi trong quá trình cập nhật',
+                'message' => 'Xảy ra lỗi trong quá trình thêm',
                 'error' => $e->getMessage()
             ], 500);
         }
