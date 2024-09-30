@@ -1,48 +1,43 @@
 .navItem {
   position: relative;
   display: inline-block;
-  transition: 1s linear;
 }
 
 .dropdown {
   position: absolute;
-  top: 120%;
+  top: 100%;
   background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   width: max-content;
   border-radius: 8px;
-  opacity: 0; /* Bắt đầu với opacity = 0 */
-  transform: translateY(-10px); /* Bắt đầu với vị trí dịch chuyển lên */
-  transition: opacity 0.3s ease, transform 0.3s ease; /* Hiệu ứng mờ dần và dịch chuyển */
-  visibility: hidden; /* Ẩn dropdown */
+  height: 0; /* Start with height 0 */
+  opacity: 0; /* Start with opacity 0 */
+  overflow: hidden; /* Hide content when height is 0 */
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; /* Smooth transitions for height and opacity */
+  visibility: hidden; /* Hidden by default */
 }
 
 .dropdown.show {
-  opacity: 1; /* Khi hiện thì opacity = 1 */
-  transform: translateY(0); /* Đưa về vị trí ban đầu (xuống dưới) */
-  visibility: visible; /* Hiện dropdown */
+  height: auto; /* Expand height to 100px */
+  opacity: 1; /* Fade in */
+  visibility: visible; /* Make visible */
 }
 
 .dropdown.hide {
-  opacity: 0; /* Khi ẩn thì opacity = 0 */
-  transform: translateY(-10px); /* Dịch chuyển lên */
-  visibility: hidden; /* Ẩn dropdown */
-}
-
-.dropdown ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+  height: 0; /* Collapse back to 0 */
+  opacity: 0; /* Fade out */
+  visibility: hidden; /* Hidden when collapsed */
 }
 
 .dropdownItem {
   padding: 10px 20px;
   cursor: pointer;
   color: black;
+  transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
 .dropdownItem:hover {
-  background-color: #f0f0f0; /* Thêm màu nền khi hover */
+  background-color: #f0f0f0; /* Change background on hover */
 }

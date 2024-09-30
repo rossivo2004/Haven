@@ -152,7 +152,7 @@ const Body_Cart = () => {
                             <div className='text-4xl font-medium mb-4'>Chưa có sản phẩm nào trong giỏ hàng</div>
                             <div>
                                 <Link href={'/shop'}>
-                                    <button className='bg-main p-2 rounded-lg text-white'>QUAY TRỞ LẠI CỬA HÀNG</button>
+                                    <button className='bg-main p-2 rounded-lg text-white'>Quay trở lại cửa hàng</button>
                                 </Link>
                             </div>
                         </div>

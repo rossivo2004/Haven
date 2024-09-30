@@ -15,6 +15,7 @@ import { Tabs, Tab, Button } from "@nextui-org/react";
 import { title, subtitle } from "@/src/components/primitives";
 import { GithubIcon } from "@/src/components/icons";
 import BoxProduct from "@/src/components/BoxProduct";
+import BoxProductFlashSale from "../BoxProductFlashSale";
 import BoxBlog from "@/src/components/BoxBlog";
 import InfiniteScroll from "../InfiniteScroll";
 
@@ -209,7 +210,7 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-14">
                         <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
                             {flatProducts.slice(0, 8).map((product) => (
-                                <BoxProduct key={product.id} product={product} />
+                                <BoxProductFlashSale key={product.id} product={product} />
                             ))}
                         </div>
                     </div>

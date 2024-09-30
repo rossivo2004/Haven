@@ -316,7 +316,7 @@ function Header() {
 
 
                                 <TooltipCu position='right' title={
-                                    <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative">
+                                    <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative py-3">
                                         <div className="relative">
                                             <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
                                             {/* <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-0">
@@ -409,31 +409,39 @@ function Header() {
                                 <li>
 
 
-                                    <TooltipCu position='left' title={<div className='flex items-center transition-all '>  <Link href={'/shop'}>
-                                        SẢN PHẨM
-                                    </Link> <KeyboardArrowDownIcon /></div>}>
-                                        {
-                                            isVisible ? (
-                                                <div className="p-2 grid grid-cols-4 gap-1 relative">
-                                                    <div className='row-span-4'>
-                                                        <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
-                                                    </div>
-                                                    {CATEGORY.map((item, index) => (
-                                                        <Link key={index} href={`/shop?category=${item.tag}`}>
-                                                            <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                <div className='mr-2'>
-                                                                    <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                </div>
-                                                                <div>{item.name}</div>
-                                                            </div>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                null
-                                            )
-                                        }
-                                    </TooltipCu>
+<div className='group'>
+                                <TooltipCu position='left' title={
+    <div className='flex items-center transition-all py-3'>
+        <Link href={'/shop'}>
+            SẢN PHẨM
+        </Link>
+        <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400'/>
+    </div>
+}>
+    {
+        isVisible ? (
+            <div className="p-2 grid grid-cols-4 gap-1 relative">
+                <div className='row-span-4'>
+                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
+                </div>
+                {CATEGORY.map((item, index) => (
+                    <Link key={index} href={`/shop?category=${item.tag}`}>
+                        <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                            <div className='mr-2'>
+                                <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                            </div>
+                            <div>{item.name}</div>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        ) : (
+            null
+        )
+    }
+</TooltipCu>
+</div>
+
 
                                 </li>
                                 {/* <li className='relative'>

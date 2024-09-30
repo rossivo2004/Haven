@@ -1,15 +1,16 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState } from 'react';
 import styles from './Tooltip.module.css';
 
 interface TooltipCuProps {
   title: React.ReactNode; // Accept JSX for the title
   position?: 'left' | 'right'; 
   children: React.ReactNode; 
+  className?: string; // Add className to the props interface
 }
 
-const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', children }) => {
+const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', children, className }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null); // Store timeout ID
+  const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const showDropdown = () => {
     if (hideTimeout) {
@@ -21,13 +22,13 @@ const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', childre
   const hideDropdown = () => {
     const timeoutId = setTimeout(() => {
       setIsOpen(false);
-    }, 300); // Thay đổi thời gian này nếu cần
-    setHideTimeout(timeoutId); // Store the timeout ID
+    }, 300); // Adjust delay as needed
+    setHideTimeout(timeoutId);
   };
 
   return (
     <div 
-      className={styles.navItem} 
+      className={`${styles.navItem} ${className}`} // Apply className prop
       onMouseEnter={showDropdown} 
       onMouseLeave={hideDropdown}
     >

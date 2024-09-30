@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from 'formik';
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
@@ -11,68 +11,100 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Toolti
 import TableProduct from "../TableProduct";
 import { confirmAlert } from "react-confirm-alert";
 
+import { Category } from "@/interface";
+import { Brand } from "@/interface";
 
-interface Animal {
-    key: string;
-    label: string;
-}
+import apiConfig from "@/configs/api";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Variant {
     name: string;
-    tag: string; // Thêm trường tag
     price: string;
-    salePrice: string;
-    quantity: string;
-    images: string[]; // Array of images for each variant
+    discount: string;
+    stock: string;
+    variant_value: string;
+    image: string[]; // Array of images for each variant
+    product_id: string; // Id of product
 }
 
 interface FormData {
-    name: string;
-    category: string;
-    brand: string;
+    name_product: string;
+    category_id: string;
+    brand_id: string;
     description: string;
-    images: string[]; // Thêm trường images cho sản phẩm chung
+    main_image: string[]; // Thêm trường images cho sản phẩm chung
     variants: Variant[];
 }
 
 const BodyProductsV2: React.FC = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [variants, setVariants] = useState<Variant[]>([]);
-    const [newVariant, setNewVariant] = useState<Variant>({ name: "", tag: "", price: "", salePrice: "", quantity: "", images: [] });
+    const [newVariant, setNewVariant] = useState<Variant>({ name: "", variant_value: "", price: "", discount: "", stock: "", image: [], product_id: "" });
     const [hasVariants, setHasVariants] = useState(false); // Trạng thái để theo dõi số lượng biến thể
     const [productImages, setProductImages] = useState<string[]>([]); // Trạng thái cho ảnh sản phẩm chung
+    const [loading, setLoading] = useState(false);
 
-    const animals: Animal[] = [
-        { key: "beverage", label: "Beverage" },
-        { key: "snacks", label: "Snacks" },
-        { key: "electronics", label: "Electronics" },
-    ];
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
 
-    const brands: Animal[] = [
-        { key: "pepsi", label: "Pepsi" },
-        { key: "coca", label: "Coca-Cola" },
-        { key: "fanta", label: "Fanta" },
-    ];
+    
 
     const formik = useFormik<FormData>({
         initialValues: {
-            name: "",
-            category: "",
-            brand: "",
+            name_product: "",
+            category_id: "",
+            brand_id: "",
             description: "",
-            images: [], // Khởi tạo ảnh sản phẩm chung
+            main_image: [], // Initialize main product images
             variants: [],
         },
         onSubmit: (values) => {
             const formData = {
                 ...values,
-                variants: variants,
-                images: productImages, // Thêm ảnh sản phẩm chung vào formData
+                variants: variants.map(variant => ({
+                    ...variant,
+                    price: Number(variant.price),
+                    discount: Number(variant.discount),
+                    stock: Number(variant.stock),
+
+                })),
+                main_image: productImages,
             };
-            console.log("Form Data Submitted:", formData);
-            onClose();
-            // Thực hiện các thao tác gửi dữ liệu đến backend tại đây
+
+            console.log("Form Data Submitted:", formData); // Log the data being sent
+
+            const add = async () => {
+                setLoading(true);
+                try {
+                    const response = await axios.post(apiConfig.products.createPr, formData, {
+                        headers: {
+                            accept: 'application/json',
+                        },
+                    });
+
+                    console.log(response);
+                    
+                    toast.success('Thêm phân loại thành công');
+                    formik.resetForm();
+                } catch (error: any) {
+                    if (error.response) {
+                        console.error("Error response:", error.response.data); // Log the server's response
+                        console.error("Validation errors:", error.response.data.errors); // Log validation errors
+                        toast.error(`Error: ${error.response.data.message}`); // Show an error message
+                    } else {
+                        console.error("Error submitting form:", error);
+                        toast.error('Đã xảy ra lỗi, vui lòng thử lại.');
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            add();
+            onClose(); // Close modal or perform any other necessary action
         },
+
     });
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, variantIndex: number) => {
@@ -90,9 +122,9 @@ const BodyProductsV2: React.FC = () => {
             });
         });
 
-        Promise.all(previews).then((images) => {
+        Promise.all(previews).then((image) => {
             const updatedVariants = [...variants];
-            updatedVariants[variantIndex].images = images; // Set images as base64
+            updatedVariants[variantIndex].image = image; // Set images as base64
             setVariants(updatedVariants); // Update the state to trigger re-rendering
         });
     };
@@ -112,17 +144,17 @@ const BodyProductsV2: React.FC = () => {
             });
         });
 
-        Promise.all(previews).then((images) => {
-            setProductImages(images); // Cập nhật ảnh sản phẩm chung
-            formik.setFieldValue("images", images); // Cập nhật vào formik
+        Promise.all(previews).then((image) => {
+            setProductImages(image); // Cập nhật ảnh sản phẩm chung
+            formik.setFieldValue("main_image", image); // Cập nhật vào formik
         });
     };
 
     const handleAddVariant = () => {
-        if (newVariant.name && newVariant.tag && newVariant.price && newVariant.salePrice && newVariant.quantity) {
+        if (newVariant.name && newVariant.variant_value && newVariant.price && newVariant.discount && newVariant.stock) {
             setVariants([...variants, newVariant]);
             setHasVariants(true); // Cập nhật trạng thái khi thêm biến thể
-            setNewVariant({ name: "", tag: "", price: "", salePrice: "", quantity: "", images: [] });
+            setNewVariant({ name: "", variant_value: "", price: "0", discount: "0", stock: "0", image: [], product_id: "", });
         } else {
             alert("Vui lòng điền đầy đủ thông tin biến thể.");
         }
@@ -131,18 +163,21 @@ const BodyProductsV2: React.FC = () => {
     const handleVariantChange = (index: number, field: keyof Variant, value: string | string[]) => {
         const updatedVariants = [...variants];
 
-        if (field === 'images') {
+        if (field === 'image') {
             if (Array.isArray(value)) {
-                updatedVariants[index][field] = value as string[];  // Updating images with string[]
+                updatedVariants[index][field] = value as string[]; // Updating images with string[]
             } else {
                 console.error("Expected an array for images");
             }
+        } else if (field === 'price' || field === 'discount' || field === 'stock') {
+            updatedVariants[index][field] = String(value); // Convert to number for numeric fields
         } else {
-            updatedVariants[index][field] = value as string;  // Updating other fields with string
+            updatedVariants[index][field] = value as string; // For all other fields, treat as string
         }
 
         setVariants(updatedVariants);
     };
+
 
     const removeVariant = (index: number) => {
         const updatedVariants = variants.filter((_, i) => i !== index);
@@ -150,7 +185,7 @@ const BodyProductsV2: React.FC = () => {
         formik.setFieldValue("variants", updatedVariants);
     };
 
-    const handleDelete = (userId: number) => {
+    const handleDelete = (id: number) => {
         confirmAlert({
             title: 'Xóa sản phẩm',
             message: 'Bạn có chắc muốn xóa sản phẩm?',
@@ -158,7 +193,7 @@ const BodyProductsV2: React.FC = () => {
                 {
                     label: 'Yes',
                     onClick: () => {
-                        console.log('Deleted user with id:', userId);
+                        console.log('Deleted user with id:', id);
                         // Thực hiện xóa sản phẩm tại đây
                     }
                 },
@@ -168,6 +203,29 @@ const BodyProductsV2: React.FC = () => {
             ]
         });
     };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
+            setCategories(response.data.categories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    const fetchBrands = async () => {
+        try {
+            const response = await axios.get(apiConfig.brands.getAll, { withCredentials: true });
+            setBrands(response.data.brands);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+        fetchBrands();
+    }, []);
 
     return (
         <div>
@@ -188,251 +246,253 @@ const BodyProductsV2: React.FC = () => {
                     <ModalContent>
                         <ModalHeader className="flex flex-col gap-1">Thêm mới sản phẩm</ModalHeader>
                         <ModalBody>
-                            <div className="flex gap-5 lg:flex-row flex-col mb-5">
-                                <div className="lg:w-1/2 w-full">
-                                    <label htmlFor="name" className="block mb-1">Tên sản phẩm</label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        placeholder="Tên sản phẩm"
-                                        onChange={formik.handleChange}
-                                        value={formik.values.name}
-                                        required
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label htmlFor="category" className="block mb-1">Phân loại</label>
-                                    <Select
-                                        isRequired
-                                        id="category"
-                                        name="category"
-                                        className="w-full"
-                                        placeholder="Phân loại"
-                                        aria-label="Chọn phân loại"
-                                        onChange={(value) => formik.setFieldValue("category", value)}
-                                        value={formik.values.category}
-                                    >
-                                        {animals.map((animal) => (
-                                            <SelectItem key={animal.key} value={animal.key}>
-                                                {animal.label}
-                                            </SelectItem>
-                                        ))}
-                                    </Select>
-                                </div>
-                            </div>
-                            <div className="flex gap-5 lg:flex-row flex-col mb-5">
-                                <div className="lg:w-1/2 w-full">
-                                    <label htmlFor="brand-select" className="block mb-1">Thương hiệu</label>
-                                    <Select
-                                        id="brand-select"
-                                        name="brand"
-                                        className="w-full"
-                                        placeholder="Thương hiệu"
-                                        onChange={(value) => formik.setFieldValue("brand", value)}
-                                        value={formik.values.brand}
-                                        aria-label="Chọn thương hiệu"
-                                    >
-                                        {brands.map((b) => (
-                                            <SelectItem key={b.key} value={b.key}>
-                                                {b.label}
-                                            </SelectItem>
-                                        ))}
-                                    </Select>
-                                </div>
-                            </div>
-                            
-                            {/* Ảnh sản phẩm chung */}
-                            <div className="mb-5">
-                                <label htmlFor="product-images" className="block mb-1">Ảnh sản phẩm</label>
-                                <Input
-                                    id="product-images"
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleProductImageChange}
-                                />
-                                {/* Hiển thị ảnh preview cho sản phẩm chung */}
-                                <div className="flex gap-2 mt-2">
-                                    {productImages.map((img, imgIndex) => (
-                                        <img
-                                            key={imgIndex}
-                                            src={img}
-                                            alt={`product-img-${imgIndex}`}
-                                            className="w-16 h-16 object-cover"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+    <div className="flex gap-5 lg:flex-row flex-col mb-5">
+        <div className="lg:w-1/2 w-full">
+            <label htmlFor="name_product" className="block mb-1">Tên sản phẩm</label>
+            <Input
+                id="name_product"
+                name="name_product"
+                placeholder="Tên sản phẩm"
+                onChange={formik.handleChange}
+                value={formik.values.name_product}
+                required
+            />
+            {formik.touched.name_product && formik.errors.name_product ? (
+                <div className="text-red-500">{formik.errors.name_product}</div>
+            ) : null}
+        </div>
+        <div className="flex-1">
+            <label htmlFor="category_id" className="block mb-1">Phân loại</label>
+            <Select
+                isRequired
+                id="category_id"
+                name="category_id"
+                className="w-full"
+                placeholder="Phân loại"
+                aria-label="Chọn phân loại"
+                onChange={(event) => formik.setFieldValue("category_id", event.target.value)}
+                value={formik.values.category_id}
+            >
+                {categories.map((animal) => (
+                    <SelectItem key={animal.id} value={animal.id}>
+                        {animal.name}
+                    </SelectItem>
+                ))}
+            </Select>
+            {formik.touched.category_id && formik.errors.category_id ? (
+                <div className="text-red-500">{formik.errors.category_id}</div>
+            ) : null}
+        </div>
+    </div>
+    <div className="flex gap-5 lg:flex-row flex-col mb-5">
+        <div className="lg:w-1/2 w-full">
+            <label htmlFor="brand_id" className="block mb-1">Thương hiệu</label>
+            <Select
+                isRequired
+                id="brand_id"
+                name="brand_id"
+                className="w-full"
+                placeholder="Thương hiệu"
+                onChange={(event) => formik.setFieldValue("brand_id", event.target.value)}
+                value={formik.values.brand_id}
+                aria-label="Chọn thương hiệu"
+            >
+                {brands.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                        {b.name}
+                    </SelectItem>
+                ))}
+            </Select>
+            {formik.touched.brand_id && formik.errors.brand_id ? (
+                <div className="text-red-500">{formik.errors.brand_id}</div>
+            ) : null}
+        </div>
+    </div>
 
-                            <div>
-                                <label htmlFor="description">Mô tả sản phẩm</label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    rows={6}
-                                    required
-                                    placeholder="Nhập mô tả sản phẩm"
-                                    disableAnimation
-                                    disableAutosize
-                                    classNames={{
-                                        base: "w-full",
-                                        input: "resize-y min-h-[40px]",
-                                    }}
-                                    onChange={formik.handleChange}
-                                    value={formik.values.description}
-                                />
-                            </div>
-                           
+    {/* Product Image Upload */}
+    <div className="mb-5">
+        <label htmlFor="main_image" className="block mb-1">Ảnh sản phẩm</label>
+        <Input
+            id="main_image"
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleProductImageChange}
+        />
+        <div className="flex gap-2 mt-2">
+            {productImages.map((img, imgIndex) => (
+                <img
+                    key={imgIndex}
+                    src={img}
+                    alt={`product-img-${imgIndex}`}
+                    className="w-16 h-16 object-cover"
+                />
+            ))}
+        </div>
+    </div>
 
-                            {/* Section for Variants */}
-                            <div className="mb-5">
-                                <h3 className="text-lg font-semibold mb-3">Thêm biến thể sản phẩm</h3>
-                                <div className="flex flex-col gap-3 mb-3">
-                                    <div className="flex gap-3 mb-3">
-                                        <Input
-                                            placeholder="Tên biến thể"
-                                            value={newVariant.name}
-                                            onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
-                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
-                                        />
-                                        <Input
-                                            placeholder="Tag biến thể (e.g., Lon, Lốc)"
-                                            value={newVariant.tag}
-                                            onChange={(e) => setNewVariant({ ...newVariant, tag: e.target.value })}
-                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Giá biến thể"
-                                            value={newVariant.price}
-                                            onChange={(e) => setNewVariant({ ...newVariant, price: e.target.value })}
-                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Giá giảm (Sale Price)"
-                                            value={newVariant.salePrice}
-                                            onChange={(e) => setNewVariant({ ...newVariant, salePrice: e.target.value })}
-                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Số lượng"
-                                            value={newVariant.quantity}
-                                            onChange={(e) => setNewVariant({ ...newVariant, quantity: e.target.value })}
-                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
-                                        />
-                                    </div>
+    <div>
+        <label htmlFor="description">Mô tả sản phẩm</label>
+        <Textarea
+            id="description"
+            name="description"
+            rows={6}
+            required
+            placeholder="Nhập mô tả sản phẩm"
+            disableAnimation
+            disableAutosize
+            classNames={{
+                base: "w-full",
+                input: "resize-y min-h-[40px]",
+            }}
+            onChange={formik.handleChange}
+            value={formik.values.description}
+        />
+    </div>
 
-                                    {/* Input file ảnh ngay tại đây */}
-                                    <div>
-                                        <Input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const files = Array.from(e.target.files || []);
-                                                const previews = files.map((file) => {
-                                                    return new Promise<string>((resolve, reject) => {
-                                                        const reader = new FileReader();
-                                                        reader.onloadend = () => {
-                                                            if (reader.result) {
-                                                                resolve(reader.result as string);
-                                                            }
-                                                        };
-                                                        reader.onerror = reject;
-                                                        reader.readAsDataURL(file); // Convert image to base64
-                                                    });
-                                                });
+    {/* Variants Section */}
+    <div className="mb-5">
+        <h3 className="text-lg font-semibold mb-3">Thêm biến thể sản phẩm</h3>
+        <div className="flex flex-col gap-3 mb-3">
+            <div className="flex gap-3 mb-3">
+                <Input
+                    placeholder="Tên biến thể"
+                    value={newVariant.name}
+                    onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
+                    required={!hasVariants}
+                />
+                <Input
+                    placeholder="Tag biến thể (e.g., Lon, Lốc)"
+                    value={newVariant.variant_value}
+                    onChange={(e) => setNewVariant({ ...newVariant, variant_value: e.target.value })}
+                    required={!hasVariants}
+                />
+                <Input
+                    type="number"
+                    placeholder="Giá biến thể"
+                    value={newVariant.price !== "" ? newVariant.price : ""}
+                    onChange={(e) => setNewVariant({ ...newVariant, price: e.target.value })}
+                    required={!hasVariants}
+                />
+                <Input
+                    type="number"
+                    placeholder="Giá giảm (Sale Price)"
+                    value={newVariant.discount !== "" ? newVariant.discount : ""}
+                    onChange={(e) => setNewVariant({ ...newVariant, discount: e.target.value })}
+                    required={!hasVariants}
+                />
+                <Input
+                    type="number"
+                    placeholder="Số lượng"
+                    value={newVariant.stock !== "" ? newVariant.stock : ""}
+                    onChange={(e) => setNewVariant({ ...newVariant, stock: e.target.value })}
+                    required={!hasVariants}
+                />
+            </div>
 
-                                                Promise.all(previews).then((images) => {
-                                                    setNewVariant({ ...newVariant, images });
-                                                });
-                                            }}
-                                        />
-                                    </div>
+            <div>
+                <Input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        const previews = files.map((file) => {
+                            return new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    if (reader.result) {
+                                        resolve(reader.result as string);
+                                    }
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                            });
+                        });
 
-                                    {/* Hiển thị ảnh preview */}
-                                    <div className="flex gap-2 mt-2">
-                                        {newVariant.images.map((img, imgIndex) => (
-                                            <img
-                                                key={imgIndex}
-                                                src={img}
-                                                alt={`new-variant-img-${imgIndex}`}
-                                                className="w-16 h-16 object-cover"
-                                            />
-                                        ))}
-                                    </div>
+                        Promise.all(previews).then((image) => {
+                            setNewVariant({ ...newVariant, image });
+                        });
+                    }}
+                />
+            </div>
 
-                                    <Button type="button" onPress={handleAddVariant}>Thêm biến thể</Button>
-                                </div>
+            <div className="flex gap-2 mt-2">
+                {newVariant.image.map((img, imgIndex) => (
+                    <img
+                        key={imgIndex}
+                        src={img}
+                        alt={`new-variant-img-${imgIndex}`}
+                        className="w-16 h-16 object-cover"
+                    />
+                ))}
+            </div>
 
-                                {/* Display existing variants */}
-                                <div className="mt-4">
-                                    {variants.map((variant, index) => (
-                                        <div key={index} className="flex flex-col gap-3 mb-2 border p-3 rounded">
-                                            <div className="flex gap-3 items-center">
-                                                <Input
-                                                    placeholder="Tên biến thể"
-                                                    value={variant.name}
-                                                    onChange={(e) => handleVariantChange(index, "name", e.target.value)}
-                                                    required
-                                                />
-                                                <Input
-                                                    placeholder="Tag biến thể"
-                                                    value={variant.tag}
-                                                    onChange={(e) => handleVariantChange(index, "tag", e.target.value)}
-                                                    required
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="Giá biến thể"
-                                                    value={variant.price}
-                                                    onChange={(e) => handleVariantChange(index, "price", e.target.value)}
-                                                    required
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="Giá giảm (Sale Price)"
-                                                    value={variant.salePrice}
-                                                    onChange={(e) => handleVariantChange(index, "salePrice", e.target.value)}
-                                                    required
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="Số lượng"
-                                                    value={variant.quantity}
-                                                    onChange={(e) => handleVariantChange(index, "quantity", e.target.value)}
-                                                    required
-                                                />
-                                                <Button color="danger" onPress={() => removeVariant(index)}>Xóa</Button>
-                                            </div>
+            <Button type="button" onPress={handleAddVariant}>Thêm biến thể</Button>
+        </div>
 
-                                            {/* Image upload for each variant */}
-                                            <input
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                onChange={(e) => handleImageChange(e, index)}
-                                            />
+        {/* Display existing variants */}
+        <div className="mt-4">
+            {variants.map((variant, index) => (
+                <div key={index} className="flex flex-col gap-3 mb-2 border p-3 rounded">
+                    <div className="flex gap-3 items-center">
+                        <Input
+                            placeholder="Tên biến thể"
+                            value={variant.name}
+                            onChange={(e) => handleVariantChange(index, "name", e.target.value)}
+                            required
+                        />
+                        <Input
+                            placeholder="Tag biến thể"
+                            value={variant.variant_value}
+                            onChange={(e) => handleVariantChange(index, "variant_value", e.target.value)}
+                            required
+                        />
+                        <Input
+                            type="number"
+                            placeholder="Giá biến thể"
+                            value={variant.price.toString()}
+                            onChange={(e) => handleVariantChange(index, "price", e.target.value)}
+                            required
+                        />
+                        <Input
+                            type="number"
+                            placeholder="Giá giảm (Sale Price)"
+                            value={variant.discount?.toString() || ''}
+                            onChange={(e) => handleVariantChange(index, "discount", e.target.value)}
+                            required
+                        />
+                        <Input
+                            type="number"
+                            placeholder="Số lượng"
+                            value={variant.stock.toString()}
+                            onChange={(e) => handleVariantChange(index, "stock", e.target.value)}
+                            required
+                        />
+                        <Button color="danger" onPress={() => removeVariant(index)}>Xóa</Button>
+                    </div>
 
-                                            {/* Display uploaded images */}
-                                            <div className="flex gap-2 mt-2">
-                                                {variant.images.map((img, imgIndex) => (
-                                                    <img
-                                                        key={imgIndex}
-                                                        src={img}
-                                                        alt={`variant-${index}-img-${imgIndex}`}
-                                                        className="w-16 h-16 object-cover"
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                        </ModalBody>
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleImageChange(e, index)}
+                    />
+                    <div className="flex gap-2 mt-2">
+                        {variant.image.map((img, imgIndex) => (
+                            <img
+                                key={imgIndex}
+                                src={img}
+                                alt={`variant-img-${imgIndex}`}
+                                className="w-16 h-16 object-cover"
+                            />
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</ModalBody>    
                         <ModalFooter>
                             <Button type="submit" color="primary">Lưu</Button>
                             <Button type="button" onPress={onClose}>Hủy</Button>

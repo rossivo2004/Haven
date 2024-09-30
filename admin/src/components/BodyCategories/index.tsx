@@ -9,8 +9,11 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Category } from "@/interface";
-import {Pagination} from "@nextui-org/react";
+import { Pagination } from "@nextui-org/react";
 import useCsrfToken from "@/configs/csrfToken";
+import { ToastContainer, toast } from 'react-toastify';
+import Image from "next/image";
+import CategoryTable from "./CategoryTable";
 
 function BodyCategories() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -22,13 +25,13 @@ function BodyCategories() {
     const [successMessage, setSuccessMessage] = useState("");
     const [categories, setCategories] = useState<Category[]>([]);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-    const csrf_Token = useCsrfToken();
+    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const fetchCategories = async () => {
         try {
-            const response = await axios.get(`${baseUrl}/api/category`, { withCredentials: true });
+            const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
             setCategories(response.data.categories);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -41,9 +44,6 @@ function BodyCategories() {
     }, []);
 
     const handleSubmit = async () => {
-        console.log(csrf_Token);
-        
-        
         if (!categoryName || !categoryTag) {
             alert('Please fill in all fields.');
             return;
@@ -53,7 +53,7 @@ function BodyCategories() {
             setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
             return;
         }
-
+        onOpenChange();
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
@@ -66,21 +66,19 @@ function BodyCategories() {
         }
 
         try {
-
-            const response = await axios.post(`${baseUrl}/api/category/store`, formData, {
+            const response = await axios.post(apiConfig.categories.createCt, formData, {
                 headers: {
                     accept: 'application/json',
-                    'X-CSRF-TOKEN': csrf_Token,
                 },
-                withCredentials: true,
             });
 
-            setSuccessMessage('Category added successfully!');
             setCategoryName('');
             setCategoryTag('');
             setImage(null);
             fetchCategories();
+            toast.success('Thêm phân loại thành công');
         } catch (error) {
+            toast.error('Thêm phân loại thất bại');
             console.error('Error adding category:', error);
             setErrorMessage('Failed to add category. Please try again.');
         } finally {
@@ -88,28 +86,29 @@ function BodyCategories() {
         }
     };
 
-    function getCookie(name: string): string | null {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) {
-            return parts.pop()?.split(';').shift() || null;
-        }
-        return null;
-    }
-    
-
     const handleDelete = (categoryId: string) => {
+        // Find the specific category to delete by its ID
+        const categoryToDelete = categories.find(category => category.id === categoryId);
+
+        if (!categoryToDelete) {
+            setErrorMessage("Category not found.");
+            return;
+        }
+
         confirmAlert({
-            title: 'Delete Category',
-            message: 'Are you sure you want to delete this category?',
+            title: 'Xóa phân loại',
+            message: `Bạn có muốn xóa phân loại ${categoryToDelete.name}?`,
             buttons: [
                 {
                     label: 'Yes',
                     onClick: async () => {
                         setLoading(true);
                         try {
-                            await axios.delete(`${baseUrl}/api/category/${categoryId}`, { withCredentials: true });
+                            await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
                             fetchCategories(); // Refresh categories after deletion
+                            toast.success('Xóa phân loại thành công');
+
+
                         } catch (error) {
                             console.error('Error deleting category:', error);
                             setErrorMessage('Failed to delete category. Please try again.');
@@ -128,6 +127,15 @@ function BodyCategories() {
     const handleEdit = (category: Category) => {
         setEditingCategory(category);
         onOpen();
+        fetchCategories();
+    };
+
+    const handleOpenAddCategoryModal = () => {
+        setIsAddCategoryModalOpen(true);
+    };
+
+    const handleCloseAddCategoryModal = () => {
+        setIsAddCategoryModalOpen(false);
     };
 
     const renderCell = (category: Category, columnKey: React.Key) => {
@@ -138,10 +146,13 @@ function BodyCategories() {
                 return (
                     <div className="flex items-center">
                         {category.image && (
-                            <img
+                            <Image
+                                loading="lazy"
                                 src={category.image}
                                 alt={category.name}
-                                className="w-8 h-8 rounded-full mr-2"
+                                className="w-12 h-12 rounded-full mr-2"
+                                width={50}
+                                height={50}
                             />
                         )}
                         <span>{cellValue}</span>
@@ -160,6 +171,52 @@ function BodyCategories() {
                                 <EditIcon />
                             </span>
                         </Tooltip>
+                        <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false}>
+                            <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                        <ModalHeader>Sửa phân loại</ModalHeader>
+                                        <ModalBody>
+                                            <div className="flex gap-5 lg:flex-row flex-col mb-5">
+                                                <div className="lg:w-1/2 w-full">
+                                                    <label>Category Name</label>
+                                                    <Input
+                                                        placeholder="Category Name"
+                                                        value={categoryName}
+                                                        onChange={(e) => setCategoryName(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label>Category Tag</label>
+                                                    <Input
+                                                        placeholder="Category Tag"
+                                                        value={categoryTag}
+                                                        onChange={(e) => setCategoryTag(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label>Image</label>
+                                                <Input
+                                                    type="file"
+                                                    onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
+                                                />
+                                            </div>
+                                            {errorMessage && <div className="text-red-600">{errorMessage}</div>}
+                                            {successMessage && <div className="text-green-600">{successMessage}</div>}
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="danger" onPress={onClose}>
+                                                Close
+                                            </Button>
+                                            <Button color="primary" onPress={handleSubmit} disabled={loading}>
+                                                {loading ? 'Processing...' : 'Add'}
+                                            </Button>
+                                        </ModalFooter>
+                                    </>
+                                )}
+                            </ModalContent>
+                        </Modal>
                         <Tooltip color="danger" content="Delete category">
                             <span
                                 className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -187,16 +244,22 @@ function BodyCategories() {
                     />
                 </div>
                 <div>
-                    <Button onPress={onOpen}>Add Category</Button>
-                    <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false}>
+                    <Button onPress={handleOpenAddCategoryModal}>Thêm phân loại</Button>
+                    <Modal
+                        size="5xl"
+                        scrollBehavior="inside"
+                        isOpen={isAddCategoryModalOpen}
+                        onOpenChange={handleCloseAddCategoryModal}
+                        isDismissable={false}
+                    >
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader>Add New Category</ModalHeader>
+                                    <ModalHeader>Thê mới phân loại</ModalHeader>
                                     <ModalBody>
                                         <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                             <div className="lg:w-1/2 w-full">
-                                                <label>Category Name</label>
+                                                <label>Tên phân loại</label>
                                                 <Input
                                                     placeholder="Category Name"
                                                     value={categoryName}
@@ -204,7 +267,7 @@ function BodyCategories() {
                                                 />
                                             </div>
                                             <div className="flex-1">
-                                                <label>Category Tag</label>
+                                                <label>Tag phân loại</label>
                                                 <Input
                                                     placeholder="Category Tag"
                                                     value={categoryTag}
@@ -213,7 +276,7 @@ function BodyCategories() {
                                             </div>
                                         </div>
                                         <div>
-                                            <label>Image</label>
+                                            <label>Hình ảnh phân loại</label>
                                             <Input
                                                 type="file"
                                                 onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
@@ -224,10 +287,10 @@ function BodyCategories() {
                                     </ModalBody>
                                     <ModalFooter>
                                         <Button color="danger" onPress={onClose}>
-                                            Close
+                                            Đóng
                                         </Button>
                                         <Button color="primary" onPress={handleSubmit} disabled={loading}>
-                                            {loading ? 'Processing...' : 'Add'}
+                                            {loading ? 'Processing...' : 'Thêm'}
                                         </Button>
                                     </ModalFooter>
                                 </>
@@ -240,31 +303,21 @@ function BodyCategories() {
             <div className="mb-4 text-xl font-bold">Category Table</div>
 
             <div>
-                {loading && <Spinner size="lg" />}
-                <Table aria-label="Category table">
-                    <TableHeader columns={[
-                        { uid: 'name', name: 'Category Name' },
-                        { uid: 'tag', name: 'Category Tag' },
-                        { uid: 'actions', name: 'Actions' }
-                    ]}>
-                        {(column) => (
-                            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
-                                {column.name}
-                            </TableColumn>
-                        )}
-                    </TableHeader>
-                    <TableBody items={categories}>
-                        {(item) => (
-                            <TableRow key={item.id}>
-                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                {loading && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <Spinner size="lg" />
+                    </div>
+                )}
 
-                <div className="flex justify-end w-full">
+                <CategoryTable
+                    categories={categories}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+
+                {/* <div className="flex justify-end w-full mt-2">
                     <Pagination showControls total={10} initialPage={1} />
-                </div>
+                </div> */}
             </div>
         </div>
     );
