@@ -53,8 +53,8 @@ function BodySignIn() {
                     />
                 </div>
                 <div className="flex-1 flex flex-col justify-center">
-                    <div className="text-4xl font-medium mb-5">Đăng nhập</div>
-                    <div className="text-base font-normal mb-6">
+                    <div className="text-4xl font-medium mb-5 dark:text-white">Đăng nhập</div>
+                    <div className="text-base font-normal mb-6 dark:text-white">
                         Vui lòng nhập đầy đủ thông tin đăng nhập!
                     </div>
                     <div>
@@ -73,7 +73,7 @@ function BodySignIn() {
                                             type="text"
                                             name="phone"
                                             placeholder="Số điện thoại"
-                                            className="border-b border-black py-2 text-base font-normal focus:outline-none w-full"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
                                         />
                                         <ErrorMessage
                                             name="phone"
@@ -87,7 +87,7 @@ function BodySignIn() {
                                             type="password"
                                             name="password"
                                             placeholder="Mật khẩu"
-                                            className="border-b border-black py-2 text-base font-normal focus:outline-none w-full"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
                                         />
                                         <ErrorMessage
                                             name="password"
@@ -107,7 +107,7 @@ function BodySignIn() {
                     </div>
                 <div className="flex items-center mb-2">
   <div className="flex-1 border-t border-gray-300" />
-  <span className="mx-2">Hoặc</span>
+  <span className="mx-2 dark:text-white">Hoặc</span>
   <div className="flex-1 border-t border-gray-300" />
 </div>
 
@@ -123,9 +123,9 @@ function BodySignIn() {
 
                     <div className="text-center text-base font-normal">
                     <Link href={'/forgotpassword'}>
-                        <div className="mb-2">Quên mật khẩu?</div>
+                        <div className="mb-2 dark:text-white">Quên mật khẩu?</div>
                         </Link>
-                        <div>
+                        <div className="dark:text-white">
                             Bạn chưa có tài khoản?{" "}
                             <Link href={"/signup"} className="text-main">
                                 Đăng ký ngay

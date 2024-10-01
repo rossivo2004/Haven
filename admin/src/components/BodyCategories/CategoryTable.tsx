@@ -74,6 +74,8 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
         }
     };
 
+    
+
     const uploadImage = async (file: File): Promise<string> => {
         const formData = new FormData();
         formData.append("file", file);

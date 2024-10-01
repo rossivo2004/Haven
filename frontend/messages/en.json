@@ -1,0 +1,47 @@
+{
+    "HomePage": {
+      "title": "Hello world!",
+      "about": "Go to the about page",
+      "login": "Login",
+      "register": "Register",
+      "cart": "Shopping cart",
+      "product": "Products",
+      "home_nav": "HOME",
+      "blog_nav": "BLOG",
+      "product_nav": "PRODUCTS",
+      "contact_nav" : "CONTACT",
+      "lookup_nav": "LOOKUP",
+      "about_nav": "ABOUT US",
+      "input_pl_search": "Search for products...",
+      "input_pl_search_kq": "Search by product name",
+      "input_pl_search_kq_faile": "No products found",
+
+      "flashsale": "Flash Sale",
+      "category": "Category",
+      "featured_products": "Featured Products",
+      "new_products": "New products",
+
+      "free_shipping": "Free shipping",
+      "free_shipping_title": "For orders from 500k or more",
+      "24/7_support": "24/7 Support",
+      "24/7_support_title": "24/7 online / offline support",
+      "free_returns": "Free returns",
+      "free_returns_title": "Within 7 days",
+      "order_online": "Order online",
+
+      "end_after" : "End after:",
+
+      "y_cart": "Your shopping cart",
+      "y_cart_empty": "Cart is empty",
+      "y_cart_btn": "View cart",
+
+      "day": "Day",
+      "hour": "Hour",
+      "minute": "Minute",
+      "second": "Second",
+
+      "see_more": "See more"
+    }
+  }
+
+  

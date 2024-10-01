@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Spinner } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon";
@@ -14,6 +14,9 @@ import useCsrfToken from "@/configs/csrfToken";
 import { ToastContainer, toast } from 'react-toastify';
 import Image from "next/image";
 import CategoryTable from "./CategoryTable";
+import SearchIcon from '@mui/icons-material/Search';
+import useDebounce from "@/un/useDebounce";
+import CloseIcon from '@mui/icons-material/Close';
 
 function BodyCategories() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -26,12 +29,23 @@ function BodyCategories() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+    const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 300);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    const fetchCategories = async () => {
+    const fetchCategories = async (searchTerm = "") => {
+        console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
-            const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
+            const response = await axios.get(apiConfig.categories.getAll, {
+                params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
+                withCredentials: true,
+            });
+            console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
             setCategories(response.data.categories);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -40,10 +54,19 @@ function BodyCategories() {
     };
 
     useEffect(() => {
+        if (image) {
+            // Create a preview URL for the selected image
+            setImagePreviewUrl(URL.createObjectURL(image));
+        } else {
+            setImagePreviewUrl(null); // Clear preview if no image
+        }
+    }, [image]);
+
+    useEffect(() => {
         fetchCategories();
     }, []);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (onClose: () => void) => {
         if (!categoryName || !categoryTag) {
             alert('Please fill in all fields.');
             return;
@@ -53,7 +76,6 @@ function BodyCategories() {
             setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
             return;
         }
-        onOpenChange();
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
@@ -66,17 +88,20 @@ function BodyCategories() {
         }
 
         try {
+            onClose();
+
             const response = await axios.post(apiConfig.categories.createCt, formData, {
                 headers: {
                     accept: 'application/json',
                 },
             });
-
             setCategoryName('');
             setCategoryTag('');
             setImage(null);
             fetchCategories();
             toast.success('Thêm phân loại thành công');
+
+            // Close the modal after successfully adding the category
         } catch (error) {
             toast.error('Thêm phân loại thất bại');
             console.error('Error adding category:', error);
@@ -85,6 +110,7 @@ function BodyCategories() {
             setLoading(false);
         }
     };
+
 
     const handleDelete = (categoryId: string) => {
         // Find the specific category to delete by its ID
@@ -136,6 +162,21 @@ function BodyCategories() {
 
     const handleCloseAddCategoryModal = () => {
         setIsAddCategoryModalOpen(false);
+    };
+
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setImage(event.target.files[0]);
+        }
+    };
+    
+    const handleImageClear = () => {
+        setImage(null);
+        setImagePreviewUrl(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Clear the file input field
+        }
     };
 
     const renderCell = (category: Category, columnKey: React.Key) => {
@@ -209,9 +250,10 @@ function BodyCategories() {
                                             <Button color="danger" onPress={onClose}>
                                                 Close
                                             </Button>
-                                            <Button color="primary" onPress={handleSubmit} disabled={loading}>
-                                                {loading ? 'Processing...' : 'Add'}
+                                            <Button color="primary" onPress={() => handleSubmit(onClose)} disabled={loading}>
+                                                {loading ? 'Processing...' : 'Thêm'}
                                             </Button>
+
                                         </ModalFooter>
                                     </>
                                 )}
@@ -232,8 +274,18 @@ function BodyCategories() {
         }
     };
 
+    useEffect(() => {
+        const filtered = categories.filter(c => c.name.toLowerCase().includes(debouncedSearch.toLowerCase()));
+        setFilteredCategories(filtered);
+    }, [debouncedSearch, categories]);
+
     return (
         <div>
+            {loading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <Spinner />
+                </div>
+            )}
             <div className="flex justify-between items-center">
                 <div className="py-5 h-[62px]">
                     <BreadcrumbNav
@@ -244,7 +296,7 @@ function BodyCategories() {
                     />
                 </div>
                 <div>
-                    <Button onPress={handleOpenAddCategoryModal}>Thêm phân loại</Button>
+
                     <Modal
                         size="5xl"
                         scrollBehavior="inside"
@@ -255,7 +307,7 @@ function BodyCategories() {
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader>Thê mới phân loại</ModalHeader>
+                                    <ModalHeader>Thêm mới phân loại</ModalHeader>
                                     <ModalBody>
                                         <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                             <div className="lg:w-1/2 w-full">
@@ -276,22 +328,45 @@ function BodyCategories() {
                                             </div>
                                         </div>
                                         <div>
-                                            <label>Hình ảnh phân loại</label>
-                                            <Input
-                                                type="file"
-                                                onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
-                                            />
-                                        </div>
-                                        {errorMessage && <div className="text-red-600">{errorMessage}</div>}
-                                        {successMessage && <div className="text-green-600">{successMessage}</div>}
+    <label>Image</label>
+    <Input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        ref={fileInputRef} // Add ref here
+    />
+    {imagePreviewUrl && (
+        <div className="flex items-center mt-2">
+             <div className="w-[200px] h-[200px]">
+            <Image
+                src={imagePreviewUrl}
+                alt="Selected image preview"
+                width={200}
+                height={200}
+                className="rounded-lg object-cover mb-2 w-full h-full"
+            />
+             </div>
+            <Button
+                color="danger"
+                onClick={handleImageClear}
+                className="ml-2" // Optional for spacing
+            >
+                <CloseIcon /> {/* Use a close icon */}
+            </Button>
+        </div>
+    )}
+    {errorMessage && <div className="text-red-600">{errorMessage}</div>}
+    {successMessage && <div className="text-green-600">{successMessage}</div>}
+</div>
                                     </ModalBody>
                                     <ModalFooter>
                                         <Button color="danger" onPress={onClose}>
                                             Đóng
                                         </Button>
-                                        <Button color="primary" onPress={handleSubmit} disabled={loading}>
+                                        <Button color="primary" onPress={() => handleSubmit(onClose)} disabled={loading}>
                                             {loading ? 'Processing...' : 'Thêm'}
                                         </Button>
+
                                     </ModalFooter>
                                 </>
                             )}
@@ -300,24 +375,38 @@ function BodyCategories() {
                 </div>
             </div>
 
-            <div className="mb-4 text-xl font-bold">Category Table</div>
+            <div className="flex items-center justify-between mb-4">
+                <div className="text-xl font-bold">Category Table</div>
+                <div>
+                    <div className="flex gap-2">
+                        <Input
+                            type="text"
+                            placeholder="Tìm kiếm sản phẩm"
+                            labelPlacement="outside"
+                            size="lg"
+                            endContent={<SearchIcon />}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <Button onPress={handleOpenAddCategoryModal} size="lg" className="font-semibold" color="primary">Thêm phân loại</Button>
+                    </div>
+                </div>
+            </div>
+
 
             <div>
-                {loading && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <Spinner size="lg" />
+                {/* Hiển thị nếu không có sản phẩm */}
+                {filteredCategories.length === 0 ? (
+                    <div className="text-center text-lg font-semibold mt-4">
+                        Không có phân loại nào được tìm thấy
                     </div>
+                ) : (
+                    <CategoryTable
+                        categories={filteredCategories}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
                 )}
-
-                <CategoryTable
-                    categories={categories}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
-
-                {/* <div className="flex justify-end w-full mt-2">
-                    <Pagination showControls total={10} initialPage={1} />
-                </div> */}
             </div>
         </div>
     );

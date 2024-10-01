@@ -37,6 +37,8 @@ import './style.scss'
 
 import { fetchProducts } from "@/src/api/productApi";
 
+import {useTranslations} from 'next-intl';
+
 interface ProductIn {
     id: number;
     name: string;
@@ -50,6 +52,8 @@ function BodyHome() {
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
     const { flatProducts } = useProducts(); // Use updated hook without filters
+
+    const t = useTranslations('HomePage');
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -128,33 +132,33 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-4 lg:mb-6">
                         <div className="lg:h-[200px] h-auto w-full grid lg:grid-cols-4 grid-cols-2">
-                            <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 hover:bg-gray-50 transition-all">
-                                <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8" />
-                                <div className="text-lg text-[#666666] group-hover:text-black font-medium group-hover:tracking-wider transition-all">
-                                    Giao hàng miễn phí
+                            <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50 transition-all">
+                                <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
+                                <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
+                                {t('free_shipping')}
                                 </div>
-                                <div className="text-sm text-[#666666]">Với đơn hàng từ 500k trở lên</div>
+                                <div className="text-sm text-[#c6c6c6]">{t('free_shipping_title')}</div>
                             </div>
-                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 hover:bg-gray-50 transition-all">
-                                <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8" />
-                                <div className="text-lg text-[#666666] group-hover:text-black font-medium group-hover:tracking-wider transition-all">
-                                    Hỗ trợ 24/7
+                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
+                                <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
+                                <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
+                                {t('24/7_support')}
                                 </div>
-                                <div className="text-sm text-[#666666]">Hỗ trợ online / offline 24/7</div>
+                                <div className="text-sm text-[#c6c6c6]">{t('24/7_support_title')}</div>
                             </div>
-                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 hover:bg-gray-50 transition-all">
-                                <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8" />
-                                <div className="text-lg text-[#666666] group-hover:text-black font-medium group-hover:tracking-wider transition-all">
-                                    Miễn phí đổi trả
+                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
+                                <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
+                                <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
+                                {t('free_returns')}
                                 </div>
-                                <div className="text-sm text-[#666666]">Trong vòng 7 ngày</div>
+                                <div className="text-sm text-[#c6c6c6]">{t('free_returns_title')}</div>
                             </div>
-                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 hover:bg-gray-50 transition-all">
-                                <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8" />
-                                <div className="text-lg text-[#666666] group-hover:text-black font-medium group-hover:tracking-wider transition-all">
-                                    Đặt hàng trực tuyến
+                            <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
+                                <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
+                                <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
+                                {t('order_online')}
                                 </div>
-                                <div className="text-sm text-[#666666]">Hotline: 0357 420 420</div>
+                                <div className="text-sm text-[#c6c6c6]">Hotline: 0357 420 420</div>
                             </div>
                         </div>
                     </div>
@@ -173,34 +177,42 @@ function BodyHome() {
                         }}
                     >
                         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
-                            <div className="font-bold lg:text-4xl text-2xl">Flash Sales</div>
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">{t('flashsale')}</div>
                             <div className="flex items-center">
-                                <div className="font-semibold lg:text-lg text-xs mr-2">Kết thúc sau:</div>
+                                <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">{t('end_after')}</div>
                                 <div>
                                     <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                             <span className="countdown font-mono text-sm">
                                                 <span style={{ "--value": 15 } as CSSProperties}></span>
                                             </span>
-                                            Ngày
+                                            <div className="text-[10px]">
+                                            {t('day')}
+                                            </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                             <span className="countdown font-mono text-sm">
                                                 <span style={{ "--value": 10 } as CSSProperties}></span>
                                             </span>
-                                            Giờ
+                                            <div className="text-[10px]">
+                                            {t('hour')}
+                                            </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                             <span className="countdown font-mono text-sm">
                                                 <span style={{ "--value": 24 } as CSSProperties}></span>
                                             </span>
-                                            Phút
+                                            <div className="text-[10px]">
+                                            {t('minute')}
+                                            </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                             <span className="countdown font-mono text-sm">
                                                 <span style={customStyle}></span>
                                             </span>
-                                            Giây
+                                            <div className="text-[10px]">
+                                            {t('second')}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +231,7 @@ function BodyHome() {
 
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
-                    <div className="font-bold text-4xl mb-6">Phân Loại</div>
+                    <div className="text-black dark:text-white font-bold text-4xl mb-6">{t('category')}</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
@@ -288,7 +300,7 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex gap-4">
                             <div className="lg:w-1/4 lg:block hidden">
-                                <div className="font-bold lg:text-4xl w-max text-2xl mb-6">Sản Phẩm Nổi Bật</div>
+                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">{t('featured_products')}</div>
                                 <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden w-full h-[800px] object-cover rounded-lg" />
                             </div>
                             <div className="flex-1">
@@ -332,16 +344,16 @@ function BodyHome() {
                     className="w-full max-w-screen-xl gap-10 flex lg:flex-row flex-col-reverse lg:h-[500px] mb-16 px-4 mx-auto"
                 >
                     <div className="lg:w-1/2 w-full flex flex-col justify-center">
-                        <div className="lg:text-4xl text-2xl font-semibold mb-3">
+                        <div className="lg:text-4xl text-2xl font-semibold mb-3 text-black dark:text-white">
                             Giảm giá <span className="text-[40px] text-main">10%</span><br />cho các sản phẩm ưa thích
                         </div>
-                        <div className="mb-6 font-normal text-lg">
+                        <div className="mb-6 font-normal text-lg text-black dark:text-white">
                             Chúng tôi đang cung cấp ưu đãi đặc biệt giảm giá 10% cho các sản phẩm ưa thích. Đây là cơ hội tuyệt vời để bạn sở hữu những sản phẩm yêu thích với giá hấp dẫn. Nhanh tay để không bỏ lỡ!
                         </div>
                         <div>
                             <Link href="/shop">
                                 <Button variant="bordered" className="border-main text-main">
-                                    Xem thêm
+                                    {t('see_more')}
                                 </Button>
                             </Link>
                         </div>
@@ -377,9 +389,9 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between items-center mb-6">
-                            <div className="font-bold lg:text-4xl text-2xl">Sản phẩm mới</div>
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">{t('new_products')}</div>
                             <div className="font-medium text-sm text-main">
-                                <Link href="/shop?new">Xem thêm</Link></div>
+                                <Link href="/shop?new" className="text-main">{t('see_more')}</Link></div>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2 gap-4">
@@ -410,13 +422,13 @@ function BodyHome() {
                             <img src={`/images/bn-9.jpg`} alt="A cat sitting on a chair" className="w-full h-full object-cover min-h-[320px] max-h-[500px] rounded-lg" />
                         </div>
                         <div className="flex-1 h-full flex flex-col justify-center">
-                            <div className="text-4xl font-semibold mb-3">Ưu Đãi Hấp Dẫn – Mua Nhiều Tiết Kiệm Nhiều</div>
-                            <div className="mb-6 font-normal text-lg">
+                            <div className="text-4xl font-semibold mb-3 text-black dark:text-white">Ưu Đãi Hấp Dẫn – Mua Nhiều Tiết Kiệm Nhiều</div>
+                            <div className="mb-6 font-normal text-lg text-black dark:text-white">
                                 Chúng tôi luôn có những chương trình khuyến mãi đặc biệt giúp bạn tiết kiệm chi phí. Đừng bỏ lỡ cơ hội nhận ngay những ưu đãi độc quyền khi mua sắm trên trang web của chúng tôi.
                             </div>
                             <div>
                                 <Link href="/shop">
-                                    <Button variant="bordered" className="border-main text-main">Xem thêm</Button>
+                                    <Button variant="bordered" className="border-main text-main">{t('see_more')}</Button>
                                 </Link>
                             </div>
                         </div>
@@ -435,8 +447,8 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between mb-6 items-center">
-                            <div className="font-bold lg:text-4xl text-2xl">Thịt Đông Lạnh Nhập Khẩu Hàng Đầu Thế Giới</div>
-                            <div className="font-medium text-sm text-main">Xem tất cả</div>
+                            <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hàng Đầu Thế Giới</div>
+                            <div className="font-medium text-sm text-main">{t('see_more')}</div>
                         </div>
                         <div>
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
@@ -450,8 +462,8 @@ function BodyHome() {
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex items-center justify-between mb-6">
-                        <div className="font-bold text-4xl">Tin tức mới</div>
-                        <div className="font-medium text-sm text-main">Xem tất cả</div>
+                        <div className="font-bold text-4xl text-black dark:text-white">Tin tức mới</div>
+                        <div className="font-medium text-sm text-main">{t('see_more')}</div>
                     </div>
 
                     <Swiper

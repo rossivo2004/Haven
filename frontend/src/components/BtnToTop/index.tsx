@@ -42,7 +42,7 @@ function BtnToTop() {
         <div className="fixed lg:bottom-10 lg:right-10 bottom-20 right-6 z-50">
             <button
                 onClick={scrollToTop}
-                className={`btn-to-top w-14 h-14 rounded-full bg-black text-white hover:bg-gray-700 transition-all duration-300 transform ${isSliding ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}
+                className={`btn-to-top w-14 h-14 rounded-full dark:bg-main bg-black text-white hover:bg-gray-700 transition-all duration-300 transform ${isSliding ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}
             >
                 <VerticalAlignTopIcon />
             </button>

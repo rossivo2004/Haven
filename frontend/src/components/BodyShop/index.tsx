@@ -156,12 +156,12 @@ function BodyShop() {
 
                 {/* Product Listing */}
                 <div className="flex-1 relative">
-                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start sticky top-[120px] bg-white z-20">
+                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start sticky top-[120px] dark:bg-black bg-white z-20">
                         <div className="mr-4 mb-2 flex lg:justify-between justify-end items-center h-full w-full gap-2">
                             {filter.length > 0 || priceFilter.length > 0 ? (
                                 <div className="flex-1 flex items-center">
                                     <div className="text-base font-normal flex items-center gap-2">
-                                        <div>Bộ lọc đã chọn:</div>
+                                        <div className='dark:text-white'>Bộ lọc đã chọn:</div>
                                         <div className="w-auto lg:h-20 hidden h-auto overflow-scroll hidden-scrollbar lg:flex gap-2 items-center" style={{ whiteSpace: 'nowrap' }}>
 
                                             {/* Price Filters */}
@@ -181,7 +181,7 @@ function BodyShop() {
 
                                             {/* Category Filter Select */}
                                             {filter.length > 3 ? (
-                                                <Dropdown>
+                                                <Dropdown className='dark:text-white'>
                                                     <DropdownTrigger>
                                                         <Button variant="bordered" endContent={<KeyboardArrowDownIcon />}>
                                                             {`${filter.length} bộ lọc`}
@@ -290,14 +290,14 @@ function BodyShop() {
                                 <div></div>
                             )}
 
-                            <div className="w-[160px] text-right">
+                            <div className="w-[160px] text-right dark:text-white">
                                 <Dropdown>
                                     <DropdownTrigger>
                                         <Button variant="bordered" endContent={<KeyboardArrowDownIcon />}>
                                             Sắp xếp theo
                                         </Button>
                                     </DropdownTrigger>
-                                    <DropdownMenu variant="faded" aria-label="Static Actions">
+                                    <DropdownMenu variant="faded" aria-label="Static Actions" className='dark:text-white'>
                                         <DropdownItem key="new">Giá thấp đến cao</DropdownItem>
                                         <DropdownItem key="copy">Giá cao đến thấp</DropdownItem>
                                         <DropdownItem key="edit">Khuyến mãi nhiều</DropdownItem>

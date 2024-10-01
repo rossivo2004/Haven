@@ -1,4 +1,4 @@
-import "../src/styles/globals.css";
+import "../../styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
@@ -16,6 +16,10 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';  // Thêm import Script từ Next.js
 import ChatBox from "@/src/components/ChatBox";
 
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
+
+
 export const metadata: Metadata = {
   title: "Food Haven - Thực Phẩm Cao Cấp, Dịch Vụ Giao Hàng Tận Nhà",
   description: "Một thương hiệu trẻ mang tới trải nghiệm mới.",
@@ -28,14 +32,18 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: {lang}
 }: {
   children: React.ReactNode;
+  params: {lang: string};
 }) {
+
+  const messages = await getMessages();
+
   return (
-    <StoreProvider>
-      <html suppressHydrationWarning lang="en">
+      <html suppressHydrationWarning lang={lang}>
         <head>
           {/* Google Tag Manager */}
           {/* <Script id="google-tag-manager" strategy="afterInteractive">
@@ -55,7 +63,9 @@ export default function RootLayout({
           </Script> */}
         </head>
         
-        <body className="light:bg-white dark:bg-black">
+        <body className="bg-white dark:bg-black">
+    <StoreProvider>
+    <NextIntlClientProvider messages={messages}>
           {/* Google Tag Manager (noscript) */}
           <noscript>
             <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MQ3DL62"
@@ -72,8 +82,9 @@ export default function RootLayout({
             <SpeedInsights />
             <Footer />
           </Providers>
+          </NextIntlClientProvider>
+    </StoreProvider>
         </body>
       </html>
-    </StoreProvider>
   );
 }

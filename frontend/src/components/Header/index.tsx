@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 import SearchIcon from '@mui/icons-material/Search';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
@@ -27,7 +28,7 @@ import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, Na
 import { Checkbox } from "@nextui-org/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
 import { Divider } from "@nextui-org/divider";
-
+import { Select, SelectItem } from "@nextui-org/react";
 import { Product } from '@/src/interface';
 import API_PRODUCTS from '@/src/data';
 import useDebounce from '@/src/utils';
@@ -41,6 +42,9 @@ import TooltipCu from '../ui/Tootip';
 
 import { updateQuantity } from '@/src/store/cartSlice';
 import { DUMP_PRODUCTS } from '@/src/dump';
+import ThemeSwitchBtn from '../SwitchTheme';
+
+import { useTranslations } from 'next-intl';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -52,6 +56,8 @@ const menuItems = [
 
 function Header() {
     const dispatch = useDispatch();
+    const router = useRouter();
+
     const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Product[]>([]);
@@ -67,15 +73,25 @@ function Header() {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [isDropdownVisible, setIsDropdownVisible] = useState(true); // Controls the dropdown visibility
+    const [language, setLanguage] = useState('vi'); // Default to 'en'
 
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('theme') || 'light';
+        }
+        return 'light';
+    });
 
     const handleQuantityChange = (id: number, quantity: number) => {
         if (quantity > 0) {
             dispatch(updateQuantity({ id, quantity }));
         }
     };
+
+    const t = useTranslations('HomePage');
 
     // const handleScroll = () => {
     //     const currentScrollY = window.scrollY;
@@ -112,6 +128,7 @@ function Header() {
     //     }
     //     getApi();
     // }, []);
+
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -166,13 +183,48 @@ function Header() {
             window.removeEventListener('scroll', handleScroll); // Clean up event listener
         };
     }, []);
-    const categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4'];
+
+    useEffect(() => {
+        const currentLang = window.location.pathname.startsWith('/vi') ? 'vi' : 'en';
+        setLanguage(currentLang);
+    }, []);
+
+
+    useEffect(() => {
+        // Khi theme thay đổi, cập nhật class trên document
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        // Chuyển đổi theme giữa light và dark
+        setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
+
+    const handleLanguageChange = (e: any) => {
+        const selectedLang = e.target.value;
+
+        // Lấy phần còn lại của URL
+        const currentPath = window.location.pathname.replace(/^\/vi|\/en/, '');
+
+        // Điều hướng đến URL tương ứng
+        if (selectedLang === 'vi') {
+            router.push(`/vi${currentPath}`);
+        } else {
+            router.push(`/en${currentPath}`);
+        }
+    };
 
     return (
         <div>
             <div className='lg:h-[130px]'>
                 <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 `}>
-                {/* <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
+                    {/* <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
                     }`}> */}
                     <div className="w-full bg-secondary lg:block hidden">
                         <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
@@ -198,7 +250,7 @@ function Header() {
                                         }}
                                         className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         type="text"
-                                        placeholder="Tìm kiếm sản phẩm..."
+                                        placeholder={t('input_pl_search')}
                                     />
                                     <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
                                         {search && (
@@ -219,7 +271,7 @@ function Header() {
 
                                 {(isDropdownVisible && (isFocused || isMouseOver) && debouncedSearch) && (
                                     <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-                                        <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
+                                        <div className="text-xl font-bold mt-2 ml-5">{t('input_pl_search_kq')}</div>
                                         <div className='flex gap-5 p-5'>
                                             <div className='w-1/4'>
                                                 <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
@@ -241,7 +293,7 @@ function Header() {
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
+                                                    <div className="flex items-center justify-center w-full h-full">{t('input_pl_search_kq_faile')}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -259,16 +311,16 @@ function Header() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    {/* <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div> */}
-                                    {/* <div className="xl:text-sm lg:text-[10px]">
+                                    <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
+                                    <div className="xl:text-sm lg:text-[10px]">
                                         <div>
-                                            <Link href={'/signin'}>Đăng nhập</Link>
+                                            <Link href={'/signin'}>{t('login')}</Link>
                                         </div>
                                         <div>
-                                            <Link href={'/signup'}>Đăng kí</Link>
+                                            <Link href={'/signup'}>{t('register')}</Link>
                                         </div>
-                                    </div> */}
-                                    <div>
+                                    </div>
+                                    {/* <div>
                                         <Dropdown placement="bottom-end">
                                             <DropdownTrigger>
                                                 <Avatar
@@ -310,11 +362,8 @@ function Header() {
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
-                                    </div>
+                                    </div> */}
                                 </div>
-
-
-
                                 <TooltipCu position='right' title={
                                     <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative py-3">
                                         <div className="relative">
@@ -325,8 +374,8 @@ function Header() {
                                         </div>
                                         <Link href={'/cart'}>
                                             <div>
-                                                <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
-                                                <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
+                                                <div className="xl:text-sm lg:text-[10px]">{t('cart')}</div>
+                                                <div className="font-semibold"><span>({cartCount})</span> {t('product')}</div>
                                             </div>
                                         </Link>
                                     </div>
@@ -335,7 +384,7 @@ function Header() {
                                         <div>
                                             <div className='p-4 min-w-[460px] max-w-[460px]'>
                                                 <div className='flex justify-end mb-4 items-center'>
-                                                    <div className='text-xl mb-2 font-semibold text-black'>Giỏ hàng của bạn</div>
+                                                    <div className='text-xl mb-2 font-semibold text-black'>{t('y_cart')}</div>
                                                 </div>
 
                                                 <div>
@@ -349,7 +398,7 @@ function Header() {
                                                                     <div>
                                                                         <div className='max-w-[220px]'>{item.name}</div>
 
-                                                                        <div>aaaa</div>
+
 
                                                                         <div className="flex items-center">
                                                                             <button
@@ -378,12 +427,12 @@ function Header() {
                                                                 </li>
                                                             ))
                                                         ) : (
-                                                            <div className='text-center py-4'>Giỏ hàng trống</div>
+                                                            <div className='text-center py-4'>{t('y_cart_empty')}</div>
                                                         )}
                                                     </ul>
                                                 </div>
                                                 <div className='flex items-center justify-between mt-6'>
-                                                    <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
+                                                    <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>{t('y_cart_btn')}</Link></div>
                                                     {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
                                                 </div>
                                             </div>
@@ -393,7 +442,44 @@ function Header() {
                                     )
                                     }
                                 </TooltipCu>
+                                <div className='flex items-center'>
+                                    <div className="pr-2">
+                                        <label className="swap swap-rotate">
+                                            {/* Ẩn checkbox */}
+                                            <input
+                                                type="checkbox"
+                                                onChange={toggleTheme}
+                                                checked={theme === 'light'}
+                                            />
 
+                                            {/* Icon mặt trời (light theme) */}
+                                            <svg
+                                                className="swap-on h-6 w-6 fill-current"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24">
+                                                <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+                                            </svg>
+
+                                            {/* Icon mặt trăng (dark theme) */}
+                                            <svg
+                                                className="swap-off h-6 w-6 fill-current"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24">
+                                                <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
+                                            </svg>
+                                        </label>
+                                    </div>
+                                    <div className="border border-white h-6"></div>
+                                    <div className='pl-2'>
+                                        <select
+                                            value={language}
+                                            onChange={handleLanguageChange}
+                                            className="text-white dark:text-white bg-transparent dark:bg-transparent rounded-lg outline-none border-transparent">
+                                            <option className='text-black' value="vi">Vie</option>
+                                            <option className='text-black' value="en">Eng</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -401,46 +487,46 @@ function Header() {
                         <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                             <ul className='flex gap-16 text-white font-medium'>
                                 <li className='flex items-center'>
-                                    <Link href={'/'}>TRANG CHỦ</Link>
+                                    <Link href={'/'}>{t('home_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/blog'}>TIN TỨC</Link>
+                                    <Link href={'/blog'}>{t('blog_nav')}</Link>
                                 </li>
                                 <li>
 
 
-<div className='group'>
-                                <TooltipCu position='left' title={
-    <div className='flex items-center transition-all py-3'>
-        <Link href={'/shop'}>
-            SẢN PHẨM
-        </Link>
-        <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400'/>
-    </div>
-}>
-    {
-        isVisible ? (
-            <div className="p-2 grid grid-cols-4 gap-1 relative">
-                <div className='row-span-4'>
-                    <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
-                </div>
-                {CATEGORY.map((item, index) => (
-                    <Link key={index} href={`/shop?category=${item.tag}`}>
-                        <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                            <div className='mr-2'>
-                                <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                            </div>
-                            <div>{item.name}</div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
-        ) : (
-            null
-        )
-    }
-</TooltipCu>
-</div>
+                                    <div className='group'>
+                                        <TooltipCu position='left' title={
+                                            <div className='flex items-center transition-all py-3'>
+                                                <Link href={'/shop'}>
+                                                    {t('product_nav')}
+                                                </Link>
+                                                <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400' />
+                                            </div>
+                                        }>
+                                            {
+                                                isVisible ? (
+                                                    <div className="p-2 grid grid-cols-4 gap-1 relative">
+                                                        <div className='row-span-4'>
+                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
+                                                        </div>
+                                                        {CATEGORY.map((item, index) => (
+                                                            <Link key={index} href={`/shop?category=${item.tag}`}>
+                                                                <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                    <div className='mr-2'>
+                                                                        <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                    </div>
+                                                                    <div>{item.name}</div>
+                                                                </div>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    null
+                                                )
+                                            }
+                                        </TooltipCu>
+                                    </div>
 
 
                                 </li>
@@ -480,13 +566,13 @@ function Header() {
 
                                 </li> */}
                                 <li className='flex items-center'>
-                                    <Link href={'/contact'}>LIÊN HỆ</Link>
+                                    <Link href={'/contact'}>{t('contact_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/tracking'}>TRA CỨU</Link>
+                                    <Link href={'/tracking'}>{t('lookup_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/tracking'}>VỀ CHÚNG TÔI</Link>
+                                    <Link href={'/tracking'}>{t('about_nav')}</Link>
                                 </li>
                             </ul>
                         </div>
@@ -600,7 +686,7 @@ function Header() {
                                         onBlur={() => setIsFocused(false)}
                                         className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         type="text"
-                                        placeholder="Tìm kiếm sản phẩm..."
+                                        placeholder={t('input_pl_search')}
                                     />
                                 </ModalHeader>
                                 <ModalBody>

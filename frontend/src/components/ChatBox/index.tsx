@@ -19,7 +19,7 @@ function ChatBox() {
             {!isOpen && (
                 <button
                     onClick={toggleChat}
-                    className="w-14 h-14 rounded-full bg-black text-white hover:bg-gray-700 transition-all duration-300"
+                    className="w-14 h-14 rounded-full dark:bg-main bg-black text-white hover:bg-gray-700 transition-all duration-300"
                 >
                     <ChatIcon />
                 </button>
