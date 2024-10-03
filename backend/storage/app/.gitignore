@@ -1,4 +1,6 @@
-*
+# Ignore private files
 !private/
+# Ignore public files
 !public/
+# Ignore the .gitignore file itself
 !.gitignore
