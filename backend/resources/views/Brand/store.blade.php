@@ -18,10 +18,14 @@
                 <label for="name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
+<<<<<<< HEAD
+         
+=======
             <div class="mb-3">
                 <label for="name" class="form-label">Tag</label>
                 <input type="text" class="form-control" id="name" name="tag" required>
             </div>
+>>>>>>> origin/TNghia
             <div class="mb-3">
                 <label for="formFileMultiple" class="form-label">Logo</label>
                 <input class="form-control" type="file" id="formFileMultiple" name="image" multiple>

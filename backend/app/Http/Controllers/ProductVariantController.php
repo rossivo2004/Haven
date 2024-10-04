@@ -36,15 +36,18 @@ class ProductVariantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProductVariant $product_variant)
+    public function show(ProductVariant $productVariant)
     {
-        //
+        return response()->json([
+            'success' => true,
+            'product' => $productVariant
+            ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ProductVariant $product_variant)
+    public function edit(ProductVariant $productVariant)
     {
         //
     }
@@ -52,7 +55,7 @@ class ProductVariantController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProduct_variantRequest $request, ProductVariant $product_variant)
+    public function update(UpdateProduct_variantRequest $request, ProductVariant $productVariant)
     {
         //
     }
@@ -60,7 +63,7 @@ class ProductVariantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProductVariant $product_variant)
+    public function destroy(ProductVariant $productVariant)
     {
         //
     }

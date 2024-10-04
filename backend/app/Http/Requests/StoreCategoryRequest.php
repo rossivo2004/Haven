@@ -25,7 +25,6 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'tag' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ];
     }
@@ -37,10 +36,7 @@ class StoreCategoryRequest extends FormRequest
         'name.string' => 'Tên phải là một chuỗi ký tự hợp lệ.',
         'name.max' => 'Tên không được vượt quá 255 ký tự.',
 
-        // Thông báo cho trường 'tag'
-        'tag.required' => 'Vui lòng nhập thẻ (tag).',
-        'tag.string' => 'Thẻ (tag) phải là một chuỗi ký tự hợp lệ.',
-        'tag.max' => 'Thẻ (tag) không được vượt quá 255 ký tự.',
+      
 
         // Thông báo cho trường 'image'
         'image.image' => 'Tệp tải lên phải là hình ảnh.',
@@ -54,6 +50,7 @@ protected function failedValidation(Validator $validator)
 {
     // Tùy chỉnh phản hồi JSON cho lỗi xác thực
     throw new HttpResponseException(response()->json([
+        'success' => false,
         'message' => 'Dữ liệu không hợp lệ.',
         'errors' => $validator->errors(),
     ], 422));

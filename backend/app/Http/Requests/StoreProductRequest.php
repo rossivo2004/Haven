@@ -38,8 +38,7 @@ class StoreProductRequest extends FormRequest
             'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh phải là file hình hợp lệ với dung lượng tối đa 2MB
             'category_id' => 'required|exists:categories,id', // ID danh mục bắt buộc, phải tồn tại trong bảng categories
             'brand_id' => 'nullable|exists:brands,id', // ID thương hiệu có thể rỗng, nếu có phải tồn tại trong bảng brands
-            'tag' => 'required|array|',
-            'tag.*' => 'string', // Tên sản phẩm bắt buộc
+           
             'discount' => 'required|array|', 
             'discount.*' => 'numeric|min:0|max:100'// Thông tin giảm giá phải là kiểu boolean
         ];
@@ -93,10 +92,7 @@ class StoreProductRequest extends FormRequest
             // 'brand_id' messages
             'brand_id.exists' => 'Thương hiệu bạn chọn không tồn tại.',
     
-            // 'tag' messages
-            'tag.required' => 'Vui lòng nhập thẻ (tag) cho sản phẩm.',
-            'tag.array' => 'Thẻ (tag) phải là một mảng.',
-            'tag.*.string' => 'Mỗi thẻ (tag) phải là chuỗi ký tự hợp lệ.',
+          
     
             // 'discount' messages
             'discount.required' => 'Vui lòng nhập thông tin giảm giá.',
@@ -111,6 +107,7 @@ class StoreProductRequest extends FormRequest
     {
         // Tùy chỉnh phản hồi JSON cho lỗi xác thực
         throw new HttpResponseException(response()->json([
+            'success' => false,
             'message' => 'Dữ liệu không hợp lệ.',
             'errors' => $validator->errors(),
         ], 422));

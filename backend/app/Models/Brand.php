@@ -10,7 +10,6 @@ class Brand extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'tag',
         'image',
     ];
 
@@ -18,4 +17,5 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class);
     }
+
 }
