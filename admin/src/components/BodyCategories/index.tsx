@@ -380,15 +380,16 @@ function BodyCategories() {
                 <div>
                     <div className="flex gap-2">
                         <Input
+                         isClearable
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"
                             labelPlacement="outside"
-                            size="lg"
+                            size="md"
                             endContent={<SearchIcon />}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        <Button onPress={handleOpenAddCategoryModal} size="lg" className="font-semibold" color="primary">Thêm phân loại</Button>
+                        <Button onPress={handleOpenAddCategoryModal} size="md" className="font-medium !px-6" color="primary">Thêm phân loại</Button>
                     </div>
                 </div>
             </div>

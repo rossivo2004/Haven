@@ -74,7 +74,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
         }
     };
 
-    
+
 
     const uploadImage = async (file: File): Promise<string> => {
         const formData = new FormData();
@@ -202,76 +202,104 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
 
             {/* Modal for editing category */}
             {editingCategory && (
-                <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+                <Modal isOpen={isEditModalOpen} onClose={closeEditModal} className="bg-[#FCFCFC]" size="4xl">
                     <ModalContent>
-                        <ModalHeader>Sửa phân loại</ModalHeader>
+                        <ModalHeader><div className="text-2xl">Sửa phân loại</div></ModalHeader>
                         <ModalBody>
-                            <div>
-                                <label>
-                                    Tên phân loại:
-                                    <Input
-                                        type="text"
-                                        value={categoryName}
-                                        onChange={(e) => setCategoryName(e.target.value)}
-                                    />
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    Tag phân lọai
-                                    <Input
-                                        type="text"
-                                        value={categoryTag}
-                                        onChange={(e) => setCategoryTag(e.target.value)}
-                                    />
-                                </label>
-                            </div>
-                            <div>
-                                <label className="mb-2">
-                                    Hình ảnh hiện tại:
-                                    {editingCategory.image && !categoryImage && (
-                                        <div className="w-[200px] h-[200px]">
+                            <div className="flex gap-10">
+                                <div className="flex flex-col items-center gap-4">
+                                    <label className="block text-lg font-medium mb-2">Hình ảnh</label>
+
+                                    {/* Hiển thị ảnh hiện tại hoặc ảnh mới đã chọn */}
+                                    <div className="relative w-[200px] h-[200px]">
+                                        {/* Nếu có ảnh mới, hiển thị ảnh mới */}
+                                        {categoryImage ? (
                                             <Image
-                                                src={editingCategory.image}
-                                                alt={editingCategory.name}
+                                                src={URL.createObjectURL(categoryImage)} // Preview ảnh mới
+                                                alt="Selected image preview"
                                                 width={200}
                                                 height={200}
-                                                className="rounded-lg object-cover mb-2 w-full h-full"
+                                                className="rounded-lg object-cover w-full h-full"
                                             />
-                                        </div>
-                                    )}
-                                </label>
-                                <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    ref={fileInputRef} // Attach the ref to the file input
-                                    className="mt-2"
-                                />
+                                        ) : (
+                                            // Nếu chưa có ảnh mới, hiển thị ảnh hiện tại
+                                            editingCategory?.image && (
+                                                <Image
+                                                    src={editingCategory.image} // Ảnh hiện tại
+                                                    alt={editingCategory.name}
+                                                    width={200}
+                                                    height={200}
+                                                    className="rounded-lg object-cover w-full h-full"
+                                                />
+                                            )
+                                        )}
 
+                                        {/* Nút "X" để xóa ảnh mới được chọn */}
+                                        {categoryImage && (
+                                            <div
+                                                className="absolute top-1 right-1 cursor-pointer bg-white rounded-full shadow-lg flex items-center justify-center hover:text-red-600"
+                                                onClick={handleRemoveImage}
+                                            >
+                                                <CloseIcon className="w-5 h-5"/>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {categoryImage && (
-                                    <div className="relative w-[200px] h-[200px]">
-                                        <div
-                                            className="absolute top-0 right-0 p-1 cursor-pointer bg-white rounded-full shadow-lg"
-                                            onClick={handleRemoveImage}
+                                    {/* Nút chọn file được tùy chỉnh */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
-                                            <CloseIcon />
-                                        </div>
-                                        <Image
-                                            src={URL.createObjectURL(categoryImage)} // Preview the selected image
-                                            alt="Selected image preview"
-                                            width={200}
-                                            height={200}
-                                            className="rounded-lg mt-2 w-full h-full"
+                                            { "Change Image"}
+                                        </button>
+
+                                        {/* Input file ẩn hoàn toàn */}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            ref={fileInputRef}
+                                            onChange={handleImageChange}
+                                            className="hidden" // Hoàn toàn ẩn input file
                                         />
                                     </div>
-                                )}
+
+                                    {/* Chỉ hiển thị tên ảnh đã chọn, không hiển thị link */}
+                                    {categoryImage && (
+                                        <div className="mt-2 text-sm text-gray-600 hidden">
+                                            {categoryImage.name} {/* Chỉ tên ảnh, không link */}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <div className="mb-4">
+                                        <label>
+                                            <div className="text-lg font-medium">Tên phân loại:</div>
+                                            <Input
+                                                type="text"
+                                                value={categoryName}
+                                                onChange={(e) => setCategoryName(e.target.value)}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <div className="text-lg font-medium"> Tag phân lọai:</div>
+                                            <Input
+                                                type="text"
+                                                value={categoryTag}
+                                                onChange={(e) => setCategoryTag(e.target.value)}
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+
                         </ModalBody>
                         <ModalFooter>
                             <Button onClick={closeEditModal}>Cancel</Button>
-                            <Button onClick={handleSubmitEdit} disabled={isLoading} className="bg-primary-400 font-semibold">
+                            <Button onClick={handleSubmitEdit} disabled={isLoading} className="bg-primary-400 text-white font-semibold">
                                 {isLoading ? "Saving..." : "Save"}
                             </Button>
                         </ModalFooter>

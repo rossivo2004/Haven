@@ -16,8 +16,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';  // Thêm import Script từ Next.js
 import ChatBox from "@/src/components/ChatBox";
 
-import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 
 export const metadata: Metadata = {
@@ -34,57 +34,44 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({
   children,
-  params: {lang}
+  params: { lang }
 }: {
   children: React.ReactNode;
-  params: {lang: string};
+  params: { lang: string };
 }) {
 
-  const messages = await getMessages();
+  // Lấy messages dựa trên ngôn ngữ từ params
+  const messages = await getMessages({ locale: lang });
 
   return (
-      <html suppressHydrationWarning lang={lang}>
-        <head>
-          {/* Google Tag Manager */}
-          {/* <Script id="google-tag-manager" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-5MQ3DL62');`}
-          </Script> */}
-          
-          {/* Google Analytics */}
-          {/* <Script id="google-analytics" strategy="afterInteractive">
-            {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-KW0JDLWNDG');`}
-          </Script> */}
-        </head>
-        
-        <body className="bg-white dark:bg-black">
-    <StoreProvider>
-    <NextIntlClientProvider messages={messages}>
-          {/* Google Tag Manager (noscript) */}
-          <noscript>
-            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MQ3DL62"
-              height="0" width="0" style={{ display: 'none', visibility: 'hidden' }}></iframe>
-          </noscript>
+    <html suppressHydrationWarning lang={lang}>
+      <head>
+        {/* Head components như Google Analytics/Tag Manager có thể giữ nguyên */}
+      </head>
 
-          <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
-            <Header />
-            <ToastContainer className="mt-[64px]" />
-            <ChatBox />
-            <BtnToTop />
-            {children}
-            <Analytics />
-            <SpeedInsights />
-            <Footer />
-          </Providers>
+      <body className="bg-white dark:bg-black">
+        <StoreProvider>
+          <NextIntlClientProvider locale={lang} messages={messages}>
+            {/* Google Tag Manager (noscript) */}
+            <noscript>
+              <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MQ3DL62"
+                height="0" width="0" style={{ display: 'none', visibility: 'hidden' }}></iframe>
+            </noscript>
+
+            <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
+              <Header params={{ lang }} />
+              <ToastContainer className="mt-[64px]" />
+              <ChatBox />
+              <BtnToTop />
+              {children}
+              <Analytics />
+              <SpeedInsights />
+              <Footer />
+            </Providers>
           </NextIntlClientProvider>
-    </StoreProvider>
-        </body>
-      </html>
+        </StoreProvider>
+      </body>
+    </html>
   );
 }
+

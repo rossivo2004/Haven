@@ -25,24 +25,18 @@ import { Tooltip, Button } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
-import { Checkbox } from "@nextui-org/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
-import { Divider } from "@nextui-org/divider";
-import { Select, SelectItem } from "@nextui-org/react";
 import { Product } from '@/src/interface';
-import API_PRODUCTS from '@/src/data';
 import useDebounce from '@/src/utils';
 import { CATEGORY } from '@/src/dump';
 import { selectTotalItems } from '@/src/store/cartSlice';
 import { removeItem } from '@/src/store/cartSlice';
 
 import './style.scss'
-import { log } from 'console';
 import TooltipCu from '../ui/Tootip';
 
 import { updateQuantity } from '@/src/store/cartSlice';
 import { DUMP_PRODUCTS } from '@/src/dump';
-import ThemeSwitchBtn from '../SwitchTheme';
 
 import { useTranslations } from 'next-intl';
 
@@ -54,7 +48,7 @@ const menuItems = [
     { href: '/', icon: <InfoOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hướng dẫn' },
 ];
 
-function Header() {
+function Header({ params }: { params: { lang: string } }) {
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -77,6 +71,8 @@ function Header() {
 
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+
+    const { lang } = params;
 
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -283,7 +279,7 @@ function Header() {
                                                     <ul className='overflow-scroll h-[400px]'>
                                                         {filteredProducts.map((product) => (
                                                             <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                                                                <a href={`/product/${product.id}`} className="flex gap-4 items-center">
+                                                                <a href={`/${lang}/product/${product.id}`} className="flex gap-4 items-center">
                                                                     <div className='w-14 h-14'>
                                                                         {/* <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} /> */}
                                                                     </div>
@@ -314,10 +310,10 @@ function Header() {
                                     <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
                                     <div className="xl:text-sm lg:text-[10px]">
                                         <div>
-                                            <Link href={'/signin'}>{t('login')}</Link>
+                                            <Link href={`/${lang}/signin`}>{t('login')}</Link>
                                         </div>
                                         <div>
-                                            <Link href={'/signup'}>{t('register')}</Link>
+                                            <Link href={`/${lang}/signup`}>{t('register')}</Link>
                                         </div>
                                     </div>
                                     {/* <div>
@@ -372,7 +368,7 @@ function Header() {
                                              {cartCount}
                                          </span> */}
                                         </div>
-                                        <Link href={'/cart'}>
+                                        <Link href={`/${lang}/cart`}>
                                             <div>
                                                 <div className="xl:text-sm lg:text-[10px]">{t('cart')}</div>
                                                 <div className="font-semibold"><span>({cartCount})</span> {t('product')}</div>
@@ -432,7 +428,7 @@ function Header() {
                                                     </ul>
                                                 </div>
                                                 <div className='flex items-center justify-between mt-6'>
-                                                    <div><Link href={'/cart'} className='py-1 px-4 rounded-lg bg-main text-white'>{t('y_cart_btn')}</Link></div>
+                                                    <div><Link href={`/${lang}/cart`} className='py-1 px-4 rounded-lg bg-main text-white'>{t('y_cart_btn')}</Link></div>
                                                     {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
                                                 </div>
                                             </div>
@@ -490,7 +486,7 @@ function Header() {
                                     <Link href={'/'}>{t('home_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/blog'}>{t('blog_nav')}</Link>
+                                    <Link href={`/${lang}/blog`}>{t('blog_nav')}</Link>
                                 </li>
                                 <li>
 
@@ -498,7 +494,7 @@ function Header() {
                                     <div className='group'>
                                         <TooltipCu position='left' title={
                                             <div className='flex items-center transition-all py-3'>
-                                                <Link href={'/shop'}>
+                                                <Link href={`/${lang}/shop`}>
                                                     {t('product_nav')}
                                                 </Link>
                                                 <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400' />
@@ -566,13 +562,13 @@ function Header() {
 
                                 </li> */}
                                 <li className='flex items-center'>
-                                    <Link href={'/contact'}>{t('contact_nav')}</Link>
+                                    <Link href={`/${lang}/contact`}>{t('contact_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/tracking'}>{t('lookup_nav')}</Link>
+                                    <Link href={`/${lang}/tracking`}>{t('lookup_nav')}</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={'/tracking'}>{t('about_nav')}</Link>
+                                    <Link href={`/${lang}/tracking`}>{t('about_nav')}</Link>
                                 </li>
                             </ul>
                         </div>
@@ -625,7 +621,7 @@ function Header() {
                         <ul className="menu menu-horizontal w-full h-full flex items-center justify-around">
                             <li className='lg:mx-4'><Link href={'/'}><HomeIcon className='h-5 w-5' /></Link></li>
                             <li className='lg:mx-4'> <Button className='p-2 min-w-16' variant='light' onPress={onOpen}><SearchIcon className='h-5 w-5' /></Button></li>
-                            <li className='lg:mx-4'><Link href={'/cart'}>  <div className="relative">
+                            <li className='lg:mx-4'><Link href={`/${lang}/cart`}>  <div className="relative">
                                 <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
                                 <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-[-4px]">
                                     <div className='text-white'>{cartCount}</div>
@@ -649,7 +645,7 @@ function Header() {
                                             <p className="font-semibold">zoey@example.com</p>
                                         </DropdownItem>
                                         <DropdownItem key="settings">
-                                            <Link href={'/profile'}>
+                                            <Link href={`/${lang}/profile`}>
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>
@@ -699,7 +695,7 @@ function Header() {
                                                     <ul className="h-screen overflow-y-auto pb-20">
                                                         {filteredProducts.map((product) => (
                                                             <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                                                                <Link href={`/product/${product.id}`} className="flex gap-4 items-center">
+                                                                <Link href={`/${lang}/product/${product.id}`} className="flex gap-4 items-center">
                                                                     <div className="w-14 h-14">
                                                                         <img
                                                                             className="w-full h-full object-cover"
