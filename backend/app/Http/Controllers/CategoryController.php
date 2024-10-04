@@ -5,24 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Models\Product;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        $search = $request->input('search');
+        $categories = Category::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%');
+        })->orderBy('id', 'desc')->paginate(10)->appends(request()->all());
+
         return response()->json([
             'success' => true,
-            'message' => 'Category đã được cập nhật thành công',
-            'categories' => Category::orderBy('id', 'desc')->get(),
-
+            'categories' => $categories,
         ], 200);
-        // $categories = new Category();
+        
+    
+        
         // return view('Category.home',[
-        //     'categories' => Category::all(),
+        //     'categories' => $categories,
         // ]);
     }
 
@@ -71,7 +79,10 @@ class CategoryController extends Controller
      */
     public function show(category $category)
     {
-        //
+        return response()->json([
+            'success' => true,
+            'category' => $category
+        ], 200);
     }
 
     /**
@@ -81,11 +92,22 @@ class CategoryController extends Controller
     {
         return response()->json([
             'success' => true,
-            'message' => 'Category đã được cập nhật thành công',
             'Category' => $category
         ], 200);
+        // return view('Category.edit',[
+        //     'category' => $category,
+        // ]);
     }
-
+    public function getProducts(category $category)
+    {
+        return response()->json([
+            'success' => true,
+            'products' => Product::where('category_id', $category->id)->paginate(10)
+        ], 200);
+        // return view('Category.edit',[
+        //     'category' => $category,
+        // ]);
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -168,12 +190,5 @@ class CategoryController extends Controller
         }
     }
     
-    public function getCategoryByTag($tag)
-    {
-            $category = Category::where('tag',$tag)->first();
-            if (!$category) {
-                return response()->json(['message' => 'Category not found'], 404);
-            }
-            return response()->json($category);
-    }
+
 }
