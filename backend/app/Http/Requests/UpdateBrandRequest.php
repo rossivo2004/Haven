@@ -24,6 +24,7 @@ class UpdateBrandRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'tag' => 'required|string|max:255|unique:brands,tag',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ];
     }
@@ -36,7 +37,11 @@ class UpdateBrandRequest extends FormRequest
             'name.max' => 'Tên không được vượt quá 255 ký tự.',
     
             // Thông báo cho trường 'tag'
-          
+            'tag.required' => 'Vui lòng nhập tag.',
+            'tag.string' => 'tag phải là một chuỗi ký tự hợp lệ.',
+            'tag.max' => 'tag không được vượt quá 255 ký tự.',
+            'tag.unique' => 'Tag đã tồn tại.',
+    
     
             // Thông báo cho trường 'image'
             'image.image' => 'Tệp tải lên phải là hình ảnh.',

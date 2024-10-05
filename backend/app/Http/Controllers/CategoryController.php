@@ -84,7 +84,14 @@ class CategoryController extends Controller
             'category' => $category
         ], 200);
     }
-
+    public function getCategoryByTag( $tag)
+    {
+    
+        return response()->json([
+            'success' => true,
+            'category' => Category::where('tag', $tag)->get(),
+            ]);
+    }
     /**
      * Show the form for editing the specified resource.
      */

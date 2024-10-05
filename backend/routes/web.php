@@ -66,6 +66,7 @@ route::group([
     Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('Product.delete');
     Route::get('/show/{product}', [ProductController::class, 'show'])->name('Product.show');
     Route::get('/getproductvariants/{product}', [ProductController::class, 'getProductVariants'])->name('Product.getProductVariant');
+
 });
 route::group([
     'prefix' => 'api/productvariant'
@@ -87,7 +88,7 @@ route::group([
     Route::delete('/delete/{category}', [CategoryController::class, 'destroy'])->name('Category.delete');
     Route::get('/show/{category}', [CategoryController::class, 'show'])->name('Category.show');
     Route::get('/getproducts/{category}', [CategoryController::class, 'getProducts'])->name('Category.getProduct');
-
+    Route::get('/getCategoryByTag/{tag}', [CategoryController::class, 'getCategoryByTag'])->name('Category.getProductByTag');
 });
 
 route::group([
@@ -101,7 +102,7 @@ route::group([
     Route::delete('/delete/{brand}', [BrandController::class, 'destroy'])->name('Brand.delete');
     Route::get('/show/{brand}', [BrandController::class, 'show'])->name('Brand.show');
     Route::get('/getproducts/{brand}', [BrandController::class, 'getProducts'])->name('Brand.getProduct');
- 
+    Route::get('/getBrandByTag/{tag}', [BrandController::class, 'getBrandByTag'])->name('Brand.getProductByTag');
 });
 route::group([
     'prefix' => 'api/flashsale',

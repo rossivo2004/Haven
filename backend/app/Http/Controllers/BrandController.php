@@ -72,6 +72,14 @@ class BrandController extends Controller
             'brand' => $brand
         ], 200);
     }
+
+    public function getBrandByTag($tag)
+    {
+        return response()->json([
+            'success' => true,
+            'category' => Brand::where('tag', $tag)->get(),
+            ]);
+    }
     public function getProducts(Brand $brand)
     {
         return response()->json([
