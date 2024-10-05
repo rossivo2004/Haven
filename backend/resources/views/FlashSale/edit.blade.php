@@ -26,13 +26,7 @@
                     <label for="end_time" class="form-label">End time </label>
                     <input type="datetime-local" class="form-control" id="end_time" name="end_time" value="{{$flashSale->end_time}}" required>
                 </div>
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-control" id="status" name="status">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
+
             </div>
             <div id="variants">
                 @foreach ($productVariantFlashSales as $product)

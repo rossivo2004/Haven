@@ -25,6 +25,7 @@ class StoreBrandRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'tag' => 'required|string|max:255|unique:brands,tag',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ];
     }
@@ -35,7 +36,10 @@ class StoreBrandRequest extends FormRequest
         'name.required' => 'Vui lòng nhập tên.',
         'name.string' => 'Tên phải là một chuỗi ký tự hợp lệ.',
         'name.max' => 'Tên không được vượt quá 255 ký tự.',
-
+        'tag.required' => 'Vui lòng nhập tag.',
+        'tag.string' => 'tag phải là một chuỗi ký tự hợp lệ.',
+        'tag.max' => 'tag không được vượt quá 255 ký tự.',
+        'tag.unique' => 'Tag đã tồn tại.',
         // Thông báo cho trường 'image'
         'image.image' => 'Tệp tải lên phải là hình ảnh.',
         'image.mimes' => 'Hình ảnh phải có định dạng jpg, png hoặc jpeg.',

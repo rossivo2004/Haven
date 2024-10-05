@@ -24,7 +24,7 @@ class FlashSaleController extends Controller
         
         $flashSales = FlashSale::when($status === '0' || $status === '1', function ($query) use ($status) {
             return $query->where('status',  $status);
-        })->orderBy('id', 'desc')->paginate(10)->appends(request()->all());
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
         // $flashSales = FlashSale::where('status',  $status)->get();
 
         // return view('FlashSale.home', [
@@ -80,7 +80,7 @@ class FlashSaleController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Nhập trùng sản phẩm !',
-                ], 500);
+                ], 422);
             }
             // kiểm tra hàng tồn kho
             foreach ($productVariantIds as $index => $productVariantid) {
@@ -98,7 +98,7 @@ class FlashSaleController extends Controller
                     'success' => false,
                     'message' => 'Một số sản phẩm không đủ hàng tồn kho.',
                     'out_of_stock_products' => $outOfStockProducts
-                ], 500);
+                ], 422);
             }
             //kiểm tra số lượng flash sale có lớn hơn số lượng tồn kho hay không
             foreach ($productVariantIds as $index => $productVariantid) {
@@ -117,7 +117,7 @@ class FlashSaleController extends Controller
                     'success' => false,
                     'message' => 'Một số sản phẩm không đủ hàng tồn kho cho flash sale.',
                     'over_stock_flash_sale_products' => $overStockFlashSaleProducts
-                ], 500);
+                ], 422);
             }
 
             // kiểm tra xem có flash sale nào trùng lặp hay không
@@ -134,7 +134,7 @@ class FlashSaleController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Chương trình Flash sale bị chồng chéo với chương trình Flash sale khác !',
-                ], 500);
+                ], 422);
             } else {
                 // thêm flashsale 
                 $flashSale->start_time = $startTime;
@@ -328,12 +328,12 @@ class FlashSaleController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Chương trình flash sale đã được lưu thành công',
+                'message' => 'Chương trình flash sale đã được cập nhật thành công',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Xảy ra lỗi trong quá trình lưu',
+                'message' => 'Xảy ra lỗi trong quá trình cập nhật',
                 'error' => $e->getMessage()
             ], 500);
         }

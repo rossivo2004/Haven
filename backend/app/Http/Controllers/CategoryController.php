@@ -20,7 +20,7 @@ class CategoryController extends Controller
         $search = $request->input('search');
         $categories = Category::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
-        })->orderBy('id', 'desc')->paginate(10)->appends(request()->all());
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
 
         return response()->json([
             'success' => true,
@@ -84,7 +84,14 @@ class CategoryController extends Controller
             'category' => $category
         ], 200);
     }
-
+    public function getCategoryByTag( $tag)
+    {
+    
+        return response()->json([
+            'success' => true,
+            'category' => Category::where('tag', $tag)->get(),
+            ]);
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -102,7 +109,7 @@ class CategoryController extends Controller
     {
         return response()->json([
             'success' => true,
-            'products' => Product::where('category_id', $category->id)->paginate(10)
+            'products' => Product::where('category_id', $category->id)->paginate(20)
         ], 200);
         // return view('Category.edit',[
         //     'category' => $category,
@@ -146,7 +153,7 @@ class CategoryController extends Controller
             // Return a success response
             return response()->json([
                 'success' => true,
-                'message' => 'Category đã được cập nhật thành công',
+                'message' => '  ',
                 'data' => $category
             ], 200);
         } catch (\Exception $e) {

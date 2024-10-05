@@ -68,10 +68,7 @@
             <h4>Thêm biến thể</h4>
             <div class="variant">
                 @foreach ($variants as $item)
-<<<<<<< HEAD
                 <h2>Sản phẩm</h2>
-=======
->>>>>>> origin/TNghia
                 <input type="checkbox" name="delete_variants[]" value="{{ $item->id }}"> Xóa
                 <input type="hidden" name="variant_id[]" value="{{ $item->id }}">
                 <div class="mb-3">
@@ -82,24 +79,13 @@
                     <label for="price" class="form-label">Price</label>
                     <input type="number" value="{{$item->price}}" step="0.01" class="form-control" id="price" name="price[]" required>
                 </div>
-<<<<<<< HEAD
            
-=======
-                <div class="mb-3">
-                    <label for="weight" class="form-label">Tag</label>
-                    <input type="number" value="{{$item->tag}}" step="0.01" class="form-control" id="weight" name="tag[]">
-                </div>
->>>>>>> origin/TNghia
                 <div class="mb-3">
                     <label for="quantity" class="form-label">Stock</label>
                     <input type="number"  value="{{$item->stock}}" class="form-control" id="quantity" name="stock[]" required>
                 </div>
                 <div class="mb-3">
-<<<<<<< HEAD
                     <label for="expiry" class="form-label">Variant value</label>
-=======
-                    <label for="expiry" class="form-label">Expiry Date</label>
->>>>>>> origin/TNghia
                     <input type="text"  value="{{$item->variant_value}}" class="form-control" id="expiry" name="variant_value[]">
                 </div>
                 
@@ -138,27 +124,14 @@
                         <label for="price" class="form-label">Price</label>
                         <input type="number" step="0.01" class="form-control" id="price" name="price[]" required>
                     </div>
-<<<<<<< HEAD
                   
-=======
-                    <div class="mb-3">
-                        <label for="weight" class="form-label">Tag</label>
-                        <input type="number" step="0.01" class="form-control" id="tag" name="tag[]">
-                    </div>
->>>>>>> origin/TNghia
                     <div class="mb-3">
                         <label for="quantity" class="form-label">Stock</label>
                         <input type="number" class="form-control" id="quantity" name="stock[]" required>
                     </div>
-<<<<<<< HEAD
                      <div class="mb-3">
                         <label for="expiry" class="form-label">Variant value</label>
                         <input type="text"   class="form-control" id="expiry" name="variant_value[]" required>
-=======
-                    <div class="mb-3">
-                        <label for="expiry" class="form-label">Expiry Date</label>
-                        <input type="date" class="form-control" id="expiry" name="expiry[]">
->>>>>>> origin/TNghia
                     </div>
                     <div class="mb-3">
                         <label for="formFileMultiple" class="form-label">Multiple files input example</label>
