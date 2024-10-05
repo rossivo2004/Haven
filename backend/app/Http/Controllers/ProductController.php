@@ -78,7 +78,7 @@ class ProductController extends Controller
                 }
             });
 
-        })->orderBy('id', 'desc')->paginate(10)->appends(request()->all());
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
 
       
         // return view('Product.shop', [
@@ -206,7 +206,7 @@ class ProductController extends Controller
     
         return response()->json([
             'success' => true,
-            '$product' => $product
+            'product' => $product
             ]);
     }
 
@@ -215,7 +215,7 @@ class ProductController extends Controller
     
         return response()->json([
             'success' => true,
-            'productVariants' => ProductVariant::where('product_id', $product->id)->paginate(10),
+            'productVariants' => ProductVariant::where('product_id', $product->id)->paginate(20),
             ]);
     }
     

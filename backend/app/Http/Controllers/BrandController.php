@@ -18,7 +18,7 @@ class BrandController extends Controller
         $search = $request->input('search');
         $brands = Brand::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
-        })->orderBy('id', 'desc')->paginate(1)->appends(request()->all());
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
 
         return response()->json([
             'success' => true,
@@ -76,7 +76,7 @@ class BrandController extends Controller
     {
         return response()->json([
             'success' => true,
-            'products' => Product::where('brand_id',$brand->id)->paginate(10),
+            'products' => Product::where('brand_id',$brand->id)->paginate(20),
         ], 200);
     }
     
