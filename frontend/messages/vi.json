@@ -1,0 +1,45 @@
+{
+    "HomePage": {
+      "title": "Xin chào",
+       "login": "Đăng nhập",
+      "register": "Đăng kí",
+      "cart": "Giỏ hàng",
+      "product": "Sản phẩm",
+      "home_nav": "TRANG CHỦ",
+      "blog_nav": "TIN TỨC",
+      "product_nav": "SẢN PHẨM",
+      "contact_nav" : "LIÊN HỆ",
+      "lookup_nav": "TRA CỨU",
+      "about_nav": "VỀ CHÚNG TÔI",
+      "input_pl_search": "Tìm kiếm sản phẩm...",
+      "input_pl_search_kq": "Tìm kiếm theo tên sản phẩm",
+      "input_pl_search_kq_faile": "Không tìm thấy sản phẩm",
+      
+    
+      "flashsale": "Sản phẩm giảm giá",
+      "category": "Phân loại",
+      "featured_products": "Sản phẩm phổ biến",
+      "new_products": "Sản phẩm mới ra mắt",
+
+      "free_shipping": "Giao hàng miễn phí",
+      "free_shipping_title": "Với đơn hàng từ 500k trở lên",
+      "24/7_support": " Hỗ trợ 24/7",
+      "24/7_support_title": "Hỗ trợ online / offline 24/7",
+      "free_returns": "Miễn phí đổi trả",
+      "free_returns_title": "Trong vòng 7 ngày",
+      "order_online": "Đặt hàng trực tuyến",
+
+      "end_after" : "Kết thúc sau:",
+
+      "y_cart": "Giỏ hàng của bạn",
+      "y_cart_empty": "Giỏ hàng trống",
+      "y_cart_btn": "Xem giỏ hàng",
+
+      "day": "Ngày",
+      "hour": "GIờ",
+      "minute": "Phút",
+      "second": "Giây",
+
+      "see_more": "Xem thêm"
+    }
+  }

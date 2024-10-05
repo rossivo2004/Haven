@@ -12,6 +12,7 @@ class Brand extends Model
         'name',
         'tag',
         'image',
+        'tag'
     ];
 
     public function product()

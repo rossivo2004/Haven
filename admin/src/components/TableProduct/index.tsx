@@ -21,6 +21,7 @@ interface Animal {
 interface Variant {
     name: string;
     price: string;
+    tag: string;
     salePrice: string;
     quantity: string;
     images: string[]; // Array of images for each variant
@@ -40,7 +41,8 @@ export default function TableProduct() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [image, setImage] = useState<string[]>([]); // State for image previews
     const [hasVariants, setHasVariants] = useState(false); // Trạng thái để theo dõi số lượng biến thể
-    const [newVariant, setNewVariant] = useState<Variant>({ name: "", price: "", salePrice: "", quantity: "", images: [] });
+    const [newVariant, setNewVariant] = useState<Variant>({ name: "", tag: "" ,price: "", salePrice: "", quantity: "", images: [] });
+    const [productImages, setProductImages] = useState<string[]>([]); // Trạng thái cho ảnh sản phẩm chung
 
     const animals = [
         { key: "cat", label: "Cat" },
@@ -90,11 +92,50 @@ export default function TableProduct() {
         });
     };
 
+    const handleDeleteVariant = (index: number) => {
+        confirmAlert({
+            title: 'Xóa sản phẩm biến thể',
+            message: 'Bạn có chắc muốn xóa sản phẩm biến thể này?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => removeVariant(index) // Call removeVariant with the correct index
+                },
+                {
+                    label: 'No',
+                }
+            ]
+        });
+    };
+    
+
+    const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const previews = files.map((file) => {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (reader.result) {
+                        resolve(reader.result as string);
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file); // Convert image to base64
+            });
+        });
+
+        Promise.all(previews).then((images) => {
+            setProductImages(images); // Cập nhật ảnh sản phẩm chung
+            formik.setFieldValue("images", images); // Cập nhật vào formik
+        });
+    };
+
+
     const handleAddVariant = () => {
         if (newVariant.name && newVariant.price && newVariant.salePrice && newVariant.quantity) {
             setVariants([...variants, newVariant]);
             setHasVariants(true); // Cập nhật trạng thái khi thêm biến thể
-            setNewVariant({ name: "", price: "", salePrice: "", quantity: "", images: [] });
+            setNewVariant({ name: "", price: "",tag: "" ,salePrice: "", quantity: "", images: [] });
         } else {
             alert("Vui lòng điền đầy đủ thông tin biến thể.");
         }
@@ -251,6 +292,29 @@ export default function TableProduct() {
                                     </Select>
                                 </div>
                             </div>
+                                  {/* Ảnh sản phẩm chung */}
+                                  <div className="mb-5">
+                                <label htmlFor="product-images" className="block mb-1">Ảnh sản phẩm</label>
+                                <Input
+                                    id="product-images"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleProductImageChange}
+                                />
+                                {/* Hiển thị ảnh preview cho sản phẩm chung */}
+                                <div className="flex gap-2 mt-2">
+                                    {productImages.map((img, imgIndex) => (
+                                        <img
+                                            key={imgIndex}
+                                            src={img}
+                                            alt={`product-img-${imgIndex}`}
+                                            className="w-16 h-16 object-cover"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
                             <div>
                                 <label htmlFor="description">Mô tả sản phẩm</label>
                                 <Textarea
@@ -278,6 +342,12 @@ export default function TableProduct() {
                                             placeholder="Tên biến thể (e.g., Lon, Lốc)"
                                             value={newVariant.name}
                                             onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
+                                            required={!hasVariants} // Bỏ required nếu đã có biến thể
+                                        />
+                                            <Input
+                                            placeholder="Tag biến thể (e.g., Lon, Lốc)"
+                                            value={newVariant.tag}
+                                            onChange={(e) => setNewVariant({ ...newVariant, tag: e.target.value })}
                                             required={!hasVariants} // Bỏ required nếu đã có biến thể
                                         />
                                         <Input
@@ -378,7 +448,7 @@ export default function TableProduct() {
                                                     onChange={(e) => handleVariantChange(index, "quantity", e.target.value)}
                                                     required
                                                 />
-                                                <Button color="danger" onPress={() => removeVariant(index)}>Xóa</Button>
+                                            <Button color="danger" onClick={() => handleDeleteVariant(index)} >Xóa</Button>
                                             </div>
 
                                             {/* Image upload for each variant */}

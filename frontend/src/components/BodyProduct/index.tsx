@@ -44,8 +44,8 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
             {...getBaseProps()}
             className={cn(
                 "group flex items-center justify-between hover:bg-content2",
-                "w-max cursor-pointer border-2 border-default rounded-lg gap-4 p-1 pr-3",
-                isSelected ? "data-[selected=true]:border-primary" : "border-gray-300" // Điều chỉnh kiểu khi được chọn
+                "w-max cursor-pointer border-2 border-default rounded-lg gap-4 p-1 pr-3 font-medium ",
+                isSelected ? "data-[selected=true]:bg-main border-main !text-white" : "border-gray-300" // Điều chỉnh kiểu khi được chọn
             )}
         >
             <VisuallyHidden>

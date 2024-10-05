@@ -12,6 +12,7 @@ class Category extends Model
         'name',
         'tag',
         'image',
+        'tag'
     ];
     public function product()
     {

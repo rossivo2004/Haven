@@ -1,36 +1,33 @@
-import React from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, ChipProps } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, useDisclosure } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
-import { EyeIcon } from "./EyeIcon";
-import { columns, users } from "./data";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/input";
+import { Category } from "@/interface";
+import {Spinner} from "@nextui-org/spinner";
+interface TableCategoryProps {
+    categories: Category[] | null; // Expecting an array of Category or null
+}
 
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
-
-type User = typeof users[0];
-
-export default function TableCategory() {
+const TableCategory: React.FC<TableCategoryProps> = ({ categories }) => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [loading, setLoading] = useState(false); // State for loading
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null); // For storing the category being edited
 
-    const handleDelete = (userId: number) => {
+    const handleDelete = (categoryId: string) => {
         confirmAlert({
             title: 'Xóa phân loại',
-            message: 'Bạn có chắc muốn xóa phân loại?',
+            message: 'Bạn có chắc muốn xóa phân loại này?',
             buttons: [
                 {
                     label: 'Yes',
-                    onClick: () => {
-                        console.log('Deleted user with id:', userId);
+                    onClick: async () => {
+                        setLoading(true); // Start loading
+                        console.log('Deleted category with id:', categoryId);
+                        // Implement delete logic here
+                        // After deletion logic
+                        setLoading(false); // End loading
                     }
                 },
                 {
@@ -40,38 +37,45 @@ export default function TableCategory() {
         });
     };
 
-    const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-        const cellValue = user[columnKey as keyof User];
+    const handleEdit = (category: Category) => {
+        setEditingCategory(category);
+        onOpen(); // Open modal for editing
+    };
+
+    const renderCell = (category: Category, columnKey: React.Key) => {
+        const cellValue = category[columnKey as keyof Category]; // Ensure this line has the correct type
 
         switch (columnKey) {
             case "name":
                 return (
-                    <User
-                        avatarProps={{ radius: "lg", src: user.img }}
-                        name={cellValue}
-                    />
-                );
-            case "role":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{cellValue}</p>
+                    <div className="flex items-center">
+                        {category.image && (
+                            <img
+                                src={category.image}
+                                alt={category.name}
+                                className="w-8 h-8 rounded-full mr-2" // Adjust size and margin as needed
+                            />
+                        )}
+                        <span>{cellValue}</span>
                     </div>
                 );
+            case "tag":
+                return <span>{cellValue}</span>;
             case "actions":
                 return (
                     <div className="relative flex items-center gap-2 justify-center">
-                        <Tooltip content="Edit user">
+                        <Tooltip content="Edit category">
                             <span
                                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                                onClick={onOpen}
+                                onClick={() => handleEdit(category)} // Pass the category for editing
                             >
                                 <EditIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip color="danger" content="Delete user">
+                        <Tooltip color="danger" content="Delete category">
                             <span
                                 className="text-lg text-danger cursor-pointer active:opacity-50"
-                                onClick={() => handleDelete(user.id)}
+                                onClick={() => handleDelete(category.id)} // Ensure category.id matches your type
                             >
                                 <DeleteIcon />
                             </span>
@@ -81,19 +85,24 @@ export default function TableCategory() {
             default:
                 return cellValue;
         }
-    }, [onOpen]);
+    };
 
     return (
         <>
-            <Table aria-label="Example table with custom cells">
-                <TableHeader columns={columns}>
+            {loading && <Spinner size="lg" />} {/* Loading indicator for delete/edit operations */}
+            <Table aria-label="Category table">
+                <TableHeader columns={[
+                    { uid: 'name', name: 'Tên phân loại' },
+                    { uid: 'tag', name: 'Tag phân loại' },
+                    { uid: 'actions', name: 'Hành động' }
+                ]}>
                     {(column) => (
                         <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={users}>
+                <TableBody items={categories || []}>
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -102,7 +111,7 @@ export default function TableCategory() {
                 </TableBody>
             </Table>
 
-            <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+            <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -111,11 +120,11 @@ export default function TableCategory() {
                                 <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                     <div className="lg:w-1/2 w-full">
                                         <label htmlFor="">Tên phân loại</label>
-                                        <Input type="text" placeholder="Tên phân loại" />
+                                        <Input type="text" placeholder="Tên phân loại" defaultValue={editingCategory?.name} />
                                     </div>
                                     <div className="flex-1">
                                         <label htmlFor="">Tag phân loại</label>
-                                        <Input type="text" placeholder="Tag phân loại" />
+                                        <Input type="text" placeholder="Tag phân loại" defaultValue={editingCategory?.tag} />
                                     </div>
                                 </div>
                                 <div>
@@ -127,8 +136,8 @@ export default function TableCategory() {
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Đóng
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
-                                    Sửa
+                                <Button color="primary" onPress={onClose} disabled={loading}>
+                                    {loading ? 'Processing...' : 'Sửa'}
                                 </Button>
                             </ModalFooter>
                         </>
@@ -137,4 +146,6 @@ export default function TableCategory() {
             </Modal>
         </>
     );
-}
+};
+
+export default TableCategory;

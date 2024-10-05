@@ -23,17 +23,17 @@
                 @foreach ($categories as $item)
                     <option value="{{$item->id}}">{{$item->name}}</option>
                 @endforeach
-           
-               
+
+
               </select>
-      
+
             <label for="brand_id" class="form-label">Brand ID</label>
             <select class="form-select" name="brand_id" aria-label="Default select example">
                 @foreach ($brands as $item)
                     <option value="{{$item->id}}">{{$item->name}}</option>
                 @endforeach
-           
-               
+
+
               </select>
               <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
@@ -59,7 +59,7 @@
                         <label for="price" class="form-label">Price</label>
                         <input type="number" step="0.01" class="form-control" id="price" name="price[]" required>
                     </div>
-              
+
                     <div class="mb-3">
                         <label for="quantity" class="form-label">Stock</label>
                         <input type="number" class="form-control" id="quantity" name="stock[]" required>

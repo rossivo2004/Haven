@@ -28,7 +28,7 @@ class ProductVariant extends Model
         return $this->belongsToMany(FlashSale::class, FlashSaleProduct::class)
                     ->withPivot('discount_percent', 'stock','sold');
     }
-    
+
     public function getDiscountedPriceAttribute()
     {
         if ($this->discount > 0) {
@@ -38,7 +38,7 @@ class ProductVariant extends Model
     }
     public function getStatusStockAttribute()
     {
-        
+
         if ($this->stock > 0) {
             return 'Còn hàng';
         }else{
@@ -51,7 +51,7 @@ class ProductVariant extends Model
         if ($this->flashSales && $this->flashSales->isNotEmpty()) {
             // Lấy bản ghi flash sale đầu tiên và trạng thái là activee
             $flashSale = $this->flashSales->where('status',1)->First();
-            
+
             // Kiểm tra xem có pivot và discount_percent hay không
             if ($flashSale && isset($flashSale->pivot->discount_percent)) {
                 $discountPercent = $flashSale->pivot->discount_percent;

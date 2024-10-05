@@ -7,6 +7,8 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <BodyHome />
+    <div>
+      <BodyHome />
+    </div>
   );
 }

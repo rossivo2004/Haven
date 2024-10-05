@@ -24,18 +24,20 @@ function BoxProduct({ product }: { product: SingleProduct }) {
 
     return (
         <Link href={`/product/${id}`} >
-            <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 px-2 pt-2 pb-3 rounded-lg">
+            <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 pb-3 rounded-lg">
                 <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                     <Image
+                    loading="lazy"
                         src={product.images[0] }
                         alt={name}
                         width={500}
                         height={500}
                         className="w-full lg:h-[260px] h-full object-cover group-hover:scale-110 transition-all"
+                        
                     />
                 </div>
                 <div className="w-full h-auto flex flex-col justify-between mt-4">
-                    <div className="font-semibold lg:text-[22px] lg:h-[52px] text-base text-start group-hover:text-main mb-1 overflow-hidden text-ellipsis">
+                    <div className="dark:text-white font-semibold lg:text-[22px] lg:h-[52px] text-base text-start group-hover:text-main mb-1 overflow-hidden text-ellipsis">
                         <span className="line-clamp-2 h-[inherit]">
                             {name}
                         </span>
@@ -60,7 +62,7 @@ function BoxProduct({ product }: { product: SingleProduct }) {
                         )}
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 dark:text-white">
                         <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{category}</span>
                         <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{brand}</span>
                     </div>

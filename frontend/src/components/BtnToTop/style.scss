@@ -1,3 +1,5 @@
 .btn-to-top {
-    transition: transform 0.5s ease, opacity 0.3s ease; /* Thời gian trượt và độ mờ */
+    // transform: translateY(300px); /* Nằm ngoài màn hình ban đầu */
+    // opacity: 0;
+    transition: transform 0.8s ease, opacity 0.3s ease; /* Thời gian trượt và độ mờ */
 }

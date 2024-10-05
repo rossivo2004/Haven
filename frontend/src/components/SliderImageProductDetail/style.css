@@ -30,3 +30,11 @@
 .carousel {
     justify-content: center;
 }
+
+.carousel .thumb.selected{
+    border: 1px solid !important;
+}
+
+.carousel .thumb:hover{
+    border: 1px solid gray !important;
+}
