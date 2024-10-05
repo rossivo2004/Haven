@@ -45,8 +45,8 @@ function BodyCategories() {
                 params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
                 withCredentials: true,
             });
-            console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
-            setCategories(response.data.categories);
+            console.log("API Response:", response.data.categories.data); // Kiểm tra phản hồi từ API
+            setCategories(response.data.categories.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
             setErrorMessage('Failed to fetch categories. Please try again.');
@@ -65,6 +65,8 @@ function BodyCategories() {
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    
 
     const handleSubmit = async (onClose: () => void) => {
         if (!categoryName || !categoryTag) {

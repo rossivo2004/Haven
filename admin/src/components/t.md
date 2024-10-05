@@ -307,6 +307,28 @@ const BodyProductsV2: React.FC = () => {
         </div>
     </div>
 
+    {/* Product Image Upload */}
+    {/* <div className="mb-5">
+        <label htmlFor="main_image" className="block mb-1">Ảnh sản phẩm</label>
+        <Input
+            id="main_image"
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleProductImageChange}
+        />
+        <div className="flex gap-2 mt-2">
+            {productImages.map((img, imgIndex) => (
+                <img
+                    key={imgIndex}
+                    src={img}
+                    alt={`product-img-${imgIndex}`}
+                    className="w-16 h-16 object-cover"
+                />
+            ))}
+        </div>
+    </div> */}
+
     <div>
         <label htmlFor="description">Mô tả sản phẩm</label>
         <Textarea
