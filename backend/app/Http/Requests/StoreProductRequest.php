@@ -25,10 +25,13 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name_product' => 'required|string|max:255', 
+            'images' => 'required|array|',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             'name' => 'required|array|',
             'name.*' => 'string', // Tên sản phẩm bắt buộc
             'price' => 'required|array|', // Giá sản phẩm là số và >= 0
             'price.*' => 'required|numeric|min:0',
+            
             'stock' => 'required|array|', 
             'stock.*' => 'integer|min:0',// Số lượng sản phẩm là số nguyên không âm
             'variant_value' => 'required|array',
@@ -52,7 +55,12 @@ class StoreProductRequest extends FormRequest
             'name_product.required' => 'Vui lòng nhập tên sản phẩm chính.',
             'name_product.string' => 'Tên sản phẩm chính phải là chuỗi ký tự hợp lệ.',
             'name_product.max' => 'Tên sản phẩm chính không được vượt quá 255 ký tự.',
-    
+            
+            'images.array' => 'Danh sách hình ảnh phải là một mảng.',
+            'images.*.image' => 'Mỗi tệp phải là một hình ảnh hợp lệ.',
+            'images.*.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, gif hoặc svg.',
+            'images.*.max' => 'Dung lượng mỗi hình ảnh không được vượt quá 2MB.',
+            
             // 'name' messages
             'name.required' => 'Vui lòng nhập tên cho các biến thể.',
             'name.array' => 'Tên biến thể phải là một mảng.',
