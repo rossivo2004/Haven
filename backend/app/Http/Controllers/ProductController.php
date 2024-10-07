@@ -24,16 +24,24 @@ class ProductController extends Controller
         // $startTime = Carbon::parse('2024-10-02 15:16:00');
         // $endTime = Carbon::parse('2024-10-04 12:08:00');
         
+        // return response()->json([
+        //     'flashSaleProducts' =>  ProductVariant::whereHas('flashSales', function ($query) {
+        //         $query->where('status', 1); // Chỉ lấy flash sale có status = 1 (active)
+        //     })->get(),
+        //     'categories' => Category::orderBy('id', 'desc')->get(),
+        //     'newProducts' => ProductVariant::orderBy('id', 'desc')->get(),
+        //     'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
+        //     ]);
+        
+        $search = $request->input('search');
+        $products = Product::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%');
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
+
         return response()->json([
-            'flashSaleProducts' =>  ProductVariant::whereHas('flashSales', function ($query) {
-                $query->where('status', 1); // Chỉ lấy flash sale có status = 1 (active)
-            })->get(),
-            'categories' => Category::orderBy('id', 'desc')->get(),
-            'newProducts' => ProductVariant::orderBy('id', 'desc')->get(),
-            'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
-            ]);
-        
-        
+            'success' => true,
+            'products' => $products,
+        ], 200);
 
         // return view('Product.home', [
         //     'products' =>   $products,
@@ -44,6 +52,8 @@ class ProductController extends Controller
 
        
     }
+
+    
 
     public function shop(Request $request)
     {
@@ -221,11 +231,13 @@ class ProductController extends Controller
     public function home()
     {
         return response()->json([
-        'flashSales' =>  FlashSale::where('status',1)->productVariants,
-        'categories' => Category::orderBy('id', 'desc')->get(),
-        'newProducts' => ProductVariant::orderBy('id', 'desc')->get(),
-        'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
-        ]);
+            'flashSaleProducts' =>  ProductVariant::whereHas('flashSales', function ($query) {
+                $query->where('status', 1); // Chỉ lấy flash sale có status = 1 (active)
+            })->get(),
+            'categories' => Category::orderBy('id', 'desc')->get(),
+            'newProducts' => ProductVariant::orderBy('id', 'desc')->get(),
+            'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
+            ]);
         // return view('Product.detail', [
        
         // ]);

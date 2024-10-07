@@ -57,6 +57,7 @@ route::group([
     'prefix' => 'api/product'
 ],function(){
     Route::get('/', [ProductController::class, 'index'])->name('Product.index');
+    Route::get('/home', [ProductController::class, 'home'])->name('Product.home');
     Route::get('/create', [ProductController::class, 'create'])->name('Product.create');
     Route::post('/store', [ProductController::class, 'store'])->name('Product.store');
     Route::get('/detail/{productVariant}', [ProductController::class, 'detail'])->name('Product.detail');
