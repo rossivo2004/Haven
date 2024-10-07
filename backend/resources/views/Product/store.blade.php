@@ -41,12 +41,16 @@
             </div>
             <div class="mb-3">
                 <label for="formFileMultiple" class="form-label">Img 2</label>
-                <input class="form-control" type="file" id="formFileMultiple" name="images[]" multiple>
+                <input class="form-control" type="file" id="formFileMultiple" name="images[]" >
+            </div>
+            {{-- <div class="mb-3">
+                <label for="formFileMultiple" class="form-label">Img 2</label>
+                <input class="form-control" type="file" id="formFileMultiple" name="images[]" >
             </div>
             <div class="mb-3">
-                <label for="formFileMultiple" class="form-label">Img 2</label>
-                <input class="form-control" type="file" id="formFileMultiple" name="images[]" multiple>
-            </div>
+                <label for="formFileMultiple" class="form-label">Img 3</label>
+                <input class="form-control" type="file" id="formFileMultiple" name="images[]" >
+            </div> --}}
             </div>
             <div id="variants">
                 <h4>Thêm biến thể</h4>
