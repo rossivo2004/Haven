@@ -16,12 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('stock');
-            $table->date('expiry')->nullable();
+            // $table->date('expiry')->nullable();
             $table->string('image')->nullable();
             $table->integer('view')->default(0);
             $table->integer('discount')->default(0);
-            $table->string('tag');
-            
+            // $table->string('tag');
+
             $table->timestamps();
         });
     }
