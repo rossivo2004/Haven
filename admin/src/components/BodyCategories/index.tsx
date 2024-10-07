@@ -102,6 +102,7 @@ function BodyCategories() {
             setImage(null);
             fetchCategories();
             toast.success('Thêm phân loại thành công');
+console.log(formData);
 
             // Close the modal after successfully adding the category
         } catch (error) {
