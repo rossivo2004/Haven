@@ -7,6 +7,7 @@ const apiConfig = {
     deletePr: `${baseUrl}/api/product/delete/`,
     updatepr: `${baseUrl}/api/product/update/`,
     createPr: `${baseUrl}/api/product/store/`,
+    getproductvariants : `${baseUrl}/api/product/getproductvariants/`,
   },
   categories: {
     getAll: `${baseUrl}/api/category/`,
