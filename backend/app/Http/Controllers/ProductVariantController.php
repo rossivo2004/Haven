@@ -6,6 +6,7 @@ use App\Models\Product_variant;
 use App\Http\Requests\StoreProduct_variantRequest;
 use App\Http\Requests\UpdateProduct_variantRequest;
 use App\Models\ProductVariant;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductVariantController extends Controller
 {
@@ -65,6 +66,30 @@ class ProductVariantController extends Controller
      */
     public function destroy(ProductVariant $productVariant)
     {
-        //
+        try {
+            $parsedUrl = parse_url($productVariant->image, PHP_URL_PATH);
+        // Loại bỏ phần '/image/upload/' và các thư mục khác
+         $pathParts = explode('/', $parsedUrl);
+        // Lấy phần cuối cùng là public_id (bao gồm cả extension)
+    $fileWithExtension = end($pathParts);
+        // Loại bỏ phần extension (đuôi file .jpg, .png, ...)
+    $publicId = pathinfo($fileWithExtension, PATHINFO_FILENAME);
+    Cloudinary::destroy($publicId);
+  
+          $productVariant->delete();
+            
+            // Return a success response
+            return response()->json([
+                'success' => true,
+                'message' => 'ProductVariant đã được xóa thành công',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Xảy ra lỗi trong quá trình xóa',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+       
     }
 }
