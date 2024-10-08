@@ -77,6 +77,7 @@ route::group([
     Route::get('/create', [ProductVariantController::class, 'create'])->name('ProductVariant.create');
     Route::post('/store', [ProductVariantController::class, 'store'])->name('ProductVariant.store');
     Route::get('/show/{productVariant}', [ProductVariantController::class, 'show'])->name('ProductVariant.show');
+    Route::get('/edit/{productVariant}', [ProductVariantController::class, 'edit'])->name('ProductVariant.edit');
     Route::put('/update/{productVariant}', [ProductVariantController::class, 'update'])->name('ProductVariant.update');
     Route::delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
 });
