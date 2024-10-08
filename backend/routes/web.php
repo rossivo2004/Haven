@@ -74,7 +74,7 @@ route::group([
 ],function(){
 
     Route::get('/show/{productVariant}', [ProductVariantController::class, 'show'])->name('ProductVariant.show');
-    Route::get('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
+    Route::delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
 });
 
 route::group([
