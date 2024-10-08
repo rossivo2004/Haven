@@ -121,33 +121,34 @@ class CategoryController extends Controller
     public function update(UpdatecategoryRequest $request, category $category)
     {
    
-        $input = $request->all();
-        if ($request->file('image') == null) {
-            unset($input['image']);
-        } else {
-            
-        $parsedUrl = parse_url($category->image, PHP_URL_PATH);
-            // Loại bỏ phần '/image/upload/' và các thư mục khác
-        $pathParts = explode('/', $parsedUrl);
-            // Lấy phần cuối cùng là public_id (bao gồm cả extension)
-        $fileWithExtension = end($pathParts);
-            // Loại bỏ phần extension (đuôi file .jpg, .png, ...)
-        $publicId = pathinfo($fileWithExtension, PATHINFO_FILENAME);
-
-        Cloudinary::destroy($publicId);
-
-        // đổi tên file ảnh rồi mới thêm vào á đổi tên theo thời gian
-        $extension = $request->file('image')->getClientOriginalExtension();
-        $filename = time() . '.' . $extension; 
-        $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
-            'public_id' => $filename
-        ])->getSecurePath();
-
-        $input['image'] = $uploadedFileUrl;
-        }
+       
         // $category->update($input);
         
         try {
+            $input = $request->all();
+            if ($request->file('image') == null) {
+                unset($input['image']);
+            } else {
+                
+            $parsedUrl = parse_url($category->image, PHP_URL_PATH);
+                // Loại bỏ phần '/image/upload/' và các thư mục khác
+            $pathParts = explode('/', $parsedUrl);
+                // Lấy phần cuối cùng là public_id (bao gồm cả extension)
+            $fileWithExtension = end($pathParts);
+                // Loại bỏ phần extension (đuôi file .jpg, .png, ...)
+            $publicId = pathinfo($fileWithExtension, PATHINFO_FILENAME);
+    
+            Cloudinary::destroy($publicId);
+    
+            // đổi tên file ảnh rồi mới thêm vào á đổi tên theo thời gian
+            $extension = $request->file('image')->getClientOriginalExtension();
+            $filename = time() . '.' . $extension; 
+            $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath(), [
+                'public_id' => $filename
+            ])->getSecurePath();
+    
+            $input['image'] = $uploadedFileUrl;
+            }
             $category->update($input);
             
             // Return a success response

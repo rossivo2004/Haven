@@ -36,11 +36,11 @@ class StoreProductRequest extends FormRequest
             'stock.*' => 'integer|min:0',// Số lượng sản phẩm là số nguyên không âm
             'variant_value' => 'required|array',
             'variant_value.*' => 'string', 
-            'description' => 'nullable|string|', // Mô tả có thể rỗng
-            'image' => 'nullable|array|',
+            'description' => 'required|string|', // Mô tả có thể rỗng
+            'image' => 'required|array|',
             'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh phải là file hình hợp lệ với dung lượng tối đa 2MB
             'category_id' => 'required|exists:categories,id', // ID danh mục bắt buộc, phải tồn tại trong bảng categories
-            'brand_id' => 'nullable|exists:brands,id', // ID thương hiệu có thể rỗng, nếu có phải tồn tại trong bảng brands
+            'brand_id' => 'required|exists:brands,id', // ID thương hiệu có thể rỗng, nếu có phải tồn tại trong bảng brands
            
             'discount' => 'required|array|', 
             'discount.*' => 'numeric|min:0|max:100'// Thông tin giảm giá phải là kiểu boolean
