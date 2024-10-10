@@ -22,6 +22,10 @@ class FlashSaleProduct extends Model
         }
         return $this->price;
     }
-   
+    public function productVariant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+    protected $with = ['productVariant'];
     protected $appends = ['DiscountedPrice'];
 }

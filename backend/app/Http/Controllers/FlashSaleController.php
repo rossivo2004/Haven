@@ -18,6 +18,7 @@ class FlashSaleController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index(Request $request)
     {
         $status =  $request->input('status');
@@ -34,7 +35,12 @@ class FlashSaleController extends Controller
             'flashSales' =>   $flashSales,
         ]);
     }
-
+    public function listFlashSale()
+    {
+        return response()->json([
+            'flashSales' =>   FlashSale::all(),
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -73,6 +79,30 @@ class FlashSaleController extends Controller
 
             $outOfStockProducts = [];
             $overStockFlashSaleProducts = [];
+
+            // kiểm tra xem có flash sale nào trùng lặp hay không
+            $overlappingFlashSales = FlashSale::where(function ($query) use ($startTime, $endTime) {
+                $query->whereBetween('start_time', [$startTime, $endTime])
+                    ->orWhereBetween('end_time', [$startTime, $endTime])
+                    ->orWhere(function ($query) use ($startTime, $endTime) {
+                        $query->where('start_time', '<=', $startTime)
+                            ->where('end_time', '>=', $endTime);
+                    });
+            })->get();
+
+            if ($overlappingFlashSales->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Chương trình Flash sale bị chồng chéo với chương trình Flash sale khác !',
+                ], 422);
+            } else {
+                // thêm flashsale 
+                $flashSale->start_time = $startTime;
+                $flashSale->end_time =  $endTime;
+                $flashSale->save();
+                $flashSaleId = $flashSale->id;
+            }
+
 
             // kiểm tra nhập trùng lặp sản phẩm
             $uniqueArray = array_unique($productVariantIds);
@@ -120,28 +150,6 @@ class FlashSaleController extends Controller
                 ], 422);
             }
 
-            // kiểm tra xem có flash sale nào trùng lặp hay không
-            $overlappingFlashSales = FlashSale::where(function ($query) use ($startTime, $endTime) {
-                $query->whereBetween('start_time', [$startTime, $endTime])
-                    ->orWhereBetween('end_time', [$startTime, $endTime])
-                    ->orWhere(function ($query) use ($startTime, $endTime) {
-                        $query->where('start_time', '<=', $startTime)
-                            ->where('end_time', '>=', $endTime);
-                    });
-            })->get();
-
-            if ($overlappingFlashSales->isNotEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Chương trình Flash sale bị chồng chéo với chương trình Flash sale khác !',
-                ], 422);
-            } else {
-                // thêm flashsale 
-                $flashSale->start_time = $startTime;
-                $flashSale->end_time =  $endTime;
-                $flashSale->save();
-                $flashSaleId = $flashSale->id;
-            }
 
             // lưu sản phẩm vào flash_sale_product
             foreach ($productVariantIds as $index => $productVariantid) {
@@ -186,7 +194,7 @@ class FlashSaleController extends Controller
             'success' => true,
             'FlashsaleProducts' => ProductVariant::whereHas('flashSales', function($query) use ($flashSale) {
                 $query->where('flash_sale_id', $flashSale->id);
-            })->get(),
+            })->paginate(20)->appends(request()->all()),
         ], 200);
     }
     
@@ -225,60 +233,8 @@ class FlashSaleController extends Controller
             $startTime = $startTimeRequest->format('Y-m-d H:i:s');
             $endTime = $endTimeRequest->format('Y-m-d H:i:s');
 
-            $productVariantIds = $request->input('product_variant_ids');
-            $stocks = $request->input('stocks');
-            $discountPercents = $request->input('discount_percents');
-
-            $outOfStockProducts = [];
-            $overStockFlashSaleProducts = [];
-
-            // kiểm tra nhập trùng lặp sản phẩm
-            $uniqueArray = array_unique($productVariantIds);
-            if (count($productVariantIds) !== count($uniqueArray)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Nhập trùng sản phẩm !',
-                ], 500);
-            }
-            // kiểm tra hàng tồn kho
-            foreach ($productVariantIds as $index => $productVariantid) {
-                $productVariant = ProductVariant::find($productVariantid);
-                if ($productVariant->stock == 0) {
-                    $overStockFlashSaleProducts[] = [
-                        'product_variant_id' => $productVariantid,
-                        'requested_quantity' => $stocks[$index],
-                        'available_stock' => $productVariant->stock
-                    ];
-                }
-            }
-            if (!empty($outOfStockProducts)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Một số sản phẩm không đủ hàng tồn kho.',
-                    'out_of_stock_products' => $outOfStockProducts
-                ], 500);
-            }
-            //kiểm tra số lượng flash sale có lớn hơn số lượng tồn kho hay không
-            foreach ($productVariantIds as $index => $productVariantid) {
-                $productVariant = ProductVariant::find($productVariantid);
-                if ($productVariant->stock < $stocks[$index]) {
-                    $overStockFlashSaleProducts[] = [
-                        'product_variant_id' => $productVariantid,
-                        'requested_quantity' => $stocks[$index],
-                        'available_stock' => $productVariant->stock
-                    ];
-                }
-            }
-            if ($overStockFlashSaleProducts) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Một số sản phẩm không đủ hàng tồn kho cho flash sale.',
-                    'over_stock_flash_sale_products' => $overStockFlashSaleProducts
-                ], 500);
-            }
-
-            // kiểm tra xem có flash sale nào trùng lặp hay không
-            $overlappingFlashSales = FlashSale::where(function ($query) use ($startTime, $endTime) {
+              // kiểm tra xem có flash sale nào trùng lặp hay không
+              $overlappingFlashSales = FlashSale::where(function ($query) use ($startTime, $endTime) {
                 $query->whereBetween('start_time', [$startTime, $endTime])
                     ->orWhereBetween('end_time', [$startTime, $endTime])
                     ->orWhere(function ($query) use ($startTime, $endTime) {
@@ -297,38 +253,94 @@ class FlashSaleController extends Controller
                 // thêm flashsale 
                 $flashSale->start_time = $startTime;
                 $flashSale->end_time =  $endTime;
-                $flashSale->save();
-                $flashSaleId = $flashSale->id;
+                $flashSale->update();
             }
-
-            // Cập nhật sản phẩm vào flash_sale_product
-            foreach ($productVariantIds as $index => $productVariantid) {
-                if (isset($variantIds[$index])) {
-                    $flashSaleProduct = FlashSaleProduct::findOrFail($variantIds[$index]);
-                    $flashSaleProduct->product_variant_id = $productVariantid;
-                    $flashSaleProduct->stock = $stocks[$index];
-                    $flashSaleProduct->discount_percent = $discountPercents[$index];
-                    $flashSaleProduct->save();
-                } else {
-                    $flashSaleProduct = new FlashSaleProduct();
-                    $flashSaleProduct->flash_sale_id = $flashSaleId;
-                    $flashSaleProduct->product_variant_id = $productVariantid;
-                    $flashSaleProduct->stock = $stocks[$index];
-                    $flashSaleProduct->discount_percent = $discountPercents[$index];
-                    $flashSaleProduct->save();
-                }
-            }
-            $delete_variants = $request->delete_variants ?? [];
-            foreach ($delete_variants as $item) {
-                $productFlashSale = FlashSaleProduct::Find($item);
-                $productFlashSale->delete();
-            }
+            
 
 
+        //     $productVariantIds = $request->input('product_variant_ids');
+        //     $stocks = $request->input('stocks');
+        //     $discountPercents = $request->input('discount_percents');
+
+        //     $outOfStockProducts = [];
+        //     $overStockFlashSaleProducts = [];
+
+        //     // kiểm tra nhập trùng lặp sản phẩm
+        //     $uniqueArray = array_unique($productVariantIds);
+        //     if (count($productVariantIds) !== count($uniqueArray)) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => 'Nhập trùng sản phẩm !',
+        //         ], 500);
+        //     }
+        //     // kiểm tra hàng tồn kho
+        //     foreach ($productVariantIds as $index => $productVariantid) {
+        //         $productVariant = ProductVariant::find($productVariantid);
+        //         if ($productVariant->stock == 0) {
+        //             $overStockFlashSaleProducts[] = [
+        //                 'product_variant_id' => $productVariantid,
+        //                 'requested_quantity' => $stocks[$index],
+        //                 'available_stock' => $productVariant->stock
+        //             ];
+        //         }
+        //     }
+        //     if (!empty($outOfStockProducts)) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => 'Một số sản phẩm không đủ hàng tồn kho.',
+        //             'out_of_stock_products' => $outOfStockProducts
+        //         ], 500);
+        //     }
+        //     //kiểm tra số lượng flash sale có lớn hơn số lượng tồn kho hay không
+        //     foreach ($productVariantIds as $index => $productVariantid) {
+        //         $productVariant = ProductVariant::find($productVariantid);
+        //         if ($productVariant->stock < $stocks[$index]) {
+        //             $overStockFlashSaleProducts[] = [
+        //                 'product_variant_id' => $productVariantid,
+        //                 'requested_quantity' => $stocks[$index],
+        //                 'available_stock' => $productVariant->stock
+        //             ];
+        //         }
+        //     }
+        //     if ($overStockFlashSaleProducts) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => 'Một số sản phẩm không đủ hàng tồn kho cho flash sale.',
+        //             'over_stock_flash_sale_products' => $overStockFlashSaleProducts
+        //         ], 500);
+        //     }
+
+        // //   kiểm tra có trùng lặp flash sale hay không
+
+        //     // Cập nhật sản phẩm vào flash_sale_product
+        //     foreach ($productVariantIds as $index => $productVariantid) {
+        //         if (isset($variantIds[$index])) {
+        //             $flashSaleProduct = FlashSaleProduct::findOrFail($variantIds[$index]);
+        //             $flashSaleProduct->product_variant_id = $productVariantid;
+        //             $flashSaleProduct->stock = $stocks[$index];
+        //             $flashSaleProduct->discount_percent = $discountPercents[$index];
+        //             $flashSaleProduct->save();
+        //         } else {
+        //             $flashSaleProduct = new FlashSaleProduct();
+        //             $flashSaleProduct->flash_sale_id = $flashSaleId;
+        //             $flashSaleProduct->product_variant_id = $productVariantid;
+        //             $flashSaleProduct->stock = $stocks[$index];
+        //             $flashSaleProduct->discount_percent = $discountPercents[$index];
+        //             $flashSaleProduct->save();
+        //         }
+        //     }
+        //     $delete_variants = $request->delete_variants ?? [];
+        //     foreach ($delete_variants as $item) {
+        //         $productFlashSale = FlashSaleProduct::Find($item);
+        //         $productFlashSale->delete();
+        //     }
+
+        
 
             return response()->json([
                 'success' => true,
                 'message' => 'Chương trình flash sale đã được cập nhật thành công',
+                'flashSale' => $flashSale,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
