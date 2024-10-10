@@ -31,6 +31,7 @@ class FlashSaleProductController extends Controller
      */
     public function store(StoreFlashSaleProductRequest $request)
     {
+       try {
         $flashSaleId = $request->input('flash_sale_id');
         $productVariantIds = $request->input('product_variant_ids');
         $stocks = $request->input('stocks');
@@ -104,6 +105,18 @@ class FlashSaleProductController extends Controller
                 $flashSaleProduct->discount_percent = $discountPercents[$index];
                 $flashSaleProduct->save();
             }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Flash sale product đã được thêm thành công',
+            ], 200);
+       } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Xảy ra lỗi trong quá trình cập nhật',
+            'error' => $e->getMessage()
+        ], 500);
+       }
     }
 
     /**
