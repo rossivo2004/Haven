@@ -29,9 +29,37 @@ class ProductImageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(StoreProduct_imageRequest $request)
     {
-        //
+       try{
+        $images = $request->file('product_images');
+        $product_id = $request->input('product_id');
+        foreach ($images as $image) {
+            $productImage = new ProductImage();
+            // Xử lý upload hình ảnh
+            $extension = $image->getClientOriginalExtension();
+            $filename = time() . '.' . $extension; 
+            $uploadedFileUrl = Cloudinary::upload($image->getRealPath(), [
+                'public_id' => $filename
+            ])->getSecurePath();
+           
+            $productImage->image = $uploadedFileUrl;
+            $productImage->product_id = $product_id;
+
+            $productImage->save();
+        }
+        return response()->json([
+            'success' => true,
+            'message' => "Thêm ảnh tham khảo thành công !",
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Xảy ra lỗi trong quá trình thêm',
+            'error' => $e->getMessage()
+        ], 500);
+    }
     }
 
     /**

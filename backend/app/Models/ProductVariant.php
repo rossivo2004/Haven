@@ -26,7 +26,7 @@ class ProductVariant extends Model
 
     public function flashSales() {
         return $this->belongsToMany(FlashSale::class, FlashSaleProduct::class)
-                    ->withPivot('discount_percent', 'stock','sold');
+                    ->withPivot('id','discount_percent', 'stock','sold');
     }
 
     public function getDiscountedPriceAttribute()
@@ -45,6 +45,7 @@ class ProductVariant extends Model
             return 'Hết hàng';
         }
     }
+
     public function getFlashSalePriceAttribute()
     {
         // Kiểm tra nếu quan hệ flashSales có bản ghi
@@ -62,6 +63,7 @@ class ProductVariant extends Model
         // Nếu không có flash sale hoặc không có giảm giá thì trả về giá gốc
         return $this->price;
     }
+    
     protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock'];
     protected $with = ['flashSales','product'];
 }
