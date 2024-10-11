@@ -47,13 +47,13 @@ class FlashSaleController extends Controller
 
     public function create()
     {
-        return response()->json([
-            'success' => true,
-            'productVariants' => ProductVariant::where('stock', '>', 0)->get(),
-        ], 200);
-        // return view('FlashSale.store', [
+        // return response()->json([
+        //     'success' => true,
         //     'productVariants' => ProductVariant::where('stock', '>', 0)->get(),
-        // ]);
+        // ], 200);
+        return view('FlashSale.store', [
+            'productVariants' => ProductVariant::where('stock', '>', 0)->get(),
+        ]);
     }
 
     /**

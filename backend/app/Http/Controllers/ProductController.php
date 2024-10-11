@@ -61,9 +61,23 @@ class ProductController extends Controller
         $categories = new Category();
          
         $search = $request->input('search');
-        $categoriesOption = $request->input('category');
-        $brandsOption = $request->input('brand');
+        $categoryNames = $request->input('category');
+        $brandNames = $request->input('brand');
         $priceRangesOption = $request->input('priceRanges');
+        if (isset($request->category) && !empty($request->category)) {
+            $categoriesOption = Category::whereIn('name', $categoryNames)->pluck('id')->toArray();
+        }else{
+            $categoriesOption = [];
+        }
+        if (isset($request->brand) && !empty($request->brand)) {
+            $brandsOption = Brand::whereIn('name', $brandNames)->pluck('id')->toArray();
+        }else{
+            $brandsOption = [];
+        }
+        // return response()->json([
+        //     'categoriesOption' => $categoriesOption,
+        //     'brandsOption' => $brandsOption,
+        // ]); 
 
         $productVariants = ProductVariant::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
