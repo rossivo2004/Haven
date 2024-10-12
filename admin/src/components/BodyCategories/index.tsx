@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Spinner } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Tooltip, Spinner } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { confirmAlert } from "react-confirm-alert";
@@ -10,7 +10,6 @@ import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Category } from "@/interface";
 import { Pagination } from "@nextui-org/react";
-import useCsrfToken from "@/configs/csrfToken";
 import { ToastContainer, toast } from 'react-toastify';
 import Image from "next/image";
 import CategoryTable from "./CategoryTable";
@@ -19,67 +18,71 @@ import useDebounce from "@/un/useDebounce";
 import CloseIcon from '@mui/icons-material/Close';
 
 function BodyCategories() {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [categoryName, setCategoryName] = useState("");
-    const [categoryTag, setCategoryTag] = useState("");
-    const [image, setImage] = useState<File | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-    const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+    // Các hook quản lý trạng thái của component
+    const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Quản lý trạng thái của Modal chỉnh sửa danh mục
+    const [categoryName, setCategoryName] = useState(""); // Quản lý tên danh mục
+    const [categoryTag, setCategoryTag] = useState(""); // Quản lý tag của danh mục đẫ bỏ
+    const [image, setImage] = useState<File | null>(null); // Quản lý hình ảnh của danh mục
+    const [loading, setLoading] = useState(false); // Trạng thái loading khi đang gọi API
+    const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
+    const [successMessage, setSuccessMessage] = useState(""); // Thông báo thành công
+    const [categories, setCategories] = useState<Category[]>([]); // Danh sách các danh mục
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Lưu thông tin của danh mục đang chỉnh sửa
+    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false); // Trạng thái Modal thêm mới danh mục
+    const [filteredCategories, setFilteredCategories] = useState<Category[]>([]); // Danh sách danh mục sau khi lọc
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // URL hiển thị preview hình ảnh
 
-    const [search, setSearch] = useState("");
-    const debouncedSearch = useDebounce(search, 300);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [search, setSearch] = useState(""); // Quản lý trạng thái tìm kiếm
+    const debouncedSearch = useDebounce(search, 300); // Giảm thiểu số lần thực hiện tìm kiếm (debounce)
+    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file để reset sau khi tải hình
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL; //URL API
 
+    // Hàm lấy danh sách các danh mục từ API
     const fetchCategories = async (searchTerm = "") => {
         console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
             const response = await axios.get(apiConfig.categories.getAll, {
-                params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
+                params: { name: searchTerm }, // Tìm kiếm danh mục theo tên
                 withCredentials: true,
             });
             console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
-            setCategories(response.data.categories);
+            setCategories(response.data.categories);// Lưu danh sách danh mục vào state
         } catch (error) {
             console.error('Error fetching categories:', error);
             setErrorMessage('Failed to fetch categories. Please try again.');
         }
     };
 
+    // Cập nhật URL preview khi người dùng chọn một hình ảnh mới
     useEffect(() => {
         if (image) {
-            // Create a preview URL for the selected image
-            setImagePreviewUrl(URL.createObjectURL(image));
+           
+            setImagePreviewUrl(URL.createObjectURL(image));// Tạo URL preview cho ảnh
         } else {
-            setImagePreviewUrl(null); // Clear preview if no image
+            setImagePreviewUrl(null); // Xóa preview nếu không có ảnh
         }
     }, [image]);
-
+    // Lấy danh sách danh mục ngay khi component được mount
     useEffect(() => {
         fetchCategories();
     }, []);
-
+    // xử lý thêm hoặc chỉnh sửa danh mục
     const handleSubmit = async (onClose: () => void) => {
         if (!categoryName || !categoryTag) {
             alert('Please fill in all fields.');
             return;
         }
-
+        // kiểm định dạng file hình ảnh
         if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
             setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
             return;
         }
-        setLoading(true);
+        setLoading(true); // bật trạng thái loading
         setErrorMessage("");
         setSuccessMessage("");
 
+        // tải form data để gửi lên api 
         const formData = new FormData();
         formData.append('name', categoryName);
         formData.append('tag', categoryTag);
@@ -88,7 +91,7 @@ function BodyCategories() {
         }
 
         try {
-            onClose();
+            onClose(); //đóng modal khi hoàn tất
 
             const response = await axios.post(apiConfig.categories.createCt, formData, {
                 headers: {
@@ -101,17 +104,17 @@ function BodyCategories() {
             fetchCategories();
             toast.success('Thêm phân loại thành công');
 
-            // Close the modal after successfully adding the category
+            // Reset các trường dữ liệu và tải lại danh mục
         } catch (error) {
             toast.error('Thêm phân loại thất bại');
             console.error('Error adding category:', error);
             setErrorMessage('Failed to add category. Please try again.');
         } finally {
-            setLoading(false);
+            setLoading(false); //tắt trạng thái loading
         }
     };
 
-
+    // xử lý xóa một danh mục
     const handleDelete = (categoryId: string) => {
         // Find the specific category to delete by its ID
         const categoryToDelete = categories.find(category => category.id === categoryId);
@@ -120,7 +123,7 @@ function BodyCategories() {
             setErrorMessage("Category not found.");
             return;
         }
-
+        // hiện thị modal xác nhận xóa
         confirmAlert({
             title: 'Xóa phân loại',
             message: `Bạn có muốn xóa phân loại ${categoryToDelete.name}?`,
@@ -131,7 +134,7 @@ function BodyCategories() {
                         setLoading(true);
                         try {
                             await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
-                            fetchCategories(); // Refresh categories after deletion
+                            fetchCategories(); // tải lại ảnh sau khi xóa
                             toast.success('Xóa phân loại thành công');
 
 
@@ -149,28 +152,29 @@ function BodyCategories() {
             ]
         });
     };
-
+    // Xử lý khi người dùng nhấn vào chỉnh sửa
     const handleEdit = (category: Category) => {
-        setEditingCategory(category);
-        onOpen();
-        fetchCategories();
+        setEditingCategory(category); //đặt danh mục đang chỉnh sửa
+        onOpen();// mở model chỉnh sửa
+        fetchCategories();//cập nhật danh sách  
     };
-
+    //mở model thêm mới
     const handleOpenAddCategoryModal = () => {
         setIsAddCategoryModalOpen(true);
     };
-
+    //dóng model thêm mới 
     const handleCloseAddCategoryModal = () => {
         setIsAddCategoryModalOpen(false);
     };
 
-
+    // xử lí khi chọn ảnh
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setImage(event.target.files[0]);
         }
     };
     
+    // xóa ảnh đã chọn
     const handleImageClear = () => {
         setImage(null);
         setImagePreviewUrl(null);
@@ -273,19 +277,22 @@ function BodyCategories() {
                 return cellValue;
         }
     };
-
+    //Lọc danh sach theo từ khóa tìm kiếm 
     useEffect(() => {
         const filtered = categories.filter(c => c.name.toLowerCase().includes(debouncedSearch.toLowerCase()));
         setFilteredCategories(filtered);
     }, [debouncedSearch, categories]);
 
     return (
+        
         <div>
+            {/* hiện thị trạng thái loading */}
             {loading && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <Spinner />
                 </div>
             )}
+            {/* hiện thị modal và bảng dữ liệu */}
             <div className="flex justify-between items-center">
                 <div className="py-5 h-[62px]">
                     <BreadcrumbNav

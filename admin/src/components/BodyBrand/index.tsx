@@ -1,46 +1,175 @@
 'use client';
-import { useState, ChangeEvent, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import TableBrand from "../TableBrand";
-import CustomPagination from "@/components/Pagination";
-import { Pagination } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Tooltip, Spinner } from "@nextui-org/react";
+import { EditIcon } from "./EditIcon";
+import { DeleteIcon } from "./DeleteIcon";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 import axios from "axios";
+import apiConfig from "@/configs/api";
 import { Brand } from "@/interface";
+import { Pagination } from "@nextui-org/react";
+import { ToastContainer, toast } from 'react-toastify';
+import Image from "next/image";
+import BrandTable from "./BrandTable"; // Import component bảng thương hiệu
+import SearchIcon from '@mui/icons-material/Search';
+import useDebounce from "@/un/useDebounce";
+import CloseIcon from '@mui/icons-material/Close';
+import TableBrand from "../TableBrand";
 
-const BodyBrand: React.FC = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+function BodyBrand() {
+    //các hook quản lý trangj thái của component
+    const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Quản lý trạng thái Modal chỉnh sửa thương hiệu
+    const [brandName, setBrandName] = useState(""); // quản lý tên thương hiệu
+    const [brandTag, setBrandTag] = useState(""); // Tag của thương hiệu bỏ
+    const [image, setImage] = useState<File | null>(null); // Hình ảnh của thương hiệu
+    const [loading, setLoading] = useState(false); // Trạng thái loading khi thao tác
+    const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
+    const [successMessage, setSuccessMessage] = useState(""); // Thông báo thành công
+    const [brands, setBrands] = useState<Brand[]>([]); // Danh sách thương hiệu
+    const [editingBrand, setEditingBrand] = useState<Brand | null>(null); //Lưu thông tin của Thương hiệu đang chỉnh sửa
+    const [isAddBrandModalOpen, setIsAddBrandModalOpen] = useState(false); // Trạng thái Modal thêm thương hiệu
+    const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]); // Danh sách thương hiệu sau khi lọc
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // URL preview hình ảnh
 
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [image, setImage] = useState<string[]>([]); // Image state
-    const [brand, setBrand] = useState<Brand[]>([]);
-    
+    const [search, setSearch] = useState(""); // Trạng thái tìm kiếm
+    const debouncedSearch = useDebounce(search, 300); // Thực hiện tìm kiếm giảm thiểu số lần gọi API
+    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file
 
-    // Function to handle file input change (if you want to store the image as base64 or file path)
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            const fileArray = Array.from(files).map(file => URL.createObjectURL(file)); // Preview images
-            setImage(fileArray);
-        }
-    };
-
-    const fetch = async () => {
+    // Hàm lấy danh sách thương hiệu từ API
+    const fetchBrands = async (searchTerm = "") => {
         try {
-            const response = await axios.get(`${baseUrl}/api/brand`, { withCredentials: true });
-            setBrand(response.data.categories);
+            const response = await axios.get(apiConfig.brands.getAll, {
+                params: { name: searchTerm },
+                withCredentials: true,
+            });
+            console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
+            setBrands(response.data.brands);
         } catch (error) {
-            console.error('Error fetching categories:', error);
+            console.error('Error fetching brands:', error);
+            setErrorMessage('Failed to fetch brands. Please try again.');
         }
     };
 
-    console.log(brand);
-    
-
+    // Cập nhật URL preview khi người dùng chọn một hình ảnh mới
     useEffect(() => {
-        fetch();
+        if (image) {
+           
+            setImagePreviewUrl(URL.createObjectURL(image));// Tạo URL preview cho ảnh
+        } else {
+            setImagePreviewUrl(null); // Xóa preview nếu không có ảnh
+        }
+    }, [image]);
+    // Lấy danh sách danh mục ngay khi component được mount
+    useEffect(() => {
+        fetchBrands();
     }, []);
+    // xử lý thêm hoặc chỉnh sửa danh mục
+    const handleSubmit = async (onClose: () => void) => {
+        if (!brandName || !brandTag) {
+            alert('Please fill in all fields.');
+            return;
+        }
+        // kiểm định dạng file hình ảnh
+        if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
+            setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
+            return;
+        }
+        setLoading(true); //bật trạng thái loading
+        setErrorMessage("");
+        setSuccessMessage("");
+
+        //Tải form data để gửi lên api
+        const formData = new FormData();
+        formData.append('name', brandName);
+        formData.append('tag', brandTag);
+        if (image) {
+            formData.append('image', image);
+        }
+
+        try {
+            onClose();//đóng modal khi hoàn tất
+
+            const response = await axios.post(apiConfig.brands.create, formData, {
+                headers: { accept: 'application/json' },
+            });
+            setBrandName('');
+            setBrandTag('');
+            setImage(null);
+            fetchBrands();
+            toast.success('Thêm thương hiệu thành công');
+            
+            //reset lại các trường dữ liêu và tải lai brand
+        } catch (error) {
+            toast.error('Thêm thương hiệu thất bại');
+            console.error('Error adding category:', error);
+            setErrorMessage('Failed to add brand. Please try again.');
+        } finally {
+            setLoading(false); //tắt trạng thái loading
+        }
+    };
+
+    //Xử lý xóa một brand
+    const handleDelete = (brandId: string) => {
+        const brandToDelete = brands.find(brand => brand.id === brandId);
+
+        if (!brandToDelete) {
+            setErrorMessage("Brand not found.");
+            return;
+        }
+        //Hiện thị modal xác nhận xóa
+        confirmAlert({
+            title: 'Xóa thương hiệu',
+            message: `Bạn có muốn xóa thương hiệu ${brandToDelete.name}?`,
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: async () => {
+                        setLoading(true);
+                        try {
+                            await axios.delete(`${apiConfig.brands.delete}${brandId}`);
+                            fetchBrands(); //tải laij hình ảnh khi thành công
+                            toast.success('Xóa thương hiệu thành công');
+                        } catch (error) {
+                            setErrorMessage('Failed to delete brand.');
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                },
+                { label: 'No' }
+            ]
+        });
+    };
+    //Xử lý khi người dùng nhấn vào chỉnh sửa
+    const handleEdit = (brand: Brand) => {
+        setEditingBrand(brand); // đặt brand đang chỉnh sửa
+        onOpen();// mở modal chỉnh sửa
+        fetchBrands();// cập nhật thương hiệu
+    };
+
+    //mở modal thêm mới
+    const handOpenAddBrandModal = () => {
+        setIsAddBrandModalOpen(true);
+    }
+    //đóng modal thêm mới
+    const handCloseAddBrandModal = () => {
+        setIsAddBrandModalOpen(false);
+    }
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setImage(event.target.files[0]);
+        }
+    };
+       // xóa ảnh đã chọn
+       const handleImageClear = () => {
+        setImage(null);
+        setImagePreviewUrl(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Clear the file input field
+        }
+    };
 
     return (
         <div>
@@ -93,7 +222,7 @@ const BodyBrand: React.FC = () => {
                     </Modal>
                 </div>
             </div>
-
+    
             <div>
                 <div className="mb-4">
                     <TableBrand />
@@ -113,6 +242,7 @@ const BodyBrand: React.FC = () => {
             </div>
         </div>
     );
-};
+}
 
 export default BodyBrand;
+

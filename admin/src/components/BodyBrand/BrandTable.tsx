@@ -14,123 +14,129 @@ import {
     TableRow,
     TableCell,
     Tooltip,
-} from "@nextui-org/react"; // Import các thành phần giao diện từ thư viện NextUI
+} from "@nextui-org/react";
 import Image from "next/image";
-import { EditIcon } from "./EditIcon"; // biểu tượng chỉnh sửa
-import { DeleteIcon } from "./DeleteIcon"; // biểu tượng xóa
-import { Category } from "@/interface"; // Interface của danh mục (Category)
-import apiConfig from "@/configs/api"; // configs api
-import axios from "axios"; //thư viện axios để gọi api
-import CloseIcon from '@mui/icons-material/Close'; 
-import { toast } from "react-toastify"; // thư viên để hiện thị thông báo
+import { EditIcon } from "./EditIcon";
+import { DeleteIcon } from "./DeleteIcon";
+import { Brand } from "@/interface"; // Interface cho Brand
+import apiConfig from "@/configs/api";
+import axios from "axios";
+import CloseIcon from '@mui/icons-material/Close';
+import { toast } from "react-toastify";
 
-// Khai báo kiểu dữ liệu cho các prop mà component nhận
-interface CategoryTableProps {
-    categories: Category[]; // Danh sách các danh mục
-    onEdit: (category: Category) => void; // Hàm xử lý khi chỉnh sửa danh mục   
-    onDelete: (categoryId: string) => void;// Hàm xử lý khi xóa danh mục
+interface BrandTableProps {
+    brands: Brand[]; // Danh sách các thương hiệu
+    onEdit: (brand: Brand) => void; // Hàm xử lý khi chỉnh sửa
+    onDelete: (brandId: string) => void; // Hàm xử lý khi xóa
 }
 
-const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => {
-    // State lưu trữ danh mục đang chỉnh sửa và thông tin của danh mục đó
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Danh mục đang được chỉnh sửa
-    const [categoryName, setCategoryName] = useState<string>(""); // Tên danh mục
-    const [categoryTag, setCategoryTag] = useState<string>(""); // Tag của danh mục
-    const [categoryImage, setCategoryImage] = useState<File | null>(null); // Hình ảnh của danh mục
+const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
+    const [editingBrand, setEditingBrand] = useState<Brand | null>(null); // Quản lý trạng thái thương hiệu đang chỉnh sửa
+    const [brandName, setBrandName] = useState<string>(""); // Tên thương hiệu
+    const [brandTag, setBrandTag] = useState<string>(""); // Tag của thương hiệu
+    const [brandImage, setBrandImage] = useState<File | null>(null); // Hình ảnh của thương hiệu
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); // Trạng thái mở/đóng Modal chỉnh sửa
-    const [isLoading, setIsLoading] = useState<boolean>(false); // Trạng thái loading khi thực hiện thao tác
-    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file để dễ dàng reset
+    const [isLoading, setIsLoading] = useState<boolean>(false); // Trạng thái loading khi xử lý
 
-    // Cập nhật giá trị categoryName và categoryTag khi editingCategory thay đổi
+    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file để reset sau khi tải hình
+
     useEffect(() => {
-        if (editingCategory) {
-            setCategoryName(editingCategory.name); // Đổ dữ liệu tên của danh mục vào input
-            setCategoryTag(editingCategory.tag); // Đổ dữ liệu tag của danh mục vào input
-            setCategoryImage(null); // Reset hình ảnh khi chỉnh sửa một danh mục khác
+        if (editingBrand) {
+            setBrandName(editingBrand.name); // Đổ dữ liệu tên của thương hiệu vào input
+            setBrandTag(editingBrand.tag); // Đổ dữ liệu tag của thương hiệu vào input
+            setBrandImage(null); // Reset hình ảnh khi chỉnh sửa một thương hiệu khác
         }
-    }, [editingCategory]);
+    }, [editingBrand]);
 
-    // Mở modal chỉnh sửa khi người dùng nhấn vào biểu tượng chỉnh sửa
-    const openEditModal = (category: Category) => {
-        setEditingCategory(category); // Lưu danh mục đang được chỉnh sửa vào state
-        setIsEditModalOpen(true); // Mở Modal
+    const openEditModal = (brand: Brand) => {
+        setEditingBrand(brand); // Đặt thương hiệu cần chỉnh sửa
+        setIsEditModalOpen(true); // Mở Modal chỉnh sửa
     };
-    // Đóng Modal chỉnh sửa và reset các giá trị trong form
+
     const closeEditModal = () => {
         setIsEditModalOpen(false);
-        setEditingCategory(null);
-        setCategoryName("");
-        setCategoryTag("");
-        setCategoryImage(null);
+        setEditingBrand(null); // Đặt lại thương hiệu đang chỉnh sửa về null
+        setBrandName(""); // Reset tên
+        setBrandTag(""); // Reset tag
+        setBrandImage(null); // Xóa hình ảnh khỏi state
     };
-     // Xử lý khi người dùng chọn ảnh mới
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setCategoryImage(event.target.files[0]);// Lưu ảnh đã chọn vào state
+            setBrandImage(event.target.files[0]); // Lưu ảnh vào state
         }
     };
-    // Xóa hình ảnh hiện tại khỏi state
+
     const handleRemoveImage = () => {
-        setCategoryImage(null); // Xóa ảnh khỏi state
+        setBrandImage(null); // Xóa ảnh khỏi state
         if (fileInputRef.current) {
             fileInputRef.current.value = ""; // Xóa ảnh đã chọn khỏi input file
         }
     };
+    // Upload hình ảnh lên server và trả về URL của hình ảnh
+    const uploadImage = async (file: File): Promise<string> => {
+        const formData = new FormData();
+        formData.append("file", file);
 
-     // Xử lý khi người dùng nhấn nút `Save` trong Modal chỉnh sửa
-    const handleSubmitEdit = async () => {
-        if (editingCategory) {
+        try {
+            const response = await axios.put(apiConfig.categories.updateCt, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            return response.data.url; // Trả về URL của hình ảnh
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            return ""; // Trả về chuỗi rỗng nếu xảy ra lỗi
+        }
+    };
+    // Hàm xử lý khi người dùng nhấn nút `Save` trong Modal chỉnh sửa
+const handleSubmitEdit = async () => {
+        if (editingBrand) {
             setIsLoading(true); // Set loading state
-
             const formData = new FormData();
-            formData.append("name", categoryName.trim() !== "" ? categoryName : editingCategory.name);
-            formData.append("tag", categoryTag.trim() !== "" ? categoryTag : editingCategory.tag);
+            formData.append("name", brandName.trim() !== "" ? brandName : editingBrand.name);
+            formData.append("tag", brandTag.trim() !== "" ? brandTag : editingBrand.tag);
 
-            // Nếu có hình ảnh mới, thêm vào formData
-            if (categoryImage) {
-                formData.append("image", categoryImage);
+            if (brandImage) {
+                formData.append("image", brandImage); // Đính kèm ảnh nếu có
             }
 
             // Thêm `_method` để giả lập PUT request thông qua POST
             formData.append("_method", "PUT");
 
             try {
-                const response = await axios.post(`${apiConfig.categories.updateCt}${editingCategory.id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
+                const response = await axios.post(`${apiConfig.brands.update}${editingBrand.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
 
                 if (response.status === 200) {
-                    // Call the onEdit handler to update the parent state
-                    onEdit(response.data); // Cập nhật danh mục sau khi chỉnh sửa thành công
-                    closeEditModal(); // Dóng modal
-                    toast.success('Cập nhật thành công')
+                    onEdit(response.data); // Cập nhật lại thương hiệu sau khi chỉnh sửa thành công
+                    closeEditModal(); // Đóng modal
+                    toast.success('Cập nhật thương hiệu thành công!');
                 } else {
-                    console.error("Error updating category:", response);
+                    console.error("Error updating brand:", response);
                 }
             } catch (error) {
-                console.error("Error updating category:", error);
+                console.error("Error updating brand:", error);
             } finally {
                 setIsLoading(false); // Reset loading state
             }
         }
     };
 
-
-    // Hàm render từng ô của bảng dựa vào dữ liệu danh mục và cột hiển thị
-    const renderCell = (category: Category, columnKey: React.Key) => {
-        const cellValue = category[columnKey as keyof Category]; // Lấy giá trị của ô theo cột
+    const renderCell = (brand: Brand, columnKey: React.Key) => {
+        const cellValue = brand[columnKey as keyof Brand];
 
         switch (columnKey) {
             case "name":
                 return (
                     <div className="flex items-center">
-                        {category.image && (
+                        {brand.image && (
                             <Image
                                 loading="lazy"
-                                src={category.image}
-                                alt={category.name}
+                                src={brand.image}
+                                alt={brand.name}
                                 className="w-12 h-12 rounded-full mr-2"
                                 width={50}
                                 height={50}
@@ -144,18 +150,18 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
             case "actions":
                 return (
                     <div className="relative flex items-center gap-2 justify-center">
-                        <Tooltip content="Edit category">
+                        <Tooltip content="Edit brand">
                             <span
                                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                                onClick={() => openEditModal(category)}
+                                onClick={() => openEditModal(brand)}
                             >
                                 <EditIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip color="danger" content="Delete category">
+                        <Tooltip color="danger" content="Delete brand">
                             <span
-                                className="text-lg text-danger cursor-pointer active:opacity-50"
-                                onClick={() => onDelete(category.id)}
+className="text-lg text-danger cursor-pointer active:opacity-50"
+                                onClick={() => onDelete(brand.id)}
                             >
                                 <DeleteIcon />
                             </span>
@@ -169,15 +175,15 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
 
     return (
         <>
-            <Table aria-label="Category table">
-                <TableHeader columns={[{ uid: 'name', name: 'Category Name' }, { uid: 'tag', name: 'Category Tag' }, { uid: 'actions', name: 'Actions' }]}>
+            <Table aria-label="Brand table">
+                <TableHeader columns={[{ uid: 'name', name: 'Brand Name' }, { uid: 'tag', name: 'Brand Tag' }, { uid: 'actions', name: 'Actions' }]}>
                     {(column) => (
                         <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={categories}>
+                <TableBody items={brands}>
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -186,41 +192,41 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                 </TableBody>
             </Table>
 
-            {/* Modal for editing category */}
-            {editingCategory && (
+            {/* Modal chỉnh sửa thương hiệu */}
+            {editingBrand && (
                 <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
                     <ModalContent>
-                        <ModalHeader>Sửa phân loại</ModalHeader>
+                        <ModalHeader>Sửa thương hiệu</ModalHeader>
                         <ModalBody>
                             <div>
                                 <label>
-                                    Tên phân loại:
+                                    Tên thương hiệu:
                                     <Input
                                         type="text"
-                                        value={categoryName}
-                                        onChange={(e) => setCategoryName(e.target.value)}
+                                        value={brandName}
+                                        onChange={(e) => setBrandName(e.target.value)}
                                     />
                                 </label>
                             </div>
                             <div>
                                 <label>
-                                    Tag phân lọai
+                                    Tag thương hiệu:
                                     <Input
                                         type="text"
-                                        value={categoryTag}
-                                        onChange={(e) => setCategoryTag(e.target.value)}
+                                        value={brandTag}
+                                        onChange={(e) => setBrandTag(e.target.value)}
                                     />
                                 </label>
                             </div>
                             <div>
                                 <label className="mb-2">
                                     Hình ảnh hiện tại:
-                                    {editingCategory.image && !categoryImage && (
+                                    {editingBrand.image && !brandImage && (
                                         <div className="w-[200px] h-[200px]">
                                             <Image
-                                                src={editingCategory.image}
-                                                alt={editingCategory.name}
-                                                width={200}
+                                                src={editingBrand.image}
+                                                alt={editingBrand.name}
+width={200}
                                                 height={200}
                                                 className="rounded-lg object-cover mb-2 w-full h-full"
                                             />
@@ -231,12 +237,10 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
-                                    ref={fileInputRef} // Attach the ref to the file input
+                                    ref={fileInputRef}
                                     className="mt-2"
                                 />
-
-
-                                {categoryImage && (
+                                {brandImage && (
                                     <div className="relative w-[200px] h-[200px]">
                                         <div
                                             className="absolute top-0 right-0 p-1 cursor-pointer bg-white rounded-full shadow-lg"
@@ -245,7 +249,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                                             <CloseIcon />
                                         </div>
                                         <Image
-                                            src={URL.createObjectURL(categoryImage)} // Preview the selected image
+                                            src={URL.createObjectURL(brandImage)}
                                             alt="Selected image preview"
                                             width={200}
                                             height={200}
@@ -264,9 +268,8 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                     </ModalContent>
                 </Modal>
             )}
-
         </>
     );
 };
 
-export default CategoryTable;
+export default BrandTable;
