@@ -9,12 +9,15 @@
 </head>
 <body>
     <div class="container mt-5">
+      <form action="">
+        <input type="search" name="search">
+      </form>
         <table class="table">
             <thead>
               <tr>
                 <th scope="col">#id</th>
                 <th scope="col">name</th>
-                <th scope="col">tag</th>
+                
                 <th scope="col">image</th>
                 <th scope="col">action</th>
               </tr>
@@ -24,7 +27,7 @@
                 <tr>
                     <th scope="row">{{$item->id}}</th>
                     <td>{{$item->name}}</td>
-                    <td>{{$item->tag}}</td>
+                  
                     <td><img src="{{$item->image}}" alt="" style="width: 50px; height: 50px" width="50px" height="50px"></td>
                     <td><a href="{{route('Category.edit',['category' => $item->id])}}" class="btn btn-primary">edit</a>
 
@@ -40,6 +43,7 @@
                 @endforeach
             </tbody>
           </table>
+          {{ $categories->links() }}
     </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Tooltip, Spinner } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Spinner } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { confirmAlert } from "react-confirm-alert";
@@ -10,6 +10,7 @@ import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Category } from "@/interface";
 import { Pagination } from "@nextui-org/react";
+import useCsrfToken from "@/configs/csrfToken";
 import { ToastContainer, toast } from 'react-toastify';
 import Image from "next/image";
 import CategoryTable from "./CategoryTable";
@@ -18,71 +19,69 @@ import useDebounce from "@/un/useDebounce";
 import CloseIcon from '@mui/icons-material/Close';
 
 function BodyCategories() {
-    // Các hook quản lý trạng thái của component
-    const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Quản lý trạng thái của Modal chỉnh sửa danh mục
-    const [categoryName, setCategoryName] = useState(""); // Quản lý tên danh mục
-    const [categoryTag, setCategoryTag] = useState(""); // Quản lý tag của danh mục đẫ bỏ
-    const [image, setImage] = useState<File | null>(null); // Quản lý hình ảnh của danh mục
-    const [loading, setLoading] = useState(false); // Trạng thái loading khi đang gọi API
-    const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
-    const [successMessage, setSuccessMessage] = useState(""); // Thông báo thành công
-    const [categories, setCategories] = useState<Category[]>([]); // Danh sách các danh mục
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Lưu thông tin của danh mục đang chỉnh sửa
-    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false); // Trạng thái Modal thêm mới danh mục
-    const [filteredCategories, setFilteredCategories] = useState<Category[]>([]); // Danh sách danh mục sau khi lọc
-    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // URL hiển thị preview hình ảnh
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [categoryName, setCategoryName] = useState("");
+    const [categoryTag, setCategoryTag] = useState("");
+    const [image, setImage] = useState<File | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+    const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-    const [search, setSearch] = useState(""); // Quản lý trạng thái tìm kiếm
-    const debouncedSearch = useDebounce(search, 300); // Giảm thiểu số lần thực hiện tìm kiếm (debounce)
-    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file để reset sau khi tải hình
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 300);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL; //URL API
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    // Hàm lấy danh sách các danh mục từ API
     const fetchCategories = async (searchTerm = "") => {
         console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
             const response = await axios.get(apiConfig.categories.getAll, {
-                params: { name: searchTerm }, // Tìm kiếm danh mục theo tên
+                params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
                 withCredentials: true,
             });
-            console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
-            setCategories(response.data.categories);// Lưu danh sách danh mục vào state
+            console.log("API Response:", response.data.categories.data); // Kiểm tra phản hồi từ API
+            setCategories(response.data.categories.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
             setErrorMessage('Failed to fetch categories. Please try again.');
         }
     };
 
-    // Cập nhật URL preview khi người dùng chọn một hình ảnh mới
     useEffect(() => {
         if (image) {
-           
-            setImagePreviewUrl(URL.createObjectURL(image));// Tạo URL preview cho ảnh
+            // Create a preview URL for the selected image
+            setImagePreviewUrl(URL.createObjectURL(image));
         } else {
-            setImagePreviewUrl(null); // Xóa preview nếu không có ảnh
+            setImagePreviewUrl(null); // Clear preview if no image
         }
     }, [image]);
-    // Lấy danh sách danh mục ngay khi component được mount
+
     useEffect(() => {
         fetchCategories();
     }, []);
-    // xử lý thêm hoặc chỉnh sửa danh mục
+
+    
+
     const handleSubmit = async (onClose: () => void) => {
         if (!categoryName || !categoryTag) {
             alert('Please fill in all fields.');
             return;
         }
-        // kiểm định dạng file hình ảnh
+
         if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
             setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
             return;
         }
-        setLoading(true); // bật trạng thái loading
+        setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
 
-        // tải form data để gửi lên api 
         const formData = new FormData();
         formData.append('name', categoryName);
         formData.append('tag', categoryTag);
@@ -91,7 +90,7 @@ function BodyCategories() {
         }
 
         try {
-            onClose(); //đóng modal khi hoàn tất
+            onClose();
 
             const response = await axios.post(apiConfig.categories.createCt, formData, {
                 headers: {
@@ -103,18 +102,19 @@ function BodyCategories() {
             setImage(null);
             fetchCategories();
             toast.success('Thêm phân loại thành công');
+console.log(formData);
 
-            // Reset các trường dữ liệu và tải lại danh mục
+            // Close the modal after successfully adding the category
         } catch (error) {
             toast.error('Thêm phân loại thất bại');
             console.error('Error adding category:', error);
             setErrorMessage('Failed to add category. Please try again.');
         } finally {
-            setLoading(false); //tắt trạng thái loading
+            setLoading(false);
         }
     };
 
-    // xử lý xóa một danh mục
+
     const handleDelete = (categoryId: string) => {
         // Find the specific category to delete by its ID
         const categoryToDelete = categories.find(category => category.id === categoryId);
@@ -123,7 +123,7 @@ function BodyCategories() {
             setErrorMessage("Category not found.");
             return;
         }
-        // hiện thị modal xác nhận xóa
+
         confirmAlert({
             title: 'Xóa phân loại',
             message: `Bạn có muốn xóa phân loại ${categoryToDelete.name}?`,
@@ -134,7 +134,7 @@ function BodyCategories() {
                         setLoading(true);
                         try {
                             await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
-                            fetchCategories(); // tải lại ảnh sau khi xóa
+                            fetchCategories(); // Refresh categories after deletion
                             toast.success('Xóa phân loại thành công');
 
 
@@ -152,29 +152,28 @@ function BodyCategories() {
             ]
         });
     };
-    // Xử lý khi người dùng nhấn vào chỉnh sửa
+
     const handleEdit = (category: Category) => {
-        setEditingCategory(category); //đặt danh mục đang chỉnh sửa
-        onOpen();// mở model chỉnh sửa
-        fetchCategories();//cập nhật danh sách  
+        setEditingCategory(category);
+        onOpen();
+        fetchCategories();
     };
-    //mở model thêm mới
+
     const handleOpenAddCategoryModal = () => {
         setIsAddCategoryModalOpen(true);
     };
-    //dóng model thêm mới 
+
     const handleCloseAddCategoryModal = () => {
         setIsAddCategoryModalOpen(false);
     };
 
-    // xử lí khi chọn ảnh
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setImage(event.target.files[0]);
         }
     };
     
-    // xóa ảnh đã chọn
     const handleImageClear = () => {
         setImage(null);
         setImagePreviewUrl(null);
@@ -277,22 +276,19 @@ function BodyCategories() {
                 return cellValue;
         }
     };
-    //Lọc danh sach theo từ khóa tìm kiếm 
+
     useEffect(() => {
         const filtered = categories.filter(c => c.name.toLowerCase().includes(debouncedSearch.toLowerCase()));
         setFilteredCategories(filtered);
     }, [debouncedSearch, categories]);
 
     return (
-        
         <div>
-            {/* hiện thị trạng thái loading */}
             {loading && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <Spinner />
                 </div>
             )}
-            {/* hiện thị modal và bảng dữ liệu */}
             <div className="flex justify-between items-center">
                 <div className="py-5 h-[62px]">
                     <BreadcrumbNav
@@ -387,15 +383,16 @@ function BodyCategories() {
                 <div>
                     <div className="flex gap-2">
                         <Input
+                         isClearable
                             type="text"
                             placeholder="Tìm kiếm sản phẩm"
                             labelPlacement="outside"
-                            size="lg"
+                            size="md"
                             endContent={<SearchIcon />}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        <Button onPress={handleOpenAddCategoryModal} size="lg" className="font-semibold" color="primary">Thêm phân loại</Button>
+                        <Button onPress={handleOpenAddCategoryModal} size="md" className="font-medium !px-6" color="primary">Thêm phân loại</Button>
                     </div>
                 </div>
             </div>

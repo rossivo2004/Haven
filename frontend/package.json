@@ -48,7 +48,8 @@
 		"react-responsive-carousel": "^3.2.23",
 		"react-slick": "^0.30.2",
 		"react-toastify": "^10.0.5",
-		"sass": "^1.78.0",
+		"sass": "^1.79.4",
+		"sass-loader": "^16.0.2",
 		"slick-carousel": "^1.8.1",
 		"swiper": "^11.1.11",
 		"yup": "^1.4.0"

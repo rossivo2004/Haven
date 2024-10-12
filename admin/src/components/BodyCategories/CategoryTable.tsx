@@ -14,48 +14,45 @@ import {
     TableRow,
     TableCell,
     Tooltip,
-} from "@nextui-org/react"; // Import các thành phần giao diện từ thư viện NextUI
+} from "@nextui-org/react";
 import Image from "next/image";
-import { EditIcon } from "./EditIcon"; // biểu tượng chỉnh sửa
-import { DeleteIcon } from "./DeleteIcon"; // biểu tượng xóa
-import { Category } from "@/interface"; // Interface của danh mục (Category)
-import apiConfig from "@/configs/api"; // configs api
-import axios from "axios"; //thư viện axios để gọi api
-import CloseIcon from '@mui/icons-material/Close'; 
-import { toast } from "react-toastify"; // thư viên để hiện thị thông báo
+import { EditIcon } from "./EditIcon";
+import { DeleteIcon } from "./DeleteIcon";
+import { Category } from "@/interface";
+import apiConfig from "@/configs/api";
+import axios from "axios";
+import CloseIcon from '@mui/icons-material/Close';
+import { toast } from "react-toastify";
 
-// Khai báo kiểu dữ liệu cho các prop mà component nhận
 interface CategoryTableProps {
-    categories: Category[]; // Danh sách các danh mục
-    onEdit: (category: Category) => void; // Hàm xử lý khi chỉnh sửa danh mục   
-    onDelete: (categoryId: string) => void;// Hàm xử lý khi xóa danh mục
+    categories: Category[];
+    onEdit: (category: Category) => void;
+    onDelete: (categoryId: string) => void;
 }
 
 const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => {
-    // State lưu trữ danh mục đang chỉnh sửa và thông tin của danh mục đó
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null); // Danh mục đang được chỉnh sửa
-    const [categoryName, setCategoryName] = useState<string>(""); // Tên danh mục
-    const [categoryTag, setCategoryTag] = useState<string>(""); // Tag của danh mục
-    const [categoryImage, setCategoryImage] = useState<File | null>(null); // Hình ảnh của danh mục
-    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); // Trạng thái mở/đóng Modal chỉnh sửa
-    const [isLoading, setIsLoading] = useState<boolean>(false); // Trạng thái loading khi thực hiện thao tác
-    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file để dễ dàng reset
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+    const [categoryName, setCategoryName] = useState<string>("");
+    const [categoryTag, setCategoryTag] = useState<string>("");
+    const [categoryImage, setCategoryImage] = useState<File | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Cập nhật giá trị categoryName và categoryTag khi editingCategory thay đổi
     useEffect(() => {
         if (editingCategory) {
-            setCategoryName(editingCategory.name); // Đổ dữ liệu tên của danh mục vào input
-            setCategoryTag(editingCategory.tag); // Đổ dữ liệu tag của danh mục vào input
-            setCategoryImage(null); // Reset hình ảnh khi chỉnh sửa một danh mục khác
+            setCategoryName(editingCategory.name);
+            setCategoryTag(editingCategory.tag);
+            setCategoryImage(null); // reset image if editing a different category
         }
     }, [editingCategory]);
 
-    // Mở modal chỉnh sửa khi người dùng nhấn vào biểu tượng chỉnh sửa
     const openEditModal = (category: Category) => {
-        setEditingCategory(category); // Lưu danh mục đang được chỉnh sửa vào state
-        setIsEditModalOpen(true); // Mở Modal
+        setEditingCategory(category);
+        setIsEditModalOpen(true);
     };
-    // Đóng Modal chỉnh sửa và reset các giá trị trong form
+
     const closeEditModal = () => {
         setIsEditModalOpen(false);
         setEditingCategory(null);
@@ -63,21 +60,39 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
         setCategoryTag("");
         setCategoryImage(null);
     };
-     // Xử lý khi người dùng chọn ảnh mới
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setCategoryImage(event.target.files[0]);// Lưu ảnh đã chọn vào state
-        }
-    };
-    // Xóa hình ảnh hiện tại khỏi state
-    const handleRemoveImage = () => {
-        setCategoryImage(null); // Xóa ảnh khỏi state
-        if (fileInputRef.current) {
-            fileInputRef.current.value = ""; // Xóa ảnh đã chọn khỏi input file
+            setCategoryImage(event.target.files[0]);
         }
     };
 
-     // Xử lý khi người dùng nhấn nút `Save` trong Modal chỉnh sửa
+    const handleRemoveImage = () => {
+        setCategoryImage(null); // Remove the selected image from state
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ""; // Clear the file input
+        }
+    };
+
+
+
+    const uploadImage = async (file: File): Promise<string> => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await axios.put(apiConfig.categories.updateCt, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            return response.data.url; // Adjust based on your API response structure
+        } catch (error) {
+            console.error("Error uploading image:", error);
+            return ""; // Handle error gracefully
+        }
+    };
+
     const handleSubmitEdit = async () => {
         if (editingCategory) {
             setIsLoading(true); // Set loading state
@@ -86,12 +101,12 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
             formData.append("name", categoryName.trim() !== "" ? categoryName : editingCategory.name);
             formData.append("tag", categoryTag.trim() !== "" ? categoryTag : editingCategory.tag);
 
-            // Nếu có hình ảnh mới, thêm vào formData
+            // Append the image file if a new one is selected
             if (categoryImage) {
                 formData.append("image", categoryImage);
             }
 
-            // Thêm `_method` để giả lập PUT request thông qua POST
+            // Add the `_method` field to simulate a PUT request using POST
             formData.append("_method", "PUT");
 
             try {
@@ -103,8 +118,8 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
 
                 if (response.status === 200) {
                     // Call the onEdit handler to update the parent state
-                    onEdit(response.data); // Cập nhật danh mục sau khi chỉnh sửa thành công
-                    closeEditModal(); // Dóng modal
+                    onEdit(response.data); // Pass the updated category data
+                    closeEditModal();
                     toast.success('Cập nhật thành công')
                 } else {
                     console.error("Error updating category:", response);
@@ -118,9 +133,8 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
     };
 
 
-    // Hàm render từng ô của bảng dựa vào dữ liệu danh mục và cột hiển thị
     const renderCell = (category: Category, columnKey: React.Key) => {
-        const cellValue = category[columnKey as keyof Category]; // Lấy giá trị của ô theo cột
+        const cellValue = category[columnKey as keyof Category];
 
         switch (columnKey) {
             case "name":
@@ -188,76 +202,104 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
 
             {/* Modal for editing category */}
             {editingCategory && (
-                <Modal isOpen={isEditModalOpen} onClose={closeEditModal}>
+                <Modal isOpen={isEditModalOpen} onClose={closeEditModal} className="bg-[#FCFCFC]" size="4xl">
                     <ModalContent>
-                        <ModalHeader>Sửa phân loại</ModalHeader>
+                        <ModalHeader><div className="text-2xl">Sửa phân loại</div></ModalHeader>
                         <ModalBody>
-                            <div>
-                                <label>
-                                    Tên phân loại:
-                                    <Input
-                                        type="text"
-                                        value={categoryName}
-                                        onChange={(e) => setCategoryName(e.target.value)}
-                                    />
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    Tag phân lọai
-                                    <Input
-                                        type="text"
-                                        value={categoryTag}
-                                        onChange={(e) => setCategoryTag(e.target.value)}
-                                    />
-                                </label>
-                            </div>
-                            <div>
-                                <label className="mb-2">
-                                    Hình ảnh hiện tại:
-                                    {editingCategory.image && !categoryImage && (
-                                        <div className="w-[200px] h-[200px]">
+                            <div className="flex gap-10">
+                                <div className="flex flex-col items-center gap-4">
+                                    <label className="block text-lg font-medium mb-2">Hình ảnh</label>
+
+                                    {/* Hiển thị ảnh hiện tại hoặc ảnh mới đã chọn */}
+                                    <div className="relative w-[200px] h-[200px]">
+                                        {/* Nếu có ảnh mới, hiển thị ảnh mới */}
+                                        {categoryImage ? (
                                             <Image
-                                                src={editingCategory.image}
-                                                alt={editingCategory.name}
+                                                src={URL.createObjectURL(categoryImage)} // Preview ảnh mới
+                                                alt="Selected image preview"
                                                 width={200}
                                                 height={200}
-                                                className="rounded-lg object-cover mb-2 w-full h-full"
+                                                className="rounded-lg object-cover w-full h-full"
                                             />
-                                        </div>
-                                    )}
-                                </label>
-                                <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    ref={fileInputRef} // Attach the ref to the file input
-                                    className="mt-2"
-                                />
+                                        ) : (
+                                            // Nếu chưa có ảnh mới, hiển thị ảnh hiện tại
+                                            editingCategory?.image && (
+                                                <Image
+                                                    src={editingCategory.image} // Ảnh hiện tại
+                                                    alt={editingCategory.name}
+                                                    width={200}
+                                                    height={200}
+                                                    className="rounded-lg object-cover w-full h-full"
+                                                />
+                                            )
+                                        )}
 
+                                        {/* Nút "X" để xóa ảnh mới được chọn */}
+                                        {categoryImage && (
+                                            <div
+                                                className="absolute top-1 right-1 cursor-pointer bg-white rounded-full shadow-lg flex items-center justify-center hover:text-red-600"
+                                                onClick={handleRemoveImage}
+                                            >
+                                                <CloseIcon className="w-5 h-5"/>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {categoryImage && (
-                                    <div className="relative w-[200px] h-[200px]">
-                                        <div
-                                            className="absolute top-0 right-0 p-1 cursor-pointer bg-white rounded-full shadow-lg"
-                                            onClick={handleRemoveImage}
+                                    {/* Nút chọn file được tùy chỉnh */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
-                                            <CloseIcon />
-                                        </div>
-                                        <Image
-                                            src={URL.createObjectURL(categoryImage)} // Preview the selected image
-                                            alt="Selected image preview"
-                                            width={200}
-                                            height={200}
-                                            className="rounded-lg mt-2 w-full h-full"
+                                            { "Change Image"}
+                                        </button>
+
+                                        {/* Input file ẩn hoàn toàn */}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            ref={fileInputRef}
+                                            onChange={handleImageChange}
+                                            className="hidden" // Hoàn toàn ẩn input file
                                         />
                                     </div>
-                                )}
+
+                                    {/* Chỉ hiển thị tên ảnh đã chọn, không hiển thị link */}
+                                    {categoryImage && (
+                                        <div className="mt-2 text-sm text-gray-600 hidden">
+                                            {categoryImage.name} {/* Chỉ tên ảnh, không link */}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <div className="mb-4">
+                                        <label>
+                                            <div className="text-lg font-medium">Tên phân loại:</div>
+                                            <Input
+                                                type="text"
+                                                value={categoryName}
+                                                onChange={(e) => setCategoryName(e.target.value)}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <div className="text-lg font-medium"> Tag phân lọai:</div>
+                                            <Input
+                                                type="text"
+                                                value={categoryTag}
+                                                onChange={(e) => setCategoryTag(e.target.value)}
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+
                         </ModalBody>
                         <ModalFooter>
                             <Button onClick={closeEditModal}>Cancel</Button>
-                            <Button onClick={handleSubmitEdit} disabled={isLoading} className="bg-primary-400 font-semibold">
+                            <Button onClick={handleSubmitEdit} disabled={isLoading} className="bg-primary-400 text-white font-semibold">
                                 {isLoading ? "Saving..." : "Save"}
                             </Button>
                         </ModalFooter>

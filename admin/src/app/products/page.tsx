@@ -1,10 +1,12 @@
 import BodyProducts from "@/components/BodyProducts";
 import BodyProductsV2 from "@/components/BodyProducts";
 
+import ProductForm from "@/components/FormAdd";
+
 function page() {
     return ( 
         <div>
-            <BodyProductsV2 />
+            <ProductForm />
            
         </div>
      );

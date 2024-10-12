@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Tooltip, Spinner } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Spinner } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { confirmAlert } from "react-confirm-alert";
@@ -10,77 +10,78 @@ import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Brand } from "@/interface";
 import { Pagination } from "@nextui-org/react";
+import useCsrfToken from "@/configs/csrfToken";
 import { ToastContainer, toast } from 'react-toastify';
 import Image from "next/image";
-import BrandTable from "./BrandTable"; // Import component bảng thương hiệu
+import BrandTable from "./tablebrand";
 import SearchIcon from '@mui/icons-material/Search';
 import useDebounce from "@/un/useDebounce";
 import CloseIcon from '@mui/icons-material/Close';
-import TableBrand from "../TableBrand";
 
 function BodyBrand() {
-    //các hook quản lý trangj thái của component
-    const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Quản lý trạng thái Modal chỉnh sửa thương hiệu
-    const [brandName, setBrandName] = useState(""); // quản lý tên thương hiệu
-    const [brandTag, setBrandTag] = useState(""); // Tag của thương hiệu bỏ
-    const [image, setImage] = useState<File | null>(null); // Hình ảnh của thương hiệu
-    const [loading, setLoading] = useState(false); // Trạng thái loading khi thao tác
-    const [errorMessage, setErrorMessage] = useState(""); // Thông báo lỗi
-    const [successMessage, setSuccessMessage] = useState(""); // Thông báo thành công
-    const [brands, setBrands] = useState<Brand[]>([]); // Danh sách thương hiệu
-    const [editingBrand, setEditingBrand] = useState<Brand | null>(null); //Lưu thông tin của Thương hiệu đang chỉnh sửa
-    const [isAddBrandModalOpen, setIsAddBrandModalOpen] = useState(false); // Trạng thái Modal thêm thương hiệu
-    const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]); // Danh sách thương hiệu sau khi lọc
-    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // URL preview hình ảnh
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [brandName, setBrandName] = useState("");
+    const [brandTag, setBrandTag] = useState("");
+    const [image, setImage] = useState<File | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [brands, setBrands] = useState<Brand[]>([]);
+    const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+    const [isAddBrandModalOpen, setIsAddBrandModalOpen] = useState(false);
+    const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-    const [search, setSearch] = useState(""); // Trạng thái tìm kiếm
-    const debouncedSearch = useDebounce(search, 300); // Thực hiện tìm kiếm giảm thiểu số lần gọi API
-    const fileInputRef = useRef<HTMLInputElement>(null); // Tham chiếu đến input file
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 300);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Hàm lấy danh sách thương hiệu từ API
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
     const fetchBrands = async (searchTerm = "") => {
+        console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
             const response = await axios.get(apiConfig.brands.getAll, {
-                params: { name: searchTerm },
+                params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
                 withCredentials: true,
             });
-            console.log("API Response:", response.data); // Kiểm tra phản hồi từ API
-            setBrands(response.data.brands);
+            console.log("API Response:", response.data.brands.data); // Kiểm tra phản hồi từ API
+            setBrands(response.data.brands.data);
         } catch (error) {
             console.error('Error fetching brands:', error);
             setErrorMessage('Failed to fetch brands. Please try again.');
         }
     };
 
-    // Cập nhật URL preview khi người dùng chọn một hình ảnh mới
     useEffect(() => {
         if (image) {
-           
-            setImagePreviewUrl(URL.createObjectURL(image));// Tạo URL preview cho ảnh
+            // Create a preview URL for the selected image
+            setImagePreviewUrl(URL.createObjectURL(image));
         } else {
-            setImagePreviewUrl(null); // Xóa preview nếu không có ảnh
+            setImagePreviewUrl(null); // Clear preview if no image
         }
     }, [image]);
-    // Lấy danh sách danh mục ngay khi component được mount
+
     useEffect(() => {
         fetchBrands();
     }, []);
-    // xử lý thêm hoặc chỉnh sửa danh mục
+
+
+
     const handleSubmit = async (onClose: () => void) => {
         if (!brandName || !brandTag) {
             alert('Please fill in all fields.');
             return;
         }
-        // kiểm định dạng file hình ảnh
+
         if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
             setErrorMessage('Please upload a valid image (jpeg, png, or gif).');
             return;
         }
-        setLoading(true); //bật trạng thái loading
+        setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
 
-        //Tải form data để gửi lên api
         const formData = new FormData();
         formData.append('name', brandName);
         formData.append('tag', brandTag);
@@ -89,36 +90,39 @@ function BodyBrand() {
         }
 
         try {
-            onClose();//đóng modal khi hoàn tất
+            onClose();
 
-            const response = await axios.post(apiConfig.brands.create, formData, {
-                headers: { accept: 'application/json' },
+            const response = await axios.post(apiConfig.brands.createBr, formData, {
+                headers: {
+                    accept: 'application/json',
+                },
             });
             setBrandName('');
             setBrandTag('');
             setImage(null);
             fetchBrands();
-            toast.success('Thêm thương hiệu thành công');
-            
-            //reset lại các trường dữ liêu và tải lai brand
+            toast.success('Thêm phân loại thành công');
+
+            // Close the modal after successfully adding the Brand
         } catch (error) {
-            toast.error('Thêm thương hiệu thất bại');
-            console.error('Error adding category:', error);
-            setErrorMessage('Failed to add brand. Please try again.');
+            toast.error('Thêm phân loại thất bại');
+            console.error('Error adding Brand:', error);
+            setErrorMessage('Failed to add Brand. Please try again.');
         } finally {
-            setLoading(false); //tắt trạng thái loading
+            setLoading(false);
         }
     };
 
-    //Xử lý xóa một brand
+
     const handleDelete = (brandId: string) => {
+        // Find the specific category to delete by its ID
         const brandToDelete = brands.find(brand => brand.id === brandId);
 
         if (!brandToDelete) {
-            setErrorMessage("Brand not found.");
+            setErrorMessage("brand not found.");
             return;
         }
-        //Hiện thị modal xác nhận xóa
+
         confirmAlert({
             title: 'Xóa thương hiệu',
             message: `Bạn có muốn xóa thương hiệu ${brandToDelete.name}?`,
@@ -128,42 +132,48 @@ function BodyBrand() {
                     onClick: async () => {
                         setLoading(true);
                         try {
-                            await axios.delete(`${apiConfig.brands.delete}${brandId}`);
-                            fetchBrands(); //tải laij hình ảnh khi thành công
+                            await axios.delete(`${apiConfig.brands.deleteBr}${brandId}`);
+                            fetchBrands(); // Refresh categories after deletion
                             toast.success('Xóa thương hiệu thành công');
+
+
                         } catch (error) {
-                            setErrorMessage('Failed to delete brand.');
+                            console.error('Error deleting brands:', error);
+                            setErrorMessage('Failed to delete brands. Please try again.');
                         } finally {
                             setLoading(false);
                         }
                     }
                 },
-                { label: 'No' }
+                {
+                    label: 'No',
+                }
             ]
         });
     };
-    //Xử lý khi người dùng nhấn vào chỉnh sửa
+
     const handleEdit = (brand: Brand) => {
-        setEditingBrand(brand); // đặt brand đang chỉnh sửa
-        onOpen();// mở modal chỉnh sửa
-        fetchBrands();// cập nhật thương hiệu
+        setEditingBrand(brand);
+        onOpen();
+        fetchBrands();
     };
 
-    //mở modal thêm mới
-    const handOpenAddBrandModal = () => {
+    const handleOpenAddBrandModal = () => {
         setIsAddBrandModalOpen(true);
-    }
-    //đóng modal thêm mới
-    const handCloseAddBrandModal = () => {
+    };
+
+    const handleCloseAddBrandModal = () => {
         setIsAddBrandModalOpen(false);
-    }
+    };
+
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setImage(event.target.files[0]);
         }
     };
-       // xóa ảnh đã chọn
-       const handleImageClear = () => {
+
+    const handleImageClear = () => {
         setImage(null);
         setImagePreviewUrl(null);
         if (fileInputRef.current) {
@@ -171,50 +181,194 @@ function BodyBrand() {
         }
     };
 
+    const renderCell = (brand: Brand, columnKey: React.Key) => {
+        const cellValue = brand[columnKey as keyof Brand];
+
+        switch (columnKey) {
+            case "name":
+                return (
+                    <div className="flex items-center">
+                        {brand.image && (
+                            <Image
+                                loading="lazy"
+                                src={brand.image}
+                                alt={brand.name}
+                                className="w-12 h-12 rounded-full mr-2"
+                                width={50}
+                                height={50}
+                            />
+                        )}
+                        <span>{cellValue}</span>
+                    </div>
+                );
+            case "tag":
+                return <span>{cellValue}</span>;
+            case "actions":
+                return (
+                    <div className="relative flex items-center gap-2 justify-center">
+                        <Tooltip content="Edit brand">
+                            <span
+                                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                                onClick={() => handleEdit(brand)}
+                            >
+                                <EditIcon />
+                            </span>
+                        </Tooltip>
+                        <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false}>
+                            <ModalContent>
+                                {(onClose) => (
+                                    <>
+                                        <ModalHeader>Sửa phân loại</ModalHeader>
+                                        <ModalBody>
+                                            <div className="flex gap-5 lg:flex-row flex-col mb-5">
+                                                <div className="lg:w-1/2 w-full">
+                                                    <label>Brand Name</label>
+                                                    <Input
+                                                        placeholder="Brand Name"
+                                                        value={brandName}
+                                                        onChange={(e) => setBrandName(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label>Brand Tag</label>
+                                                    <Input
+                                                        placeholder="Brand Tag"
+                                                        value={brandTag}
+                                                        onChange={(e) => setBrandTag(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label>Image</label>
+                                                <Input
+                                                    type="file"
+                                                    onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
+                                                />
+                                            </div>
+                                            {errorMessage && <div className="text-red-600">{errorMessage}</div>}
+                                            {successMessage && <div className="text-green-600">{successMessage}</div>}
+                                        </ModalBody>
+                                        <ModalFooter>
+                                            <Button color="danger" onPress={onClose}>
+                                                Close
+                                            </Button>
+                                            <Button color="primary" onPress={() => handleSubmit(onClose)} disabled={loading}>
+                                                {loading ? 'Processing...' : 'Thêm'}
+                                            </Button>
+
+                                        </ModalFooter>
+                                    </>
+                                )}
+                            </ModalContent>
+                        </Modal>
+                        <Tooltip color="danger" content="Delete brand">
+                            <span
+                                className="text-lg text-danger cursor-pointer active:opacity-50"
+                                onClick={() => handleDelete(brand.id)}
+                            >
+                                <DeleteIcon />
+                            </span>
+                        </Tooltip>
+                    </div>
+                );
+            default:
+                return cellValue;
+        }
+    };
+
+    useEffect(() => {
+        const filtered = brands.filter(c => c.name.toLowerCase().includes(debouncedSearch.toLowerCase()));
+        setFilteredBrands(filtered);
+    }, [debouncedSearch, brands]);
+
     return (
         <div>
+            {loading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <Spinner />
+                </div>
+            )}
             <div className="flex justify-between items-center">
                 <div className="py-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
-                            { name: 'Trang chủ', link: '/' },
-                            { name: 'Thương hiệu', link: '#' },
+                            { name: 'Home', link: '/' },
+                            { name: 'Brands', link: '#' },
                         ]}
                     />
                 </div>
                 <div>
-                    <Button onPress={onOpen}>Thêm thương hiệu</Button>
-                    <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
+
+                    <Modal
+                        size="5xl"
+                        scrollBehavior="inside"
+                        isOpen={isAddBrandModalOpen}
+                        onOpenChange={handleCloseAddBrandModal}
+                        isDismissable={false}
+                    >
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader className="flex flex-col gap-1">Thêm mới thương hiệu</ModalHeader>
+                                    <ModalHeader>Thêm mới brand</ModalHeader>
                                     <ModalBody>
                                         <div className="flex gap-5 lg:flex-row flex-col mb-5">
                                             <div className="lg:w-1/2 w-full">
-                                                <label htmlFor="">Tên thương hiệu</label>
-                                                <Input placeholder="Tên thương hiệu" />
+                                                <label>Tên thương hiệu</label>
+                                                <Input
+                                                    placeholder="Brand Name"
+                                                    value={brandName}
+                                                    onChange={(e) => setBrandName(e.target.value)}
+                                                />
                                             </div>
                                             <div className="flex-1">
-                                                <label htmlFor="">Tag thương hiệu</label>
-                                                <Input placeholder="Tag thương hiệu" />
+                                                <label>Tag thương hiệu</label>
+                                                <Input
+                                                    placeholder="Brand Tag"
+                                                    value={brandTag}
+                                                    onChange={(e) => setBrandTag(e.target.value)}
+                                                />
                                             </div>
                                         </div>
                                         <div>
-                                            <label htmlFor="">Hình ảnh</label>
-                                            <Input type="file" className="mb-2" onChange={handleImageChange} />
-                                            <div className="">
-                                                {image.length > 0 && <img src={image[0]} alt="Preview" className="h-20 w-20 object-cover" />}
-                                            </div>
+                                            <label>Image</label>
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageChange}
+                                                ref={fileInputRef} // Add ref here
+                                            />
+                                            {imagePreviewUrl && (
+                                                <div className="flex items-center mt-2">
+                                                    <div className="w-[200px] h-[200px]">
+                                                        <Image
+                                                            src={imagePreviewUrl}
+                                                            alt="Selected image preview"
+                                                            width={200}
+                                                            height={200}
+                                                            className="rounded-lg object-cover mb-2 w-full h-full"
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        color="danger"
+                                                        onClick={handleImageClear}
+                                                        className="ml-2" // Optional for spacing
+                                                    >
+                                                        <CloseIcon /> {/* Use a close icon */}
+                                                    </Button>
+                                                </div>
+                                            )}
+                                            {errorMessage && <div className="text-red-600">{errorMessage}</div>}
+                                            {successMessage && <div className="text-green-600">{successMessage}</div>}
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>
-                                        <Button color="danger" variant="light" onPress={onClose}>
+                                        <Button color="danger" onPress={onClose}>
                                             Đóng
                                         </Button>
-                                        <Button color="primary" onPress={onClose}>
-                                            Thêm
+                                        <Button color="primary" onPress={() => handleSubmit(onClose)} disabled={loading}>
+                                            {loading ? 'Processing...' : 'Thêm'}
                                         </Button>
+
                                     </ModalFooter>
                                 </>
                             )}
@@ -222,27 +376,43 @@ function BodyBrand() {
                     </Modal>
                 </div>
             </div>
-    
+
+            <div className="flex items-center justify-between mb-4">
+                <div className="text-xl font-bold">Brand Table</div>
+                <div>
+                    <div className="flex gap-2">
+                        <Input
+                            isClearable
+                            type="text"
+                            placeholder="Tìm kiếm sản phẩm"
+                            labelPlacement="outside"
+                            size="md"
+                            endContent={<SearchIcon />}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <Button onPress={handleOpenAddBrandModal} size="md" className="font-medium !px-6" color="primary">Thêm phân loại</Button>
+                    </div>
+                </div>
+            </div>
+
+
             <div>
-                <div className="mb-4">
-                    <TableBrand />
-                </div>
-                <div className="flex justify-end w-full">
-                    {/* Custom pagination component */}
-                    {/* 
-                        <CustomPagination
-                            totalItems={filteredProducts.length}
-                            itemsPerPage={itemsPerPage}
-                            currentPage={currentPage}
-                            onPageChange={(page: number) => setCurrentPage(page)}
-                        /> 
-                    */}
-                    <Pagination showControls total={10} initialPage={1} />
-                </div>
+                {/* Hiển thị nếu không có sản phẩm */}
+                {filteredBrands.length === 0 ? (
+                    <div className="text-center text-lg font-semibold mt-4">
+                        Không có phân loại nào được tìm thấy
+                    </div>
+                ) : (
+                    <BrandTable
+                        brands={filteredBrands}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+                )}
             </div>
         </div>
     );
 }
 
 export default BodyBrand;
-

@@ -25,21 +25,23 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name_product' => 'required|string|max:255', 
+            'images' => 'required|array|',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             'name' => 'required|array|',
             'name.*' => 'string', // Tên sản phẩm bắt buộc
             'price' => 'required|array|', // Giá sản phẩm là số và >= 0
             'price.*' => 'required|numeric|min:0',
+            
             'stock' => 'required|array|', 
             'stock.*' => 'integer|min:0',// Số lượng sản phẩm là số nguyên không âm
             'variant_value' => 'required|array',
             'variant_value.*' => 'string', 
-            'description' => 'nullable|string|', // Mô tả có thể rỗng
-            'image' => 'nullable|array|',
+            'description' => 'required|string|', // Mô tả có thể rỗng
+            'image' => 'required|array|',
             'image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Ảnh phải là file hình hợp lệ với dung lượng tối đa 2MB
             'category_id' => 'required|exists:categories,id', // ID danh mục bắt buộc, phải tồn tại trong bảng categories
-            'brand_id' => 'nullable|exists:brands,id', // ID thương hiệu có thể rỗng, nếu có phải tồn tại trong bảng brands
-            'tag' => 'required|array|',
-            'tag.*' => 'string', // Tên sản phẩm bắt buộc
+            'brand_id' => 'required|exists:brands,id', // ID thương hiệu có thể rỗng, nếu có phải tồn tại trong bảng brands
+           
             'discount' => 'required|array|', 
             'discount.*' => 'numeric|min:0|max:100'// Thông tin giảm giá phải là kiểu boolean
         ];
@@ -53,7 +55,12 @@ class StoreProductRequest extends FormRequest
             'name_product.required' => 'Vui lòng nhập tên sản phẩm chính.',
             'name_product.string' => 'Tên sản phẩm chính phải là chuỗi ký tự hợp lệ.',
             'name_product.max' => 'Tên sản phẩm chính không được vượt quá 255 ký tự.',
-    
+            
+            'images.array' => 'Danh sách hình ảnh phải là một mảng.',
+            'images.*.image' => 'Mỗi tệp phải là một hình ảnh hợp lệ.',
+            'images.*.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, gif hoặc svg.',
+            'images.*.max' => 'Dung lượng mỗi hình ảnh không được vượt quá 2MB.',
+            
             // 'name' messages
             'name.required' => 'Vui lòng nhập tên cho các biến thể.',
             'name.array' => 'Tên biến thể phải là một mảng.',
@@ -93,10 +100,7 @@ class StoreProductRequest extends FormRequest
             // 'brand_id' messages
             'brand_id.exists' => 'Thương hiệu bạn chọn không tồn tại.',
     
-            // 'tag' messages
-            'tag.required' => 'Vui lòng nhập thẻ (tag) cho sản phẩm.',
-            'tag.array' => 'Thẻ (tag) phải là một mảng.',
-            'tag.*.string' => 'Mỗi thẻ (tag) phải là chuỗi ký tự hợp lệ.',
+          
     
             // 'discount' messages
             'discount.required' => 'Vui lòng nhập thông tin giảm giá.',
@@ -111,6 +115,7 @@ class StoreProductRequest extends FormRequest
     {
         // Tùy chỉnh phản hồi JSON cho lỗi xác thực
         throw new HttpResponseException(response()->json([
+            'success' => false,
             'message' => 'Dữ liệu không hợp lệ.',
             'errors' => $validator->errors(),
         ], 422));

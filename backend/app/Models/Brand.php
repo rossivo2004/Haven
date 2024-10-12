@@ -12,10 +12,12 @@ class Brand extends Model
         'name',
         'tag',
         'image',
+        'tag'
     ];
 
     public function product()
     {
         return $this->hasMany(Product::class);
     }
+
 }

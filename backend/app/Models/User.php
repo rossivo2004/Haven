@@ -2,35 +2,30 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable; // Sử dụng Auth User cho Laravel authentication
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Các trường được phép mass assignment
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // Các trường sẽ bị ẩn khi trả về model
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
+
+    // Định nghĩa mối quan hệ belongsTo giữa User và Role
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
 
     /**
      * Get the attributes that should be cast.

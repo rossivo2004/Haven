@@ -9,6 +9,9 @@
 </head>
 <body>
     <div class="container mt-5">
+      <form action="">
+        <input type="search" name="search">
+      </form>
         <table class="table">
             <thead>
               <tr>
@@ -18,7 +21,7 @@
               </tr>
             </thead>
             <tbody>
-                @foreach ($product as $item)
+                @foreach ($products as $item)
                 <tr>
                     <th scope="row">{{$item->id}}</th>
                     <td>{{$item->name}}</td>
@@ -39,6 +42,7 @@
             </tbody>
           </table>
         
+          {{ $products->links() }}
 
     </div>
 </body>

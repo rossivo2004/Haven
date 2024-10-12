@@ -17,7 +17,7 @@
         <form action="">
         @foreach ($categories as $item)
       
-          <input type="checkbox" name="category[]" value="{{$item->id}}" id="">{{$item->name}}
+          <input type="checkbox" name="category[]" value="{{$item->id}}" id="">{{$item->name}} <hr>
         
          
             
@@ -25,26 +25,23 @@
         Brands
 
         @foreach ($brands as $item)
-        
+        <hr>
             <input type="checkbox" name="brand[]" value="{{$item->id}}" id="">{{$item->name}}
-          
-           
+            
+            <hr>
               
           @endforeach
+          Price ranges <hr>
+          <input type="checkbox" name="priceRanges[]" value="0-100" id="">0-100<hr>
+          <input type="checkbox" name="priceRanges[]" value="100-200">100-200<hr>
+          <input type="checkbox" name="priceRanges[]" value="200-300">200-300<hr>
         <input type="submit" value="submit">
       </form>
 
 
         
       </div>
-      <div>
-        <form action="">
-          <input type="checkbox" name="priceRanges[]" value="0-100" id="">0-100
-          <input type="checkbox" name="priceRanges[]" value="100-200">100-200
-          <input type="checkbox" name="priceRanges[]" value="200-300">200-300
-          <input type="submit" value="submit">
-        </form>
-      </div>
+    
         <table class="table">
             <thead>
               <tr>
@@ -62,7 +59,7 @@
                     <td>{{$item->name}}</td>
                     <td>{{$item->tag}}</td>
                     <td><img src="{{$item->image}}" alt="" style="width: 50px; height: 50px" width="50px" height="50px"></td>
-                    <td><a href="{{route('Product.show',['productVariant' => $item->id])}}" class="btn btn-primary">show</a>
+                    <td><a href="{{route('Product.detail',['productVariant' => $item->id])}}" class="btn btn-primary">Detail product</a>
                     </td>
                   </tr>
                     </td>

@@ -5,21 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use App\Models\Product;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use Illuminate\Http\Client\Request;
+use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
+
+        $search = $request->input('search');
+        $brands = Brand::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%');
+        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
+
         return response()->json([
             'success' => true,
-            'message' => 'Brand đã được lưu thành công',
-            'brands' => Brand::orderBy('id', 'desc')->get(),
+            'brands' => $brands,
         ], 200);
         // return view('Brand.home', [
-        //     'Brands' => Brand::all(),
+        //     'Brands' => $brands,
         // ]);
     }
 
@@ -61,16 +67,33 @@ class BrandController extends Controller
    
     public function show(Brand $brand)
     {
-        
+        return response()->json([
+            'success' => true,
+            'brand' => $brand
+        ], 200);
     }
 
+    public function getBrandByTag($tag)
+    {
+        return response()->json([
+            'success' => true,
+            'category' => Brand::where('tag', $tag)->get(),
+            ]);
+    }
+    public function getProducts(Brand $brand)
+    {
+        return response()->json([
+            'success' => true,
+            'products' => Product::where('brand_id',$brand->id)->paginate(20),
+        ], 200);
+    }
+    
    
 
     public function edit(Brand $brand)
     {
         return response()->json([
             'success' => true,
-            'message' => 'Brand đã được lưu thành công',
             'brand' => $brand
         ], 200);
         // return view('Brand.edit', [
@@ -149,17 +172,8 @@ class BrandController extends Controller
             ], 500);
         }
 
-        return redirect()->back();
     }
-    public function getBrandByTag($tag)
-    {
-            $brand = Brand::where('tag',$tag)->first();
-            if (!$brand) {
-                return response()->json(['message' => 'Brand not found'], 404);
-            }
-    
-            return response()->json($brand);
-    }
+
 }
 
 

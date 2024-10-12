@@ -16,8 +16,7 @@
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
                 <input type="text" value="{{$brand->name}}" class="form-control" id="name" name="name" required>
-                <label for="name" class="form-label">Name</label>
-                <input type="text" value="{{$brand->tag}}" class="form-control" id="name" name="tag" required>
+             
                 <div class="mb-3">
                     <label for="formFileMultiple" class="form-label">Logo</label>
                     <input class="form-control" type="file" id="formFileMultiple" name="image" multiple>
