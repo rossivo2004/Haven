@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class ProductVariant extends Model
 {
@@ -63,7 +65,63 @@ class ProductVariant extends Model
         // Nếu không có flash sale hoặc không có giảm giá thì trả về giá gốc
         return $this->price;
     }
+
+    public function Cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
     
-    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock'];
+    public function getFavoritedAttribute()
+    {
+        if (Auth::check()) {  
+            // $user = User::find(Auth::user()->id);
+            $favorited = Favorite::where([
+                'user_id' => Auth::user()->id, 
+                'product_variant_id' => $this->id,            
+            ])->first();
+    
+            return $favorited ? true : false;
+        } else {
+            return false;  
+        }
+    }
+    
+    public function getStoredCartAttribute()
+    {
+        if (Auth::check()) {  
+            // $user = User::find(Auth::user()->id);
+                $check_pro = Cart::where([
+                    'user_id' => Auth::user()->id, 
+                    'product_variant_id' => $this->id, 
+                ])->first();
+                // return $check_pro ? true : false;
+                return $check_pro ? true : false;
+            
+        } else {
+            $cart = Session::get('cart', []);
+            if (isset($cart[$this->id])) {
+                return true;  
+            } else {
+                return false;  
+            }
+        }
+    }
+    public function getQuantityInCartAttribute(){
+        if (Auth::check()) {
+           return Cart::where([
+                'user_id' => Auth::user()->id, 
+                'product_variant_id' => $this->id, 
+            ])->pluck('quantity')->first();
+        }else{
+            $cart = Session::get('cart', []);
+            if (isset($cart[$this->id])) {
+                return $cart[$this->id];  
+            } else {
+                return 0;  
+            }
+        }
+    }
+    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart'];
     protected $with = ['flashSales','product'];
 }
