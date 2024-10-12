@@ -32,9 +32,10 @@ class StoreFlashSaleRequest extends FormRequest
         return [
             'start_time' => 'required|date|after_or_equal:now', // Thời gian bắt đầu phải sau thời gian hiện tại . Carbon::now()->setTimezone('Asia/Ho_Chi_Minh')->toDateTimeString()
             'end_time' => 'required|date|after:start_time', // Thời gian kết thúc phải sau thời gian bắt đầu
+            // 'product_variant_ids' => 'required|exists:categories,id'
             'product_variant_ids' => 'required|array',
-            'stocks.*' => 'integer|min:0',
-            'product_variant_ids.*' => 'integer|', 
+            'product_variant_ids.*' => 'integer|exists:product_variants,id', 
+            'stocks' => 'required|array',
             'stocks.*' => 'integer|min:0',
             'discount_percents' => 'required|array|', 
             'discount_percents.*' => 'numeric|min:0|max:100'

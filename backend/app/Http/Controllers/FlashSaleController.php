@@ -61,6 +61,7 @@ class FlashSaleController extends Controller
      */
     public function store(StoreFlashSaleRequest $request)
     {
+        
         // Done-Thời gian bắt đầu (Start Time): Cần đảm bảo rằng thời gian bắt đầu của chương trình Flash Sale phải là sau thời gian hiện tại và không được ở trong quá khứ.
         // Done-Thời gian kết thúc (End Time): Thời gian kết thúc phải sau thời gian bắt đầu và không thể kết thúc trước thời gian bắt đầu.
         // Done-Không xung đột với các khuyến mãi khác: Đảm bảo rằng Flash Sale không mâu thuẫn hoặc chồng chéo với các chương trình khuyến mãi khác để tránh nhầm lẫn về giá.
