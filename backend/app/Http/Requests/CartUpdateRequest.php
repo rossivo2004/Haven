@@ -6,14 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class FavoriteRequest extends FormRequest
+class CartUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -24,18 +24,17 @@ class FavoriteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_variant_id' => 'required|exists:product_variants,id',
+            'quantity' => 'required|integer|min:1', // Kiểm tra số lượng
         ];
     }
 
     public function messages()
     {
         return [
-            'product_variant_id.required' => 'Không có sản phẩm biến thể.',
-            'product_variant_id.exists'   => 'Biến thể sản phẩm không tồn tại.',
+            'quantity.required' => 'Số lượng chưa được nhập.',
+            'quantity.min' => 'Số lượng không được nhỏ hơn 1.',
         ];
     }
-
     protected function failedValidation(Validator $validator)
     {
         // Tùy chỉnh phản hồi JSON cho lỗi xác thực

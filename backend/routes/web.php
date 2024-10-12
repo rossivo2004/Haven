@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FlashSaleProductController;
 use App\Models\ProductImage;
 
@@ -153,4 +154,16 @@ route::group([
 ],function(){
     Route::get('/', [FavoriteController::class, 'index'])->name('Favorite.index');
     Route::post('/store', [FavoriteController::class, 'store']);
+});
+
+
+route::group([
+    'prefix' => 'api/cart'
+],function(){
+    Route::get('/', [CartController::class, 'showCart'])->name('Cart.index');
+    Route::get('/total', [CartController::class, 'cartTotal']);
+    Route::post('/add', [CartController::class, 'addToCart']);
+    Route::put('/update/{productVariantId}', [CartController::class, 'updateCart']);
+    Route::delete('/delete/{productVariantId}', [CartController::class, 'deleteCart']);
+    Route::delete('/clear', [CartController::class, 'clearCart']);
 });
