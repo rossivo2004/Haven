@@ -137,6 +137,7 @@ route::group([
     Route::get('/show/{flashSale}', [FlashSaleController::class, 'show'])->name('FlashSale.show');
     Route::get('/getproductvariants/{flashSale}', [FlashSaleController::class, 'getProductVariants'])->name('Product.getProductVariants');
     Route::get('/getlistflashsale', [FlashSaleController::class, 'listFlashSale'])->name('FlashSale.listFlashSale');
+    Route::get('/getProductNotInFlashSale/{flashsale}', [FlashSaleController::class, 'getProductsNotInFlashSale'])->name('FlashSale.editProductVariants');
 });
 
 route::group([
