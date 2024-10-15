@@ -132,9 +132,12 @@ class FlashSaleProductController extends Controller
      */
     public function edit(FlashSaleProduct $flashSaleProduct)
     {
-              return response()->json([
+        $productVariants = ProductVariant::whereDoesntHave('flashSaleProducts', function ($query) use ($flashSaleProduct) {
+            $query->where('flash_sale_id', $flashSaleProduct->flash_sale_id);
+        })->get();
+            return response()->json([
                   'success' => true,
-                  'flashSaleProduct' => $flashSaleProduct,
+                  'flashSaleProduct' =>  $productVariants,
               ], 200);
     }
 

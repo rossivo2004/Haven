@@ -219,7 +219,16 @@ class FlashSaleController extends Controller
         //     'productVariants' => ProductVariant::where('stock', '>', 0)->get()
         // ]);
     }
-
+    public function getProductsNotInFlashSale(FlashSale $flashsale)
+    {
+        $productVariants = ProductVariant::whereDoesntHave('flashSaleProducts', function ($query) use ($flashsale) {
+            $query->where('flash_sale_id', $flashsale->id);
+        })->get();
+            return response()->json([
+                  'success' => true,
+                  'flashSaleProduct' =>  $productVariants,
+              ], 200);
+    }
     /**
      * Update the specified resource in storage.
      */

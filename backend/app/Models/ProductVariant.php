@@ -31,6 +31,11 @@ class ProductVariant extends Model
                     ->withPivot('id','discount_percent', 'stock','sold');
     }
 
+    public function flashSaleProducts()
+    {
+        return $this->hasMany(FlashSaleProduct::class);
+    }
+    
     public function getDiscountedPriceAttribute()
     {
         if ($this->discount > 0) {
