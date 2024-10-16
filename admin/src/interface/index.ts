@@ -56,4 +56,5 @@ export interface ProductVa {
   product: Product;
   stock: string;  
   variant_value: string;
+  newImage?: File;
 }

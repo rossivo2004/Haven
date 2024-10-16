@@ -114,7 +114,7 @@ function BodyBrand() {
     };
 
 
-    const handleDelete = (brandId: string) => {
+    const handleDelete = async (brandId: string) => {
         // Find the specific category to delete by its ID
         const brandToDelete = brands.find(brand => brand.id === brandId);
 
@@ -122,6 +122,21 @@ function BodyBrand() {
             setErrorMessage("brand not found.");
             return;
         }
+
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/api/brand/getproducts/${brandId}`);
+            if (response.data.products.total > 0) {
+            toast.error('Phân loại đang có sản phẩm, không thể xóa !!!');
+                setErrorMessage("Cannot delete category with existing products.");
+                return; // Prevent deletion if products exist
+            }
+        } catch (error) {
+            toast.error('Phân loại đang có sản phẩm, không thể xóa !!!');
+            console.error('Error fetching products:', error);
+            setErrorMessage('Failed to check products. Please try again.');
+            return; // Prevent deletion if there's an error
+        }
+    
 
         confirmAlert({
             title: 'Xóa thương hiệu',

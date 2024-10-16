@@ -3,6 +3,7 @@ import { useState, useEffect, CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@nextui-org/link";
 import Image from "next/image";
+import { useParams } from 'react-router-dom';
 
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
@@ -39,6 +40,11 @@ import { fetchProducts } from "@/src/api/productApi";
 
 import {useTranslations} from 'next-intl';
 
+import apiConfig from '@/src/config/api';
+
+import { Category } from "@/src/interface";
+import axios from "axios";
+
 interface ProductIn {
     id: number;
     name: string;
@@ -52,8 +58,31 @@ function BodyHome() {
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
     const { flatProducts } = useProducts(); // Use updated hook without filters
-
+    const [language, setLanguage] = useState('vi'); // Default to 'en'
+    const params = useParams(); 
+    const { lang = 'vi' } = params;
     const t = useTranslations('HomePage');
+    const [loading, setLoading] = useState(false);
+
+    const [category, setCategory] =  useState<Category[]>([]);
+
+    const fetchCategory = async () => {
+        setLoading(true); // Start loading
+        try {
+            const response = await axios.get(`${apiConfig.categories.getAll}`, { withCredentials: true });
+
+            setCategory(response.data.categories.data);
+        } catch (error) {
+            console.error('Error fetching category:', error);
+        } finally {
+            setLoading(false); // End loading
+        }
+    }
+
+    useEffect(() => {
+        fetchCategory();
+    }, [])
+    
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -221,9 +250,9 @@ function BodyHome() {
                     </motion.div>
                     <div className="max-w-screen-xl mx-auto px-4 mb-14">
                         <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                            {flatProducts.slice(0, 8).map((product) => (
+                            {/* {flatProducts.slice(0, 8).map((product) => (
                                 <BoxProductFlashSale key={product.id} product={product} />
-                            ))}
+                            ))} */}
                         </div>
                     </div>
                 </motion.div>
@@ -254,7 +283,7 @@ function BodyHome() {
                                 },
                             }}
                         >
-                            {CATEGORY.map((item, index) => (
+                            {category.map((item, index) => (
                                 <SwiperSlide key={index}>
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.8 }} // Bắt đầu nhỏ hơn
@@ -262,13 +291,13 @@ function BodyHome() {
                                         viewport={{ once: true }}
                                         transition={{ duration: 0.8, delay: index * 0.1, ease: "easeOut" }} // Hiệu ứng chậm dần cho mỗi box
                                     >
-                                        <Link href={`/shop?category=${item.tag}`} className="w-full">
+                                        <Link href={`${lang}/shop?category[]=${item.name}`} className="w-full">
                                             <div className="w-full max-w-[300px] h-auto max-h-[300px] group relative">
                                                 <div className="flex w-full items-center justify-center rounded-full overflow-hidden">
                                                     <img
-                                                        src={`/images/${item.image}`}
+                                                        src={item.image}
                                                         alt={item.name}
-                                                        className="w-full h-auto max-h-[200px] object-cover rounded-lg"
+                                                        className="w-[200px] max-h-[200px] h-[200px] object-cover rounded-lg"
                                                     />
                                                 </div>
                                                 <div className="flex items-center justify-center text-base lg:text-base font-semibold mt-2 text-black absolute bottom-0 w-full group-hover:-translate-y-[90px] group-hover:scale-150 transition-transform duration-300 ease-in-out">
@@ -313,9 +342,9 @@ function BodyHome() {
                                     >
                                         <Tab key="photos" title="Photos" className="py-0">
                                             <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full">
-                                                {flatProducts.slice(0, 6).map((product) => (
+                                                {/* {flatProducts.slice(0, 6).map((product) => (
                                                     <BoxProduct key={product.id} product={product} />
-                                                ))}
+                                                ))} */}
                                             </div>
                                         </Tab>
                                         <Tab key="music" title="Music">
@@ -398,9 +427,9 @@ function BodyHome() {
                             <div className="lg:col-span-2 md:col-span-3 col-span-2">
                                 <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                             </div>
-                            {flatProducts.slice(0, 6).map((product) => (
+                            {/* {flatProducts.slice(0, 6).map((product) => (
                                 <BoxProduct key={product.id} product={product} />
-                            ))}
+                            ))} */}
                         </div>
 
 
@@ -452,9 +481,9 @@ function BodyHome() {
                         </div>
                         <div>
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                                {flatProducts.slice(0, 8).map((product) => (
+                                {/* {flatProducts.slice(0, 8).map((product) => (
                                     <BoxProduct key={product.id} product={product} />
-                                ))}
+                                ))} */}
                             </div>
                         </div>
                     </div>

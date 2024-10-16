@@ -1,13 +1,26 @@
 export interface Variant {
-  id: string;
   name: string;
   price: number;
-  discount: number;
   stock: number;
-  view: number;
-  images: string[];
+  variantValue: string;
+  discount: number;
+  discountedPrice?: number; // Added optional discountedPrice field
+  flash_sales: any[]; // Added flash_sales as an array of any type
+  image: string;
+  product_id: string | number;
+  products: string[];
+  product?: { // Added optional product field
+    ProductVariantCount: number;
+    brand: { id: number; name: string; image: string ; tag: string };
+    category: { id: number; name: string; image: string ; tag: string };
+    description: string;
+    id: number;
+    name: string;
+    product_images: { img: string }[];
+    updated_at: string;
+    variant_value: string;
+  };
 }
-
 export interface Product {
   id: string;
   name: string;
@@ -17,17 +30,13 @@ export interface Product {
 }
 
 export interface SingleProduct {
-  id: string;
   name: string;
-  nameva: string;
-  category: string;
-  brand: string;
-  price: number;
-  discount: number;
-  stock: number;
-  view: number;
-  images: string[];
-  variants : Variant[];
+  price: string;
+  stock: string;
+  variantValue: string;
+  discount: string;
+  image: File[];
+  product_id: string | number;
 }
 
 
@@ -60,9 +69,16 @@ export interface CartItem {
 
 export interface Category {
   id: string;
-  image: string;
   name: string;
   tag: string;
+  image: string;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  tag: string;
+  image: string;
 }
 
 export interface Blog {

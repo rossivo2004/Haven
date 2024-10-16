@@ -26,12 +26,25 @@ interface Variant {
     variantValue: string;
     discount: string;
     image: File[];
+    product_id: string | number;
 }
 
 const CreateProduct = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
+    const [editingVariant, setEditingVariant] = useState<ProductVa | null>(null);
+    const [mainProduct, setMainProduct] = useState<{
+        name: string;
+        description: string;
+        category_id: string;
+        brand_id: string;
+    }>({
+        name: '',
+        description: '',
+        category_id: '',
+        brand_id: '',
+    });
 
     const [pagination, setPagination] = useState({
         last_page: 1,  // Default value for total pages
@@ -39,6 +52,17 @@ const CreateProduct = () => {
     });
     const [products, setProducts] = useState<Product[]>([]);
     const [productsVa, setProductsVa] = useState<ProductVa[]>([]);
+    // ... existing code ...
+    const [newVariant, setNewVariant] = useState<Variant>({
+        name: '',
+        price: '',
+        stock: '',
+        variantValue: '',
+        discount: '',
+        image: [],
+        product_id: '' // Add this line
+    });
+    // ... existing code ...
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -46,12 +70,24 @@ const CreateProduct = () => {
     const [showVariantForm, setShowVariantForm] = useState(false); // Control variant form visibility
     const [loading, setLoading] = useState(false); // Loading state
     const [loadingProducts, setLoadingProducts] = useState(false); // Loading state for products
-
+    const [showNewVariantForm, setShowNewVariantForm] = useState(false);
     // Error state for main product fields
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [newImages, setNewImages] = useState<File[]>([]);
+
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+    const [selectedVariantImages, setSelectedVariantImages] = useState<{ [key: number]: File[] }>({}); // Add this line
 
     const handleAddVariant = () => {
-        setVariants([...variants, { name: '', price: '', stock: '', variantValue: '', discount: '', image: [] }]);
+        setVariants([...variants, {
+            name: '',
+            price: '',
+            stock: '',
+            variantValue: '',
+            discount: '',
+            image: [],
+            product_id: '' // Add this line
+        }]);
         setShowVariantForm(true);  // Show the variant form when adding a variant
     };
 
@@ -105,6 +141,128 @@ const CreateProduct = () => {
         });
     };
 
+
+    const handleEditVariant = (variant: ProductVa) => {
+        setEditingVariant(variant);
+    };
+
+    const handleUpdateVariant = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+        if (!editingVariant || !selectedProduct) return; // Kiểm tra xem có biến thể đang chỉnh sửa và sản phẩm chính
+
+        setLoading(true);
+
+        const formData = new FormData(e.currentTarget);
+        formData.append("_method", "PUT");
+        formData.append("product_id", selectedProduct.id.toString()); // Thêm product_id vào formData
+
+        // Kiểm tra dữ liệu trước khi gửi
+        if (!formData.get('name') || !formData.get('price') || !formData.get('stock') || !formData.get('variant_value')) {
+            toast.error('Vui lòng điền đầy đủ thông tin.');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${apiConfig.products.updateproductvariants}${editingVariant.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            // console.log('Response:', response.data);
+            toast.success('Cập nhật biến thể thành công');
+            fetchProductsVa(selectedProduct.id); // Cập nhật danh sách biến thể
+            setEditingVariant(null); // Đặt lại biến thể đang chỉnh sửa
+        } catch (error) {
+            console.error('Error updating variant:', error);
+            toast.error('Cập nhật biến thể thất bại');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+    const handleDeleteVariant = async (variantId: number) => {
+        // Kiểm tra số lượng biến thể
+        if (productsVa.length <= 1) {
+            toast.error('Không thể xóa biến thể cuối cùng');
+            return;
+        }
+
+        confirmAlert({
+            title: 'Xóa biến thể',
+            message: 'Bạn có chắc chắn muốn xóa biến thể này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        setLoading(true);
+                        try {
+                            await axios.delete(`${apiConfig.products.deleteproductvariants}${variantId}`);
+                            if (selectedProduct) {
+                                fetchProductsVa(selectedProduct.id);
+                            }
+                            toast.success('Xóa biến thể thành công');
+                        } catch (error) {
+                            console.error('Error deleting variant:', error);
+                            toast.error('Xóa biến thể thất bại');
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                },
+                {
+                    label: 'Không',
+                    onClick: () => { }
+                }
+            ]
+        });
+    };
+
+    const handleAddNewVariant = async (Id: number) => {
+        if (!selectedProduct) return;
+        setLoading(true); // Start loading
+
+        try {
+            const formData = new FormData();
+            formData.append('product_id', selectedProduct.id.toString());
+            formData.append('name', newVariant.name);
+            formData.append('price', newVariant.price);
+            formData.append('stock', newVariant.stock);
+            formData.append('variant_value', newVariant.variantValue);
+            formData.append('discount', newVariant.discount);
+
+            if (newVariant.image.length > 0) {
+                formData.append('image', newVariant.image[0]);
+            }
+
+            const productToDelete = products.find(product => product.id === Id);
+
+            await axios.post(`${apiConfig.products.createproductvariants}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            // Refresh the variants list
+            // fetchProductsVa(selectedProduct.id);
+            setNewVariant({
+                ...newVariant,
+                product_id: Id,
+                name: '',
+                price: '',
+                stock: '',
+                variantValue: '',
+                discount: '',
+                image: []
+            });
+            toast.success('Thêm biến thể thành công');
+        } catch (error) {
+            console.error('Error adding new variant:', error);
+            toast.error('Thêm biến thể thất bại');
+        } finally {
+            setLoading(false); // Stop loading
+        }
+    };
+
     // Validation function
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -136,6 +294,7 @@ const CreateProduct = () => {
         // Validate the form
         if (!validateForm()) return; // Exit if validation fails
 
+
         setLoading(true); // Start loading
 
         const formElement = e.currentTarget as HTMLFormElement;
@@ -161,16 +320,19 @@ const CreateProduct = () => {
             formData.append(`variants[${index}][discount]`, variant.discount);
         });
 
+
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/product/store', formData, {
                 headers: { accept: 'application/json' },
             });
-            console.log('Response:', response.data);
+            // console.log('Response:', response.data);
             toast.success('Thêm sản phẩm thành công');
-            setShowVariantForm(false)
-            setVariants([])
+            setShowVariantForm(false);
+            setVariants([]);
             onClose();
-
+            fetchProducts();
+            setNewImages([]); // Clear new images after successful addition
+            setSelectedImages([]); // Clear selected images for the main product
         } catch (error) {
             console.error('Error submitting form:', error);
             toast.error('Thêm sản phẩm thất bại');
@@ -179,51 +341,42 @@ const CreateProduct = () => {
         }
     };
 
+    // ... existing code ...
+
+    // ... existing code ...
+
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
-        setLoading(true); // Start loading
+
+        setLoading(true);
 
         const formElement = e.currentTarget as HTMLFormElement;
         const formData = new FormData(formElement);
 
-        const mainImages = (formElement.querySelector('#image') as HTMLInputElement).files;
-        if (mainImages) {
-            Array.from(mainImages).forEach((image) => {
-                formData.append('images[]', image);
-            });
-        }
+        formData.append("_method", "PUT");
 
-        variants.forEach((variant, index) => {
-            if (variant.image.length > 0) {
-                variant.image.forEach((image) => {
-                    formData.append(`variants[${index}][image][]`, image);
-                });
-            }
-            formData.append(`variants[${index}][name]`, variant.name);
-            formData.append(`variants[${index}][price]`, variant.price);
-            formData.append(`variants[${index}][stock]`, variant.stock);
-            formData.append(`variants[${index}][variant_value]`, variant.variantValue);
-            formData.append(`variants[${index}][discount]`, variant.discount);
-        });
 
         try {
-            const response = await axios.put('http://127.0.0.1:8000/api/product/update/', formData, {
-                headers: { accept: 'application/json' },
+            if (!selectedProduct) {
+                throw new Error('No product selected');
+            }
+            const response = await axios.post(`http://127.0.0.1:8000/api/product/update/${selectedProduct.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log('Response:', response.data);
-            toast.success('Thêm sản phẩm thành công');
-            setShowVariantForm(false)
-            setVariants([])
+            // console.log('Response:', response.data);
+            toast.success('Cập nhật sản phẩm thành công');
             onClose();
-
         } catch (error) {
-            console.error('Error submitting form:', error);
-            toast.error('Thêm sản phẩm thất bại');
+            console.error('Error updating product:', error);
+            toast.error('Cập nhật sản phẩm thất bại');
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
-    }
+    };
+
+    // ... rest of the code ...
+
+    // ... rest of the code ...
 
     const fetchCategories = async () => {
         try {
@@ -279,6 +432,10 @@ const CreateProduct = () => {
         }
     };
 
+    const handleMainProductChange = (field: string, value: string) => {
+        setMainProduct(prev => ({ ...prev, [field]: value }));
+    };
+
     useEffect(() => {
         fetchCategories();
         fetchBrands();
@@ -286,10 +443,23 @@ const CreateProduct = () => {
         fetchPagination();
     }, []);
 
+    useEffect(() => {
+        if (selectedProduct) {
+            setMainProduct({
+                name: selectedProduct.name,
+                description: selectedProduct.description,
+                category_id: selectedProduct.category_id.toString(),
+                brand_id: selectedProduct.brand_id.toString(),
+            });
+            fetchProductsVa(selectedProduct.id);
+        }
+    }, [selectedProduct]);
+
     const clo = () => {
         onClose();
         setVariants([])
-
+        setNewImages([]); // Clear new images after successful addition
+        setSelectedImages([]); // Clear selected images for the main product
     }
 
     const handleOpenEditProductModal = (product: Product) => {
@@ -308,21 +478,101 @@ const CreateProduct = () => {
         }
     }, [selectedProduct]);
 
-  
+    const handleAddProductImages = async (productId: number) => {
+        const formData = new FormData();
+        formData.append('product_id', productId.toString());
+        newImages.forEach(image => {
+            formData.append('product_images[]', image); // Thêm ảnh mới vào formData
+        });
+        setLoading(true);
+        try {
+            await axios.post(`${apiConfig.products.addproductimage}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            if (selectedProduct) {
+                // Fetch updated product variants to refresh images
+                await fetchProductsVa(selectedProduct.id); // Refresh product variants
+            }
+            setNewImages([]); // Clear new images after successful addition
+            setSelectedImages([]); // Clear selected images for the main product
+            fetchProducts();
 
-console.log(productsVa);
+            setSelectedProduct(prev => ({
+                ...prev,
+                product_images: [...(prev?.product_images || []), ...newImages] // Ensure prev is not null
+            } as Product)); // Cast to Product to satisfy TypeScript
 
+            const input = document.getElementById('new_images') as HTMLInputElement;
+            if (input) {
+                input.value = ''; // Clear the input value
+            }
+
+            toast.success('Thêm ảnh thành công');
+        } catch (error) {
+            console.error('Error adding product images:', error);
+            toast.error('Thêm ảnh thất bại');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ... existing code ...
+
+    const handleDeleteProductImage = async (imageId: number) => {
+        // Check if the selected product has only one image
+        if (selectedProduct && selectedProduct.product_images.length <= 1) {
+            toast.error('Không thể xóa hình ảnh cuối cùng.');
+            return; // Exit the function if it's the last image
+        }
+
+        confirmAlert({
+            title: 'Xóa hình ảnh sản phẩm',
+            message: 'Bạn có chắc chắn muốn xóa hình ảnh này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        setLoading(true);
+                        try {
+                            await axios.delete(`${apiConfig.products.deleteproductimage}${imageId}`);
+                            if (selectedProduct) {
+                                // Fetch updated product variants to refresh images
+                                await fetchProductsVa(selectedProduct.id); // Refresh product variants
+                            }
+                            fetchProducts();
+
+                            setSelectedProduct(prev => ({
+                                ...prev!,
+                                product_images: prev?.product_images.filter(img => img.id !== imageId) // Remove the deleted image
+                            } as Product));
+                            // setSelectedProduct(null);
+                            toast.success('Xóa hình ảnh sản phẩm thành công');
+                        } catch (error) {
+                            console.error('Error deleting product image:', error);
+                            toast.error('Xóa hình ảnh sản phẩm thất bại');
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                },
+                {
+                    label: 'Không',
+                    onClick: () => { }
+                }
+            ]
+        });
+    };
 
     return (
         <div className="p-4">
             {/* {loading && <Spinner />} */}
             <div className='flex justify-between mb-4'>
                 <div className='font-semibold text-xl'>
-                    Thêm sản phẩm
+                    Quản lý sản phẩm
                 </div>
                 <div className='flex items-center gap-2'>
                     <Button color="primary" onPress={onOpen}>
-                        Create Product
+                        Thêm sản phẩm
                     </Button>
                     {/* <div>
                         aaaa
@@ -333,14 +583,14 @@ console.log(productsVa);
 
             <Modal isOpen={isOpen} onClose={clo} closeButton size='5xl'>
                 <ModalContent>
-                    <ModalHeader>Create Product</ModalHeader>
+                    <ModalHeader>Thêm mới sản phẩm</ModalHeader>
                     <ModalBody className='!max-h-[70vh] overflow-y-auto'>
                         <form onSubmit={handleSubmit} encType="multipart/form-data">
                             <div>
-                                <h1 className="text-xl font-semibold mb-4">Main Product</h1>
+                                <h1 className="text-xl font-semibold mb-4">Sản phẩm chính</h1>
                                 <div className="mb-4">
                                     <label htmlFor="name_product" className="block text-sm font-medium text-gray-700">
-                                        Name Product
+                                        Tên sản phẩm
                                     </label>
                                     <Input
                                         type="text"
@@ -357,7 +607,7 @@ console.log(productsVa);
                                     {/* Categories */}
                                     <div className="mb-4 flex-1">
                                         <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
-                                            Category ID
+                                            Phân loại
                                         </label>
                                         <Select
                                             aria-label="Chọn một tùy chọn"
@@ -380,7 +630,7 @@ console.log(productsVa);
                                     {/* Brands */}
                                     <div className="mb-4 flex-1">
                                         <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
-                                            Brand ID
+                                            Thương hiệu
                                         </label>
                                         <Select
                                             aria-label="Chọn một tùy chọn"
@@ -402,7 +652,7 @@ console.log(productsVa);
                                 </div>
                                 <div className="mb-4">
                                     <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                                        Description
+                                        Mô tả sản phẩm
                                     </label>
                                     <Textarea
                                         placeholder='Mô tả sản phẩm'
@@ -420,7 +670,7 @@ console.log(productsVa);
 
                                 <div className="mb-4">
                                     <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                                        Upload Image
+                                        Hình ảnh
                                     </label>
                                     <Input
                                         type="file"
@@ -429,13 +679,49 @@ console.log(productsVa);
                                         multiple
                                         required
                                         className={errors.image ? 'border-red-500' : ''}
+                                        onChange={(e) => {
+                                            const files = e.target.files;
+                                            if (files) {
+                                                setSelectedImages(Array.from(files)); // Update selected images
+                                            }
+                                        }}
                                     />
+                                    <div className='flex gap-2 mt-1'>
+                                        {selectedImages.map((file, index) => (
+                                            <div key={index} className="w-[200px] h-[200px] relative">
+                                                <img
+                                                    src={URL.createObjectURL(file)}
+                                                    alt={`Selected ${index}`}
+                                                    className="w-[200px] h-[200px] object-cover"
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const updatedImages = selectedImages.filter((_, i) => i !== index);
+                                                        setSelectedImages(updatedImages); // Remove the selected image
+
+                                                        // Reset the input file value
+                                                        const input = document.getElementById('image') as HTMLInputElement;
+                                                        if (input) {
+                                                            const dataTransfer = new DataTransfer();
+                                                            updatedImages.forEach((img) => {
+                                                                dataTransfer.items.add(img); // Add remaining images to DataTransfer
+                                                            });
+                                                            input.files = dataTransfer.files; // Update the input files
+                                                        }
+                                                    }}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                >
+                                                    X
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                     {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
                                 </div>
                             </div>
 
                             <div id="variants" className="mb-8">
-                                <h4 className="text-lg font-semibold mb-4">Add Variants</h4>
+                                <h4 className="text-lg font-semibold mb-1">Thêm sản phẩm biến thể</h4>
 
                                 {!showVariantForm && (
                                     <button
@@ -443,7 +729,7 @@ console.log(productsVa);
                                         onClick={handleAddVariant}
                                         className="bg-indigo-600 text-white rounded-md px-4 py-2"
                                     >
-                                        Add Variant
+                                        Tạo biến thể
                                     </button>
                                 )}
 
@@ -451,7 +737,7 @@ console.log(productsVa);
                                     <div className="mb-4 border-b pb-4" key={index}>
                                         <div className="mb-4">
                                             <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Name Product Variant
+                                                Tên sản phẩm biến thể
                                             </label>
                                             <Input
                                                 placeholder='Tên sản phẩm'
@@ -467,7 +753,7 @@ console.log(productsVa);
                                         </div>
                                         <div className="mb-4">
                                             <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Price
+                                                Giá sản phẩm biến thể
                                             </label>
                                             <Input
                                                 placeholder='Giá sản phẩm'
@@ -478,12 +764,13 @@ console.log(productsVa);
                                                 onChange={(e) => handleChangeVariant(index, 'price', e.target.value)}
                                                 required
                                                 className={errors[`price_${index}`] ? 'border-red-500' : ''}
+                                                min={0}
                                             />
                                             {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
                                             <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Stock
+                                                Số lượng sản phẩm biến thể
                                             </label>
                                             <Input
                                                 placeholder='Số lượng'
@@ -494,12 +781,13 @@ console.log(productsVa);
                                                 onChange={(e) => handleChangeVariant(index, 'stock', e.target.value)}
                                                 required
                                                 className={errors[`stock_${index}`] ? 'border-red-500' : ''}
+                                                min={0}
                                             />
                                             {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
                                             <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Variant Value
+                                                Giá trị biến thể
                                             </label>
                                             <Input
                                                 placeholder='Giá trị biến thể'
@@ -515,7 +803,7 @@ console.log(productsVa);
                                         </div>
                                         <div className="mb-4">
                                             <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Discount
+                                                Giảm giá (%)
                                             </label>
                                             <Input
                                                 placeholder='Giảm giá (%)'
@@ -525,12 +813,14 @@ console.log(productsVa);
                                                 value={variant.discount}
                                                 onChange={(e) => handleChangeVariant(index, 'discount', e.target.value)}
                                                 className={errors[`discount_${index}`] ? 'border-red-500' : ''}
+                                                min={0}
+                                                max={100}
                                             />
                                             {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
                                             <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
-                                                Upload Variant Image
+                                                Hình ảnh biến thể
                                             </label>
                                             <Input
                                                 type="file"
@@ -541,11 +831,40 @@ console.log(productsVa);
                                                     const files = e.target.files;
                                                     if (files) {
                                                         handleChangeVariant(index, 'image', files);
+                                                        setSelectedVariantImages(prev => ({
+                                                            ...prev,
+                                                            [index]: Array.from(files) // Update selected images for the specific variant
+                                                        }));
                                                     }
                                                 }}
                                             />
+                                            {selectedVariantImages[index] && selectedVariantImages[index].length > 0 && ( // Add this block to render selected images for the variant
+                                                <div className="mt-2">
+                                                    <h4 className="text-sm font-medium">Hình ảnh sản phẩm biến thể {index + 1}:</h4>
+                                                    <div className="flex gap-2">
+                                                        {selectedVariantImages[index].map((file, imgIndex) => (
+                                                            <img
+                                                                key={imgIndex}
+                                                                src={URL.createObjectURL(file)}
+                                                                alt={`Selected Variant ${index} - Image ${imgIndex}`}
+                                                                className="w-[200px] h-[200px] object-cover"
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                             {errors[`image_${index}`] && <p className="text-red-500 text-sm">{errors[`image_${index}`]}</p>} {/* Error message for variant image */}
                                         </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const updatedVariants = variants.filter((_, i) => i !== index);
+                                                setVariants(updatedVariants);
+                                            }}
+                                            className="bg-red-600 text-white rounded-md px-4 py-2"
+                                        >
+                                            Xóa biến thể
+                                        </button>
                                     </div>
                                 ))}
 
@@ -555,7 +874,7 @@ console.log(productsVa);
                                         onClick={handleAddVariant}
                                         className="bg-indigo-600 text-white rounded-md px-4 py-2"
                                     >
-                                        Add Another Variant
+                                        Tạo thêm
                                     </button>
                                 )}
                             </div>
@@ -637,12 +956,7 @@ console.log(productsVa);
                                             })}
                                         </TableBody>
                                     </Table>
-                                    <Pagination
-                                        total={pagination.last_page}  // total number of pages
-                                        initialPage={pagination.current_page}  // current page
-                                        onChange={(page) => fetchProducts(page)} // fetch products when page changes
-                                        showControls
-                                    />
+
                                 </div>
 
                             )}
@@ -680,7 +994,8 @@ console.log(productsVa);
                                                             required
                                                             placeholder='Tên sản phẩm'
                                                             className={errors.name_product ? 'border-red-500' : ''}
-                                                            value={selectedProduct.name}
+                                                            value={mainProduct.name}
+                                                            onChange={(e) => handleMainProductChange('name', e.target.value)}
                                                         />
                                                         {errors.name_product && <p className="text-red-500 text-sm">{errors.name_product}</p>}
                                                     </div>
@@ -689,14 +1004,15 @@ console.log(productsVa);
                                                         {/* Categories */}
                                                         <div className="mb-4 flex-1">
                                                             <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
-                                                                Category ID
+                                                                Phân loại
                                                             </label>
                                                             <Select
                                                                 aria-label="Chọn một tùy chọn"
                                                                 name="category_id"
                                                                 required
                                                                 placeholder='Phân loại sản phẩm'
-                                                                defaultSelectedKeys={`${selectedProduct.category_id}`}
+                                                                selectedKeys={[mainProduct.category_id]}
+                                                                onChange={(e) => handleMainProductChange('category_id', e.target.value)}
                                                             >
                                                                 {categories.length > 0 ? (
                                                                     categories.map((category) => (
@@ -713,14 +1029,15 @@ console.log(productsVa);
                                                         {/* Brands */}
                                                         <div className="mb-4 flex-1">
                                                             <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
-                                                                Brand ID
+                                                                Thương hiệu
                                                             </label>
                                                             <Select
                                                                 aria-label="Chọn một tùy chọn"
                                                                 name="brand_id"
                                                                 required
                                                                 placeholder='Thương hiệu sản phẩm'
-                                                                defaultSelectedKeys={`${selectedProduct.brand_id}`}
+                                                                selectedKeys={[mainProduct.brand_id]}
+                                                                onChange={(e) => handleMainProductChange('brand_id', e.target.value)}
 
                                                             >
                                                                 {brands.length > 0 ? (
@@ -737,7 +1054,7 @@ console.log(productsVa);
                                                     </div>
                                                     <div className="mb-4">
                                                         <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                                                            Description
+                                                            Mô tả
                                                         </label>
                                                         <Textarea
                                                             placeholder='Mô tả sản phẩm'
@@ -745,287 +1062,346 @@ console.log(productsVa);
                                                             name="description"
                                                             rows={3}
                                                             className={errors.description ? 'border-red-500' : ''}
-                                                            value={selectedProduct.description}
+                                                            value={mainProduct.description}
+                                                            onChange={(e) => handleMainProductChange('description', e.target.value)}
                                                         ></Textarea>
                                                         {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
                                                     </div>
 
-                                                    <div className='mb-2'>
-                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Hình ảnh sản phẩm
-                                                        </label>
-
-                                                        <div className='flex gap-2'>
-
-                                                            {selectedProduct.product_images.map((img, index) => (
-                                                                <img src={img.image} alt="" className='w-[200px] h-[200px] object-cover' />
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="mb-4">
-                                                        <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                                                            Upload Image
-                                                        </label>
-                                                        <Input
-                                                            type="file"
-                                                            id="image"
-                                                            name="image[]"
-                                                            multiple
-                                                            required
-                                                            className={errors.image ? 'border-red-500' : ''}
-                                                        />
-                                                        {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
-                                                    </div>
-                                                </div>
-
-                                                <div id="variants" className="mb-8">
-                                                    <h4 className="text-lg font-semibold mb-1">Sản phẩm biến thể</h4>
-
-                                                    {productsVa.map((product, index) => (
-                                                        <div className="mb-4 border-b pb-4" key={index}>
-                                                            <div className='mb-1'>Sản phẩm biến thể {index + 1}</div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Name Product Variant
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Tên sản phẩm'
-                                                                    type="text"
-                                                                    id={`name_${index}`}
-                                                                    name={`name[${index}]`}
-                                                                    value={product.name}
-                                                                    onChange={(e) => handleChangeVariant(index, 'name', e.target.value)}
-                                                                    required
-                                                                    className={errors[`name_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Price
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giá sản phẩm'
-                                                                    type="number"
-                                                                    id={`price_${index}`}
-                                                                    name={`price[${index}]`}
-                                                                    value={product.price}
-                                                                    onChange={(e) => handleChangeVariant(index, 'price', e.target.value)}
-                                                                    required
-                                                                    className={errors[`price_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Stock
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Số lượng'
-                                                                    type="number"
-                                                                    id={`stock_${index}`}
-                                                                    name={`stock[${index}]`}
-                                                                    value={product.stock}
-                                                                    onChange={(e) => handleChangeVariant(index, 'stock', e.target.value)}
-                                                                    required
-                                                                    className={errors[`stock_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Variant Value
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giá trị biến thể'
-                                                                    type="text"
-                                                                    id={`variantValue_${index}`}
-                                                                    name={`variant_value[${index}]`}
-                                                                    value={product.variant_value}
-                                                                    onChange={(e) => handleChangeVariant(index, 'variantValue', e.target.value)}
-                                                                    required
-                                                                    className={errors[`variantValue_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Discount
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giảm giá (%)'
-                                                                    type="number"
-                                                                    id={`discount_${index}`}
-                                                                    name={`discount[${index}]`}
-                                                                    value={product.discount}
-                                                                    onChange={(e) => handleChangeVariant(index, 'discount', e.target.value)}
-                                                                    className={errors[`discount_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
-                                                            </div>
-                                                            <div className='mb-2'>
-                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                                            Hình ảnh sản phẩm
-                                                        </label>
-
-                                                        <div className='flex gap-2'>
-                                                                <img src={product.image} alt="" className='w-[200px] h-[200px] object-cover' />
-                                                        </div>
-                                                    </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Upload Variant Image
-                                                                </label>
-                                                                <Input
-                                                                    type="file"
-                                                                    id={`image_${index}`}
-                                                                    name={`image[${index}]`}
-                                                                    multiple
-                                                                    onChange={(e) => {
-                                                                        const files = e.target.files;
-                                                                        if (files) {
-                                                                            handleChangeVariant(index, 'image', files);
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                {errors[`image_${index}`] && <p className="text-red-500 text-sm">{errors[`image_${index}`]}</p>} {/* Error message for variant image */}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-
-                                                    {!showVariantForm && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleAddVariant}
-                                                            className="bg-indigo-600 text-white rounded-md px-4 py-2"
-                                                        >
-                                                            Add Variant
-                                                        </button>
-                                                    )}
-
-                                                    {showVariantForm && variants.map((variant, index) => (
-                                                        <div className="mb-4 border-b pb-4" key={index}>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Name Product Variant
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Tên sản phẩm'
-                                                                    type="text"
-                                                                    id={`name_${index}`}
-                                                                    name={`name[${index}]`}
-                                                                    value={variant.name}
-                                                                    onChange={(e) => handleChangeVariant(index, 'name', e.target.value)}
-                                                                    required
-                                                                    className={errors[`name_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Price
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giá sản phẩm'
-                                                                    type="number"
-                                                                    id={`price_${index}`}
-                                                                    name={`price[${index}]`}
-                                                                    value={variant.price}
-                                                                    onChange={(e) => handleChangeVariant(index, 'price', e.target.value)}
-                                                                    required
-                                                                    className={errors[`price_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Stock
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Số lượng'
-                                                                    type="number"
-                                                                    id={`stock_${index}`}
-                                                                    name={`stock[${index}]`}
-                                                                    value={variant.stock}
-                                                                    onChange={(e) => handleChangeVariant(index, 'stock', e.target.value)}
-                                                                    required
-                                                                    className={errors[`stock_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Variant Value
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giá trị biến thể'
-                                                                    type="text"
-                                                                    id={`variantValue_${index}`}
-                                                                    name={`variant_value[${index}]`}
-                                                                    value={variant.variantValue}
-                                                                    onChange={(e) => handleChangeVariant(index, 'variantValue', e.target.value)}
-                                                                    required
-                                                                    className={errors[`variantValue_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
-                                                            </div>
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Discount
-                                                                </label>
-                                                                <Input
-                                                                    placeholder='Giảm giá (%)'
-                                                                    type="number"
-                                                                    id={`discount_${index}`}
-                                                                    name={`discount[${index}]`}
-                                                                    value={variant.discount}
-                                                                    onChange={(e) => handleChangeVariant(index, 'discount', e.target.value)}
-                                                                    className={errors[`discount_${index}`] ? 'border-red-500' : ''}
-                                                                />
-                                                                {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
-                                                            </div>
-
-                                                            
-
-                                                            <div className="mb-4">
-                                                                <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
-                                                                    Upload Variant Image
-                                                                </label>
-                                                                <Input
-                                                                    type="file"
-                                                                    id={`image_${index}`}
-                                                                    name={`image[${index}]`}
-                                                                    multiple
-                                                                    onChange={(e) => {
-                                                                        const files = e.target.files;
-                                                                        if (files) {
-                                                                            handleChangeVariant(index, 'image', files);
-                                                                        }
-                                                                    }}
-                                                                />
-                                                                {errors[`image_${index}`] && <p className="text-red-500 text-sm">{errors[`image_${index}`]}</p>} {/* Error message for variant image */}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-
-                                                    {showVariantForm && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleAddVariant}
-                                                            className="bg-indigo-600 text-white rounded-md px-4 py-2"
-                                                        >
-                                                            Add Another Variant
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                <div className='flex gap-2 justify-end'>
-                                                    <Button color="danger" onPress={onClose}>
+                                                    <div className='flex gap-2 justify-end'>
+                                                        {/* <Button color="danger" onPress={onClose}>
                                                         Close
-                                                    </Button>
-                                                    <Button color="primary" type='submit'>Cập nhật</Button>
+                                                    </Button> */}
+                                                        <Button color="primary" type='submit'>Cập nhật</Button>
+                                                    </div>
+
+
                                                 </div>
-                                            </form>
+
+
+
+                                            </form >
+                                            <div className='mb-4'>
+                                                <div className='mb-2'>
+                                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Hình ảnh sản phẩm
+                                                    </label>
+
+                                                    <div className='flex gap-2'>
+
+                                                        {selectedProduct.product_images.map((img, index) => (
+                                                            <div key={index} className="relative">
+                                                                <img src={img.image} alt="" className='w-[200px] h-[200px] object-cover' />
+                                                                <button
+                                                                    onClick={() => handleDeleteProductImage(img.id)}
+                                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                                >
+                                                                    X
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="mb-2">
+                                                    <label htmlFor="new_images" className="block text-sm font-medium text-gray-700">
+                                                        Thêm ảnh mới
+                                                    </label>
+                                                    <Input
+                                                        type="file"
+                                                        id="new_images"
+                                                        name="new_images[]"
+                                                        multiple
+                                                        onChange={(e) => {
+                                                            const files = e.target.files;
+                                                            if (files) {
+                                                                setNewImages(Array.from(files)); // Lưu trữ ảnh mới
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+
+                                                <Button color="primary" onClick={() => handleAddProductImages(selectedProduct.id)}>
+                                                    Thêm ảnh
+                                                </Button>
+                                            </div>
+                                            <div id="variants" className="mb-8">
+                                                <h4 className="text-lg font-semibold mb-1">Sản phẩm biến thể</h4>
+
+                                                {productsVa.map((product, index) => (
+                                                    <div className="mb-4 border-b pb-4" key={index}>
+                                                        {editingVariant && editingVariant.id === product.id ? (
+                                                            <form onSubmit={handleUpdateVariant} encType="multipart/form-data">
+                                                                <div className='grid grid-cols-2 gap-2'>
+                                                                    <Input
+                                                                        className='mb-2'
+                                                                        label="Tên biến thể"
+                                                                        name="name"
+                                                                        defaultValue={editingVariant.name}
+                                                                        required
+                                                                    />
+                                                                    <Input
+                                                                        className='mb-2'
+                                                                        label="Giá trị biến thể"
+                                                                        name="variant_value"
+                                                                        defaultValue={editingVariant.variant_value}
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div className='grid grid-cols-3 gap-2'>
+                                                                    <Input
+                                                                        className='mb-2'
+                                                                        label="Giá"
+                                                                        name="price"
+                                                                        type="number"
+                                                                        defaultValue={editingVariant.price}
+                                                                        required
+                                                                        min={0}
+                                                                    />
+                                                                    <Input
+                                                                        className='mb-2'
+                                                                        label="Số lượng"
+                                                                        name="stock"
+                                                                        type="number"
+                                                                        defaultValue={editingVariant.stock}
+                                                                        required
+                                                                        min={0}
+                                                                    />
+
+                                                                    <Input
+                                                                        className='mb-2'
+                                                                        label="Giảm giá (%)"
+                                                                        name="discount"
+                                                                        type="number"
+                                                                        defaultValue={editingVariant.discount}
+                                                                        min={0}
+                                                                        max={100}
+                                                                    />
+                                                                </div>
+                                                                <img src={product.image} alt="Variant Image" className="w-[200px] h-[200px] pb-4 object-cover" />
+                                                                <Input
+                                                                    className='mb-2 mt-2'
+                                                                    type="file"
+                                                                    name="image"
+                                                                    label="Hình ảnh mới (nếu muốn thay đổi)"
+                                                                />
+                                                                <div className='flex gap-2'>
+                                                                    <Button type="submit" color="primary">Lưu thay đổi</Button>
+                                                                    <Button onClick={() => setEditingVariant(null)}>Hủy</Button>
+                                                                </div>
+                                                            </form>
+                                                        ) : (
+                                                            <>
+                                                                {/* Hiển thị thông tin biến thể */}
+                                                                <div className='flex gap-4 items-center'>
+                                                                    <img src={product.image} alt="Variant Image" className="w-28 h-28 object-cover mb-2" />
+                                                                    <div className='flex-1'>
+                                                                        <div className='mb-2 flex'><div className='w-24 font-medium'>Tên:</div> {product.name}</div>
+                                                                        <div className='mb-2 flex'><div className='w-24 font-medium'>Giá:</div> {product.price}</div>
+                                                                        <div className='mb-2 flex'><div className='w-24 font-medium'>Số lượng:</div> {product.stock}</div>
+                                                                        <div className='mb-2 flex'><div className='w-24 font-medium'>Giá trị:</div> {product.variant_value}</div>
+                                                                        <div className='mb-2 flex'><div className='w-24 font-medium'>Giảm giá:</div> {product.discount}</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className='flex gap-2'>
+                                                                    <Button
+                                                                        color="primary"
+                                                                        onPress={() => handleEditVariant(product)} // Chỉnh sửa biến thể
+                                                                    >
+                                                                        Chỉnh sửa biến thể
+                                                                    </Button>
+                                                                    <Button
+                                                                        color="danger"
+                                                                        onPress={() => handleDeleteVariant(product.id)} // Xóa biến thể
+                                                                    >
+                                                                        Xóa biến thể
+                                                                    </Button>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                ))}
+
+
+
+                                                {showVariantForm && variants.map((variant, index) => (
+                                                    <div className="mb-4 border-b pb-4" key={index}>
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Name Product Variant
+                                                            </label>
+                                                            <Input
+                                                                placeholder='Tên sản phẩm'
+                                                                type="text"
+                                                                id={`name_${index}`}
+                                                                name={`name[${index}]`}
+                                                                value={variant.name}
+                                                                onChange={(e) => handleChangeVariant(index, 'name', e.target.value)}
+                                                                required
+                                                                className={errors[`name_${index}`] ? 'border-red-500' : ''}
+                                                            />
+                                                            {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Price
+                                                            </label>
+                                                            <Input
+                                                                placeholder='Giá sản phẩm'
+                                                                type="number"
+                                                                id={`price_${index}`}
+                                                                name={`price[${index}]`}
+                                                                value={variant.price}
+                                                                onChange={(e) => handleChangeVariant(index, 'price', e.target.value)}
+                                                                required
+                                                                className={errors[`price_${index}`] ? 'border-red-500' : ''}
+                                                            />
+                                                            {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Stock
+                                                            </label>
+                                                            <Input
+                                                                placeholder='Số lượng'
+                                                                type="number"
+                                                                id={`stock_${index}`}
+                                                                name={`stock[${index}]`}
+                                                                value={variant.stock}
+                                                                onChange={(e) => handleChangeVariant(index, 'stock', e.target.value)}
+                                                                required
+                                                                className={errors[`stock_${index}`] ? 'border-red-500' : ''}
+                                                            />
+                                                            {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Variant Value
+                                                            </label>
+                                                            <Input
+                                                                placeholder='Giá trị biến thể'
+                                                                type="text"
+                                                                id={`variantValue_${index}`}
+                                                                name={`variant_value[${index}]`}
+                                                                value={variant.variantValue}
+                                                                onChange={(e) => handleChangeVariant(index, 'variantValue', e.target.value)}
+                                                                required
+                                                                className={errors[`variantValue_${index}`] ? 'border-red-500' : ''}
+                                                            />
+                                                            {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
+                                                        </div>
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Discount
+                                                            </label>
+                                                            <Input
+                                                                placeholder='Giảm giá (%)'
+                                                                type="number"
+                                                                id={`discount_${index}`}
+                                                                name={`discount[${index}]`}
+                                                                value={variant.discount}
+                                                                onChange={(e) => handleChangeVariant(index, 'discount', e.target.value)}
+                                                                className={errors[`discount_${index}`] ? 'border-red-500' : ''}
+                                                            />
+                                                            {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
+                                                        </div>
+
+
+
+                                                        <div className="mb-4">
+                                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
+                                                                Upload Variant Image
+                                                            </label>
+                                                            <Input
+                                                                type="file"
+                                                                id={`image_${index}`}
+                                                                name={`image[${index}]`}
+                                                                multiple
+                                                                onChange={(e) => {
+                                                                    const files = e.target.files;
+                                                                    if (files) {
+                                                                        handleChangeVariant(index, 'image', files);
+                                                                    }
+                                                                }}
+                                                            />
+                                                            {errors[`image_${index}`] && <p className="text-red-500 text-sm">{errors[`image_${index}`]}</p>} {/* Error message for variant image */}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                <div className="mb-4 border-t pt-4">
+                                                    <h5 className="text-md font-semibold mb-2">Thêm biến thể mới</h5>
+                                                    {!showNewVariantForm && (
+                                                        <Button color="primary" onPress={() => setShowNewVariantForm(!showNewVariantForm)}>
+                                                            Hiển thị form thêm biến thể
+                                                        </Button>
+                                                    )}
+                                                    {showNewVariantForm && (
+                                                        <div className="mt-4">
+                                                            <div className="grid grid-cols-2 gap-2">
+                                                                <Input
+                                                                    className='mb-2'
+                                                                    placeholder="Tên biến thể"
+                                                                    value={newVariant.name}
+                                                                    onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
+                                                                />
+                                                                <Input
+                                                                    className='mb-2'
+                                                                    placeholder="Giá trị biến thể"
+                                                                    value={newVariant.variantValue}
+                                                                    onChange={(e) => setNewVariant({ ...newVariant, variantValue: e.target.value })}
+                                                                />
+                                                            </div>
+                                                            <div className="grid grid-cols-3 gap-2">
+                                                                <Input
+                                                                    className='mb-2'
+                                                                    placeholder="Giá"
+                                                                    type="number"
+                                                                    value={newVariant.price}
+                                                                    onChange={(e) => setNewVariant({ ...newVariant, price: e.target.value })}
+                                                                    min={0}
+                                                                />
+                                                                <Input
+                                                                    className='mb-2'
+                                                                    placeholder="Số lượng"
+                                                                    type="number"
+                                                                    value={newVariant.stock}
+                                                                    onChange={(e) => setNewVariant({ ...newVariant, stock: e.target.value })}
+                                                                    min={0}
+                                                                />
+
+                                                                <Input
+                                                                    className='mb-2'
+                                                                    placeholder="Giảm giá (%)"
+                                                                    type="number"
+                                                                    value={newVariant.discount}
+                                                                    onChange={(e) => setNewVariant({ ...newVariant, discount: e.target.value })}
+                                                                    min={0}
+                                                                    max={100}
+                                                                />
+                                                            </div>
+                                                            <Input
+                                                                className='mb-2'
+                                                                type="file"
+                                                                onChange={(e) => {
+                                                                    const files = e.target.files;
+                                                                    if (files) {
+                                                                        setNewVariant({ ...newVariant, image: Array.from(files) });
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <div className="flex gap-2">
+                                                                <Button color="primary" onPress={() => handleAddNewVariant(selectedProduct.id)}>
+                                                                    Thêm biến thể
+                                                                </Button>
+                                                                <Button color="secondary" onPress={() => setShowNewVariantForm(false)}>
+                                                                    Hủy
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     ) : (
                                         <p>No product selected.</p>
@@ -1038,7 +1414,12 @@ console.log(productsVa);
                 </Modal>
 
             </div>
-
+            <Pagination
+                total={pagination.last_page}  // total number of pages
+                initialPage={pagination.current_page}  // current page
+                onChange={(page) => fetchProducts(page)} // fetch products when page changes
+                showControls
+            />
         </div>
     );
 };

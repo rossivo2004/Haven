@@ -68,7 +68,7 @@ const BodyProductsV2: React.FC = () => {
             const formData = {
                 ...values,
                 images: productImages.length > 0 ? productImages : [],
-             
+
             };
 
             console.log("Form Data Submitted:", formData); // Log the data being sent
@@ -104,7 +104,7 @@ const BodyProductsV2: React.FC = () => {
         if (newVariant.name && newVariant.variant_value && newVariant.price && newVariant.discount && newVariant.stock) {
             const updatedVariants = [...variants, newVariant];
             setVariants(updatedVariants);
-     
+
             // Cập nhật formik values với biến thể mới
             formik.setFieldValue("name", updatedVariants.map(variant => variant.name).flat());
             formik.setFieldValue("price", updatedVariants.map(variant => variant.price).flat());
@@ -112,15 +112,15 @@ const BodyProductsV2: React.FC = () => {
             formik.setFieldValue("stock", updatedVariants.map(variant => variant.stock).flat());
             formik.setFieldValue("variant_value", updatedVariants.map(variant => variant.variant_value).flat());
             formik.setFieldValue("image", updatedVariants.map(variant => variant.image).flat()); // Cập nhật hình ảnh đúng cách
-            
+
             setHasVariants(true);
             setNewVariant({ name: [""], variant_value: [""], price: ["0"], discount: ["0"], stock: ["0"], image: [] });
         } else {
             alert("Vui lòng điền đầy đủ thông tin biến thể.");
         }
     };
-    
-    
+
+
 
     const handleVariantChange = (index: number, field: keyof typeof newVariant, value: string | string[]) => {
         const updatedVariants = [...variants];
@@ -129,11 +129,11 @@ const BodyProductsV2: React.FC = () => {
         } else {
             updatedVariants[index][field] = [value];
         }
-        
+
         setVariants(updatedVariants);
-    
+
         // Cập nhật formik values với biến thể mới
-      formik.setFieldValue("name", updatedVariants.map(variant => variant.name).flat());
+        formik.setFieldValue("name", updatedVariants.map(variant => variant.name).flat());
 
         formik.setFieldValue("price", updatedVariants.map(variant => variant.price).flat());
         formik.setFieldValue("discount", updatedVariants.map(variant => variant.discount).flat());
@@ -141,7 +141,7 @@ const BodyProductsV2: React.FC = () => {
         formik.setFieldValue("variant_value", updatedVariants.map(variant => variant.variant_value).flat());
         formik.setFieldValue("image", updatedVariants.map(variant => variant.image));
     };
-    
+
 
     const removeVariant = (index: number) => {
         const updatedVariants = variants.filter((_, i) => i !== index);
@@ -191,24 +191,24 @@ const BodyProductsV2: React.FC = () => {
     const handleProductImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
         const imageUrls = files.map(file => URL.createObjectURL(file));
-    
+
         setProductImages(imageUrls);  // Store preview URLs for display
         formik.setFieldValue("images", files);  // Store actual files for upload
     };
 
-const handleVariantImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-        const updatedVariants = [...variants];
-        const newImages = Array.from(files).map(file => URL.createObjectURL(file)); // Tạo URL cho hình ảnh
+    const handleVariantImageChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files) {
+            const updatedVariants = [...variants];
+            const newImages = Array.from(files).map(file => URL.createObjectURL(file)); // Tạo URL cho hình ảnh
 
-        updatedVariants[index].image = newImages;  // Lưu hình ảnh vào biến thể
-        setVariants(updatedVariants);
-        formik.setFieldValue("image", updatedVariants.map(variant => variant.image).flat()); // Cập nhật formik values
-    }
-};
+            updatedVariants[index].image = newImages;  // Lưu hình ảnh vào biến thể
+            setVariants(updatedVariants);
+            formik.setFieldValue("image", updatedVariants.map(variant => variant.image).flat()); // Cập nhật formik values
+        }
+    };
 
-    
+
 
     return (
         <div>
@@ -301,23 +301,23 @@ const handleVariantImageChange = (index: number, e: React.ChangeEvent<HTMLInputE
                                 />
                             </div>
                             <div className="mb-5">
-    <label htmlFor="productImages" className="block mb-1">Hình ảnh sản phẩm</label>
-    <input
-        type="file"
-        id="productImages"
-        name="productImages"
-        accept="image/*"
-        multiple
-        onChange={handleProductImagesChange}
-    />
-    {productImages.length > 0 && (
-        <div className="flex mt-3 gap-2">
-            {productImages.map((image, index) => (
-                <img key={index} src={image} alt={`Product Preview ${index}`} className="w-20 h-20 object-cover" />
-            ))}
-        </div>
-    )}
-</div>
+                                <label htmlFor="productImages" className="block mb-1">Hình ảnh sản phẩm</label>
+                                <input
+                                    type="file"
+                                    id="productImages"
+                                    name="productImages"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleProductImagesChange}
+                                />
+                                {productImages.length > 0 && (
+                                    <div className="flex mt-3 gap-2">
+                                        {productImages.map((image, index) => (
+                                            <img key={index} src={image} alt={`Product Preview ${index}`} className="w-20 h-20 object-cover" />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
 
                             {/* Biến thể */}
@@ -378,22 +378,22 @@ const handleVariantImageChange = (index: number, e: React.ChangeEvent<HTMLInputE
                                             </div>
                                         </div>
                                         <div className="mt-3">
-    <label htmlFor={`variant_image_${index}`} className="block mb-1">Hình ảnh biến thể</label>
-    <input
-        type="file"
-        id={`variant_image_${index}`}
-        name={`variants[${index}].image`}
-        accept="image/*"
-        onChange={(e) => handleVariantImageChange(index, e)}
-    />
-    {variant.image.length > 0 && (
-        <div className="flex mt-3 gap-2">
-            {variant.image.map((image, idx) => (
-                <img key={idx} src={image} alt={`Variant Preview ${idx}`} className="w-20 h-20 object-cover" />
-            ))}
-        </div>
-    )}
-</div>
+                                            <label htmlFor={`variant_image_${index}`} className="block mb-1">Hình ảnh biến thể</label>
+                                            <input
+                                                type="file"
+                                                id={`variant_image_${index}`}
+                                                name={`variants[${index}].image`}
+                                                accept="image/*"
+                                                onChange={(e) => handleVariantImageChange(index, e)}
+                                            />
+                                            {variant.image.length > 0 && (
+                                                <div className="flex mt-3 gap-2">
+                                                    {variant.image.map((image, idx) => (
+                                                        <img key={idx} src={image} alt={`Variant Preview ${idx}`} className="w-20 h-20 object-cover" />
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
 
                                         <div className="mt-3 flex justify-end">
                                             <Button color="danger" onClick={() => removeVariant(index)}>Xóa biến thể</Button>

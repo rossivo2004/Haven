@@ -12,6 +12,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import DiscountIcon from '@mui/icons-material/Discount';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,55 +44,63 @@ const Sidebar: React.FC = () => {
         ref={sidebarRef}
         className={`fixed z-50 h-screen inset-y-0 left-0 top-0 w-64 bg-gray-800 text-white transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0`}
       >
-        <div className="p-4">
+        <div className="py-4 px-2">
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
           <nav className="mt-6">
             <ul>
               <li>
                 <Link href="/">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/' ? 'sidebar_active' : ''}`}>
                     <HomeIcon className="mr-2" /> Trang chủ
                   </div>
                 </Link>
               </li>
               <li>
                 <Link href="/products">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/products' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/products' ? 'sidebar_active' : ''}`}>
                     <WidgetsIcon className="mr-2" /> Sản phẩm
                   </div>
                 </Link>
               </li>
               <li>
                 <Link href="/categories">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/categories' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/categories' ? 'sidebar_active' : ''}`}>
                     <CategoryIcon className="mr-2" /> Phân loại
                   </div>
                 </Link>
               </li>
               <li>
+                <Link href="/brand">
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/brand' ? 'sidebar_active' : ''}`}>
+                    <BrandingWatermarkIcon className="mr-2" /> Thương hiệu
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link href="/flashsale">
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/flashsale' ? 'sidebar_active' : ''}`}>
+                    <LocalFireDepartmentIcon className="mr-2" /> Flash Sale
+                  </div>
+                </Link>
+              </li>
+              <li>
                 <Link href="/users">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/users' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/users' ? 'sidebar_active' : ''}`}>
                     <PeopleIcon className="mr-2" /> Users
                   </div>
                 </Link>
               </li>
               <li>
                 <Link href="/orders">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/orders' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/orders' ? 'sidebar_active' : ''}`}>
                     <LocalShippingIcon className="mr-2" /> Đơn hàng
                   </div>
                 </Link>
               </li>
-              <li>
-                <Link href="/brand">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/brand' ? 'sidebar_active' : ''}`}>
-                    <BrandingWatermarkIcon className="mr-2" /> Thương hiệu
-                  </div>
-                </Link>
-              </li>
+             
               <li>
                 <Link href="/banner">
-                  <div className={`py-2 px-4 hover:bg-gray-700 rounded-lg mb-2 flex items-center ${pathname === '/banner' ? 'sidebar_active' : ''}`}>
+                  <div className={`py-2 px-4 hover:bg-gray-700 hover:text-[#9ce2e2] rounded-lg mb-1 flex items-center ${pathname === '/banner' ? 'sidebar_active' : ''}`}>
                     <ViewCarouselIcon className="mr-2" /> Banner
                   </div>
                 </Link>

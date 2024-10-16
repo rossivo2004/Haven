@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 
+
 import SearchIcon from '@mui/icons-material/Search';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import PersonIcon from '@mui/icons-material/Person';
@@ -26,7 +27,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
-import { Product } from '@/src/interface';
+import { Brand, Category, Variant } from '@/src/interface';
 import useDebounce from '@/src/utils';
 import { CATEGORY } from '@/src/dump';
 import { selectTotalItems } from '@/src/store/cartSlice';
@@ -34,9 +35,10 @@ import { removeItem } from '@/src/store/cartSlice';
 
 import './style.scss'
 import TooltipCu from '../ui/Tootip';
+import apiConfig from '@/src/config/api';
 
 import { updateQuantity } from '@/src/store/cartSlice';
-import { DUMP_PRODUCTS } from '@/src/dump';
+// import { DUMP_PRODUCTS } from '@/src/dump';
 
 import { useTranslations } from 'next-intl';
 
@@ -54,8 +56,8 @@ function Header({ params }: { params: { lang: string } }) {
 
     const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Variant[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Variant[]>([]);
     const [search, setSearch] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -71,6 +73,9 @@ function Header({ params }: { params: { lang: string } }) {
 
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [totalSelectedPrice, setTotalSelectedPrice] = useState<number>(0);
+
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
 
     const { lang } = params;
 
@@ -88,21 +93,6 @@ function Header({ params }: { params: { lang: string } }) {
     };
 
     const t = useTranslations('HomePage');
-
-    // const handleScroll = () => {
-    //     const currentScrollY = window.scrollY;
-
-    //     if (currentScrollY > lastScrollY && currentScrollY > 100) {
-    //         // Cuộn xuống, ẩn header
-    //         setIsVisible(false);
-    //     } else {
-    //         // Cuộn lên, hiện header
-    //         setIsVisible(true);
-    //     }
-
-    //     setLastScrollY(currentScrollY);
-    // };
-
 
     const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
 
@@ -125,20 +115,26 @@ function Header({ params }: { params: { lang: string } }) {
     //     getApi();
     // }, []);
 
+    const fetchProduct = async () => {
+        setLoading(true); // Start loading
+        try {
+            const params = new URLSearchParams();
+            const response = await axios.get(`${apiConfig.products.getallproductvariants}`, { withCredentials: true });
+
+            setProducts(response.data.productvariants.data);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false); // End loading
+        }
+    };
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const products = DUMP_PRODUCTS;
-                setProducts(products);
-            } catch (error) {
-                console.error("Failed to fetch products", error);
-            }
-            setLoading(false);
-        }
-        fetchProducts();
+        fetchProduct()
     }, [])
+
+    console.log(products);
+
 
     useEffect(() => {
         if (debouncedSearch) {
@@ -216,6 +212,34 @@ function Header({ params }: { params: { lang: string } }) {
         }
     };
 
+    
+    const fetchCategory = async () => {
+        try {
+            const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
+
+            setCategories(response.data.categories.data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+        }
+    };
+
+    const fecthBrand = async () => {
+        try {
+            const response = await axios.get(apiConfig.brands.getAll, { withCredentials: true });
+
+            setBrands(response.data.brands.data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+        }
+    };
+
+    useEffect(() => {
+        fetchCategory();
+        fecthBrand()
+    }, [])
+
     return (
         <div>
             <div className='lg:h-[130px]'>
@@ -278,10 +302,10 @@ function Header({ params }: { params: { lang: string } }) {
                                                 ) : filteredProducts.length > 0 ? (
                                                     <ul className='overflow-scroll h-[400px]'>
                                                         {filteredProducts.map((product) => (
-                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                                                                <a href={`/${lang}/product/${product.id}`} className="flex gap-4 items-center">
+                                                            <li key={product.product_id} className="p-2 border-b hover:bg-gray-100">
+                                                                <a href={`/${lang}/product/${product.product_id}`} className="flex gap-4 items-center">
                                                                     <div className='w-14 h-14'>
-                                                                        {/* <img className='w-full h-full min-w-14 object-cover' src={product.images.length > 0 ? product.images[0] : 'fallback-image-url'} alt={product.name} /> */}
+                                                                        <img className='w-full h-full min-w-14 object-cover' src={product.image} alt={product.name} />
                                                                     </div>
                                                                     <div>{product.name}</div>
                                                                 </a>
@@ -502,20 +526,43 @@ function Header({ params }: { params: { lang: string } }) {
                                         }>
                                             {
                                                 isVisible ? (
-                                                    <div className="p-2 grid grid-cols-4 gap-1 relative">
-                                                        <div className='row-span-4'>
-                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-auto object-cover' />
+                                                    <div className="p-1 grid grid-cols-4 grid-rows-2 gap-4 relative">
+                                                        <div className='row-span-2'>
+                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
                                                         </div>
-                                                        {CATEGORY.map((item, index) => (
-                                                            <Link key={index} href={`/shop?category=${item.tag}`}>
-                                                                <div className="flex py-2 px-2 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                    <div className='mr-2'>
-                                                                        <img src={`/images/${item.image}`} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                        <div className='col-span-3 row-span-2'>
+                                                        <div className='flex flex-col mb-4'>
+                                                            <div className='text-black text-lg'>Phân loại</div>
+                                                            <div className='grid grid-cols-2'>
+                                                            {categories.map((item, index) => (
+                                                                <Link key={index} href={`/${lang}/shop?category[]=${item.name}`}>
+                                                                    <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                        <div className='mr-2'>
+                                                                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                        </div>
+                                                                        <div>{item.name}</div>
                                                                     </div>
-                                                                    <div>{item.name}</div>
-                                                                </div>
-                                                            </Link>
-                                                        ))}
+                                                                </Link>
+                                                            ))}
+                                                            </div>
+                                                          
+                                                        </div>
+                                                        <div>
+                                                            <div className='text-black text-lg'>Thương hiệu</div>
+                                                            <div className='grid grid-cols-2'>
+                                                            {brands.map((item, index) => (
+                                                                <Link key={index} href={`/${lang}/shop?brand[]=${item.name}`}>
+                                                                    <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                        <div className='mr-2'>
+                                                                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                        </div>
+                                                                        <div>{item.name}</div>
+                                                                    </div>
+                                                                </Link>
+                                                            ))}
+                                                            </div>
+                                                        </div>
+                                                        </div>
                                                     </div>
                                                 ) : (
                                                     null
@@ -694,8 +741,8 @@ function Header({ params }: { params: { lang: string } }) {
                                                 ) : filteredProducts.length > 0 ? (
                                                     <ul className="h-screen overflow-y-auto pb-20">
                                                         {filteredProducts.map((product) => (
-                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100">
-                                                                <Link href={`/${lang}/product/${product.id}`} className="flex gap-4 items-center">
+                                                            <li key={product.product_id} className="p-2 border-b hover:bg-gray-100">
+                                                                <Link href={`/${lang}/product/${product.product_id}`} className="flex gap-4 items-center">
                                                                     <div className="w-14 h-14">
                                                                         <img
                                                                             className="w-full h-full object-cover"

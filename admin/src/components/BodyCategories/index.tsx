@@ -115,43 +115,59 @@ console.log(formData);
     };
 
 
-    const handleDelete = (categoryId: string) => {
-        // Find the specific category to delete by its ID
-        const categoryToDelete = categories.find(category => category.id === categoryId);
+// ... existing code ...
+// ... existing code ...
+const handleDelete = async (categoryId: string) => {
+    const categoryToDelete = categories.find(category => category.id === categoryId);
 
-        if (!categoryToDelete) {
-            setErrorMessage("Category not found.");
-            return;
+    if (!categoryToDelete) {
+        setErrorMessage("Category not found.");
+        return;
+    }
+
+    // Check if the category has products
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/category/getproducts/${categoryId}`);
+        if (response.data.products.total > 0) {
+        toast.error('Thương hiệu đang có sản phẩm, không thể xóa !!!');
+            setErrorMessage("Cannot delete category with existing products.");
+            return; // Prevent deletion if products exist
         }
+    } catch (error) {
+        toast.error('Thương hiệu đang có sản phẩm, không thể xóa !!!');
+        console.error('Error fetching products:', error);
+        setErrorMessage('Failed to check products. Please try again.');
+        return; // Prevent deletion if there's an error
+    }
 
-        confirmAlert({
-            title: 'Xóa phân loại',
-            message: `Bạn có muốn xóa phân loại ${categoryToDelete.name}?`,
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: async () => {
-                        setLoading(true);
-                        try {
-                            await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
-                            fetchCategories(); // Refresh categories after deletion
-                            toast.success('Xóa phân loại thành công');
-
-
-                        } catch (error) {
-                            console.error('Error deleting category:', error);
-                            setErrorMessage('Failed to delete category. Please try again.');
-                        } finally {
-                            setLoading(false);
-                        }
+    confirmAlert({
+        title: 'Xóa phân loại',
+        message: `Bạn có muốn xóa phân loại ${categoryToDelete.name}?`,
+        buttons: [
+            {
+                label: 'Yes',
+                onClick: async () => {
+                    setLoading(true);
+                    try {
+                        await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
+                        fetchCategories(); // Refresh categories after deletion
+                        toast.success('Xóa phân loại thành công');
+                    } catch (error) {
+                        console.error('Error deleting category:', error);
+                        setErrorMessage('Failed to delete category. Please try again.');
+                    } finally {
+                        setLoading(false);
                     }
-                },
-                {
-                    label: 'No',
                 }
-            ]
-        });
-    };
+            },
+            {
+                label: 'No',
+            }
+        ]
+    });
+};
+// ... existing code ...
+// ... existing code ...
 
     const handleEdit = (category: Category) => {
         setEditingCategory(category);
