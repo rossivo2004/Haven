@@ -119,7 +119,18 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return response()->json(['message' => 'Đăng nhập thành công'], 200);
+    
+            // Lấy thông tin user sau khi đăng nhập
+            $user = Auth::user();
+    
+            // Lưu ID của user vào session
+            session(['user_id' => $user->id]);
+    
+            // Trả về ID và thông tin của user
+            return response()->json([
+                'message' => 'Đăng nhập thành công',
+                'user_id' => $user->id, // Trả về ID
+            ], 200);
         }
 
         return response()->json(['error' => 'Email hoặc mật khẩu không đúng'], 401);
@@ -148,9 +159,14 @@ class UserController extends Controller
             $findUser = User::where('google_id', $googleUser->id)->first();
 
             if ($findUser) {
-                // Đăng nhập nếu tìm thấy người dùng
                 Auth::login($findUser);
-                return response()->json(['message' => 'Đăng nhập Google thành công'], 200);
+    
+                session(['user_id' => $findUser->id]);
+    
+                return response()->json([
+                    'message' => 'Đăng nhập Google thành công',
+                    'user_id' => $findUser->id,
+                ], 200);
             } else {
                 // Tìm role có name là 'user'
                 $role = Role::where('name', 'user')->first();
@@ -168,7 +184,15 @@ class UserController extends Controller
 
                     // Đăng nhập người dùng mới
                     Auth::login($newUser);
-                    return response()->json(['message' => 'Người dùng mới được tạo và đăng nhập thành công'], 200);
+
+                    // Lưu ID của user vào session
+                    session(['user_id' => $newUser->id]);
+
+                    // Trả về ID và thông tin của user
+                    return response()->json([
+                        'message' => 'Người dùng mới được tạo và đăng nhập thành công',
+                        'user_id' => $newUser->id,
+                    ], 200);
                 } else {
                     // Xử lý nếu không tìm thấy vai trò 'user'
                     return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
