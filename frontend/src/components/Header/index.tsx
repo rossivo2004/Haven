@@ -133,6 +133,7 @@ function Header({ params }: { params: { lang: string } }) {
         fetchProduct()
     }, [])
 
+    // console.log(products);
     console.log(products);
 
 

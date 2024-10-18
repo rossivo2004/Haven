@@ -88,7 +88,7 @@ function BodyBlog() {
 							</p>
 						</div>
 						<div>
-							<button variant="link">XEM THÊM</button>
+							<button>XEM THÊM</button>
 						</div>
 					</div>
 				))}
@@ -171,7 +171,7 @@ function BodyBlog() {
 							</p>
 						</div>
 						<div>
-							<button variant="link">XEM THÊM</button>
+							<button>XEM THÊM</button>
 						</div>
 					</div>
 				))}

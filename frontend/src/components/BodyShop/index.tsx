@@ -10,7 +10,6 @@ import BreadcrumbNav from '../Breadcrum';
 import BoxProduct from '../BoxProduct';
 import CustomPagination from '../Pagination';
 
-import { useProducts } from '@/src/hooks/product';
 import { SingleProduct } from '@/src/interface';
 
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
@@ -35,7 +34,6 @@ function BodyShop() {
 
     const [filter, setFilter] = useState<string[]>([]);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const { flatProducts } = useProducts(); // Use updated hook without filters
 
     const [variants, setVariants] = useState<Variant[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -164,7 +162,6 @@ function BodyShop() {
 
 
     // Slice for pagination
-    const currentProducts = flatProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <div>
@@ -429,7 +426,7 @@ function BodyShop() {
                             <Loading />
                         </div> // Show loading indicator
                     ) : (
-                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 mt-4 h-[2000px]">
+                        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 mt-4">
                             {variants.map((product: Variant) => (
                                 <BoxProduct key={String(product.product_id)} product={product} />
                             ))}
@@ -438,12 +435,12 @@ function BodyShop() {
 
                     {/* Pagination */}
                     <div className="flex justify-end mt-8">
-                        <CustomPagination
+                        {/* <CustomPagination
                             currentPage={currentPage}
                             totalItems={flatProducts.length} // Update this to total items
                             itemsPerPage={itemsPerPage}
                             onPageChange={setCurrentPage}
-                        />
+                        /> */}
                     </div>
                 </div>
             </div>

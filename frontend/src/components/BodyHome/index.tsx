@@ -23,7 +23,6 @@ import InfiniteScroll from "../InfiniteScroll";
 import { DUMP_PRODUCTS } from "@/src/dump";
 import { CATEGORY } from "@/src/dump";
 import { BLOG } from "@/src/dump";
-import { useProducts } from '@/src/hooks/product';
 
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
@@ -42,7 +41,7 @@ import {useTranslations} from 'next-intl';
 
 import apiConfig from '@/src/config/api';
 
-import { Category } from "@/src/interface";
+import { Category, Variant } from "@/src/interface";
 import axios from "axios";
 
 interface ProductIn {
@@ -54,10 +53,11 @@ interface ProductIn {
 
 function BodyHome() {
     const [productData, setProductData] = useState<ProductIn | null>(null);
-
+    const [productDataSale, setProductDataSale] = useState<Variant[]>([]); // Change initial state to an empty array
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
-    const { flatProducts } = useProducts(); // Use updated hook without filters
+
+
     const [language, setLanguage] = useState('vi'); // Default to 'en'
     const params = useParams(); 
     const { lang = 'vi' } = params;
@@ -82,6 +82,46 @@ function BodyHome() {
     useEffect(() => {
         fetchCategory();
     }, [])
+
+    const fetchFlashSaleProducts = async (flashSaleId: number) => {
+        try {
+            const response = await axios.get(`${apiConfig.flashsale.getShowProductFlashsale}${flashSaleId}`);
+            return response.data.FlashsaleProducts.data; // Adjust based on the actual response structure
+        } catch (error) {
+            console.error("Error fetching flash sale products:", error);
+            return [];
+        }
+    };
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${apiConfig.flashsale.getAllFlashsale}`);
+                const flashSales = response.data.flashSales.data;
+    
+                // Filter flash sales with status 1
+                const activeFlashSales = flashSales.filter((sale: any) => sale.status === 1);
+    
+                // Fetch products for each active flash sale
+                const productsPromises = activeFlashSales.map((sale: any) => fetchFlashSaleProducts(sale.id));
+                const products = await Promise.all(productsPromises);
+                setProductDataSale(products.flat() as Variant[]); // Flatten the array and cast to Variant[]
+            } catch (error) {
+                console.error("Error fetching product data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        console.log(productDataSale); // Log chỉ khi productDataSale thay đổi
+    }, [productDataSale]); 
+    
+    // console.log(productData);
     
 
     useEffect(() => {
@@ -250,6 +290,9 @@ function BodyHome() {
                     </motion.div>
                     <div className="max-w-screen-xl mx-auto px-4 mb-14">
                         <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
+                            {productDataSale.slice(0, 8).map((product) => (
+                                <BoxProductFlashSale key={product.id} product={product} />
+                            ))}
                             {/* {flatProducts.slice(0, 8).map((product) => (
                                 <BoxProductFlashSale key={product.id} product={product} />
                             ))} */}
