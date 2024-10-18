@@ -1,4 +1,4 @@
-import BodyShopV2 from "@/src/components/BodyShopV2";
+// import BodyShopV2 from "@/src/components/BodyShopV2";
 import BodyShop from "@/src/components/BodyShop";
 
 function Page() {

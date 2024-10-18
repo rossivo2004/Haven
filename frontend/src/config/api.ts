@@ -16,19 +16,16 @@ const apiConfig = {
     // Show all sản phẩm biến thể
     getallproductvariants : `${baseUrl}/api/product/shop`,
 
-    // Xóa ảnh sản phẩm chính
-    deleteproductimage : `${baseUrl}/api/productimage/delete/`,
-    // Thêm ảnh sản phẩm chính
-    addproductimage : `${baseUrl}/api/productimage/store`,
+// Show sản phẩm biến thể theo id
+    getproductvariantsbyid : `${baseUrl}/api/productvariant/show/`,
+    
   },
-
   categories: {
     getAll: `${baseUrl}/api/category/`,
     createCt: `${baseUrl}/api/category/store/`,
     updateCt: `${baseUrl}/api/category/update/`,
     deleteCt: `${baseUrl}/api/category/delete/`,
   },
-
   brands: {
     getAll: `${baseUrl}/api/brand/`,
     createBr: `${baseUrl}/api/brand/store/`,
@@ -72,6 +69,7 @@ const apiConfig = {
     addProductToFlashSale : `${baseUrl}/api/flashsaleproduct/store/`,
 
   }
+
 };
 
 export default apiConfig;

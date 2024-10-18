@@ -7,24 +7,26 @@ import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
 import { number } from 'yup';
 
-import { DUMP_PRODUCTS } from '@/src/dump';
-import { ProductProps } from '@/src/interface';
+import { ProductProps, Variant } from '@/src/interface';
 import { SingleProduct } from '@/src/interface';
 import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
 import { addItem } from '@/src/store/cartSlice';
 import { Button, Divider } from '@nextui-org/react';
 
-import { useProducts } from '@/src/hooks/product';
+// import { useProducts } from '@/src/hooks/product';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 import ImageSwiper from '../SliderImageProductDetail';
-import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
+// import RecentlyViewed from '../RecentlyViewed/RecentlyViewed';
 import BoxProduct from '../BoxProduct';
 import Loading from '../ui/Loading';
 import BreadcrumbNav from '../Breadcrum';
+
+import apiConfig from '@/src/config/api';
+import axios from 'axios';
 
 interface CustomRadioProps extends RadioProps {
     isSelected: boolean;
@@ -60,7 +62,7 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
 
 function BodyProduct() {
     const { id } = useParams(); // get id product
-    const [product, setProduct] = useState<SingleProduct | null>(null);
+    const [product, setProduct] = useState<Variant | null>(null);
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
     const router = useRouter();
     // const image = product?.images || [];
@@ -74,7 +76,7 @@ function BodyProduct() {
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
-    const { flatProducts } = useProducts(); // Use updated hook without filters
+    // const { flatProducts } = useProducts(); // Use updated hook without filters
 
     const handleQuantityChange = (value: number) => {
         if (value > 0) {
@@ -82,28 +84,28 @@ function BodyProduct() {
         }
     };
 
-useEffect(() => {
-    const fetchData = async () => {
-        if (id) {
-            const selectedVariant = flatProducts.find((variant) => variant.id === id);
-            
-            if (selectedVariant) {
-                setProduct(selectedVariant);
-                setActiveVariant(selectedVariant.id);
-            } else {
-                console.warn("Không tìm thấy biến thể cho ID:", id);
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${apiConfig.products.getproductvariantsbyid}${id}`);
+                setProduct(response.data.product);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching product data:", error);
+                setLoading(false);
             }
-        }
-        setLoading(false); // Dữ liệu đã được tải
-    };
+        };
 
-    fetchData();
-}, [id, flatProducts]);
+        fetchData();
+    }, [id]);
 
-    
-    
-    
+    console.log(product);
 
+
+
+
+    console.log(id);
 
 
     useEffect(() => {
@@ -134,59 +136,65 @@ useEffect(() => {
         }
     };
 
-    const handleAddToCart = () => {
-        if (product) {
-            const salePrice = product.price - (product.price * product.discount) / 100;
-
-            // dispatch(addItem({
-            //     id: product.id,
-            //     name: product.name,
-            //     images: product.images,
-            //     price: product.price,
-            //     salePrice: salePrice,
-            //     quantity: quantity,
-            //     select: false,
-            //     // stock: product.stock,
-            // }));
-
-            toast.success('Thêm sản phẩm thành công');
-            setQuantity(1);
-        } else {
-            toast.error('Thêm sản phẩm thất bại');
-        }
+    const getLowerPrice = (discountedPrice: string | undefined, flashSalePrice: string | undefined): string => {
+        const discounted = parseFloat(discountedPrice || "0");
+        const flashSale = parseFloat(flashSalePrice || "0");
+        return Math.min(discounted, flashSale).toLocaleString('vi-VN');
     };
 
-  const handleVariantChange = (variantId: string) => {
-    const selectedVariant = product?.variants.find((variant) => variant.id === variantId);
-    if (selectedVariant) {
+    //     const handleAddToCart = () => {
+    //         if (product) {
+    //             const salePrice = product.price - (product.price * product.discount) / 100;
 
-        setActiveVariant(selectedVariant.id);
-        
-        // Update the URL without a full page reload
-        const newUrl = `/product/${selectedVariant.id}`;
-        router.push(newUrl, undefined);
+    //             // dispatch(addItem({
+    //             //     id: product.id,
+    //             //     name: product.name,
+    //             //     images: product.images,
+    //             //     price: product.price,
+    //             //     salePrice: salePrice,
+    //             //     quantity: quantity,
+    //             //     select: false,
+    //             //     // stock: product.stock,
+    //             // }));
+
+    //             toast.success('Thêm sản phẩm thành công');
+    //             setQuantity(1);
+    //         } else {
+    //             toast.error('Thêm sản phẩm thất bại');
+    //         }
+    //     };
+
+    //   const handleVariantChange = (variantId: string) => {
+    //     const selectedVariant = product?.variants.find((variant) => variant.id === variantId);
+    //     if (selectedVariant) {
+
+    //         setActiveVariant(selectedVariant.id);
+
+    //         // Update the URL without a full page reload
+    //         const newUrl = `/product/${selectedVariant.id}`;
+    //         router.push(newUrl, undefined);
 
 
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (product && activeVariant) {
+    //         const selectedVariant = product.variants.find(variant => variant.id === activeVariant);
+    //         if (selectedVariant) {
+    //             const discount = selectedVariant.discount ? selectedVariant.price * (1 - selectedVariant.discount / 100) : selectedVariant.price;
+    //             setPriceDiscount(discount);
+    //         }
+    //     }
+    // }, [activeVariant, product]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Loading />
+            </div>
+        );
     }
-};
-
-useEffect(() => {
-    if (product && activeVariant) {
-        const selectedVariant = product.variants.find(variant => variant.id === activeVariant);
-        if (selectedVariant) {
-            const discount = selectedVariant.discount ? selectedVariant.price * (1 - selectedVariant.discount / 100) : selectedVariant.price;
-            setPriceDiscount(discount);
-        }
-    }
-}, [activeVariant, product]);
-
-if (loading) {
-    return (
-        <div className="flex justify-center items-center h-screen">
-            <Loading />
-        </div>
-    );
-}
 
 
 
@@ -224,8 +232,8 @@ if (loading) {
                     </span></div>
 
                     <div className='flex gap-5 items-center mb-4'>
-                        <div className='font-bold text-3xl text-price'>
-                            {priceDiscount.toLocaleString('vi-VN')} đ
+                    <div className='font-bold text-3xl text-price'>
+                    {getLowerPrice(product?.DiscountedPrice?.toString(), product?.FlashSalePrice?.toString())} đ
                         </div>
                         <div className='flex flex-col font-normal text-base'>
                             {product?.discount !== undefined && product.discount > 0 ? (
@@ -236,14 +244,11 @@ if (loading) {
                                     </div>
                                 </div>
                             ) : null}
-
-
-
                         </div>
                     </div>
 
                     <div className='mb-4'>
-                        <RadioGroup label="" orientation="horizontal" value={activeVariant}>
+                        {/* <RadioGroup label="" orientation="horizontal" value={activeVariant}>
                             {product?.variants.map((item) => (
                                 <CustomRadio
                                     key={item.id}
@@ -254,28 +259,28 @@ if (loading) {
                                     {item.name}
                                 </CustomRadio>
                             ))}
-                        </RadioGroup>
+                        </RadioGroup> */}
 
 
                     </div>
 
-                    <div className='font-normal text-sm mb-4'>
+                    {/* <div className='font-normal text-sm mb-4'>
                         Mã sản phẩm: 2320320320
-                    </div>
+                    </div> */}
 
                     <div className='font-normal text-sm mb-5'>
-                        Ba chỉ bò (short plate) là phần thịt được lấy ở bụng con bò...
+                        {product?.product?.description}
                     </div>
 
-                    {product && product.stock !== undefined && product.stock > 0 ?
+                    {/* {product && product.stock !== undefined && product.stock > 0 ? */}
                         <div>
 
                             <div className="flex gap-2">
-                                <Link href={'/'}>
-                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">Đồ khô</span>
+                                <Link href={`/vi/shop?category%5B%5D=${product?.product?.category?.name}`}>
+                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
                                 </Link>
-                                <Link href={'/'}>
-                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">PepsiCO</span>
+                                <Link href={`/vi/shop?category%5B%5D=${product?.product?.brand?.name}`}>
+                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
                                 </Link>
                             </div>
 
@@ -298,25 +303,25 @@ if (loading) {
                             </div>
 
                             <div className="flex flex-row gap-3">
-                                <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
+                                {/* <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
                                     <AddShoppingCartIcon /> Thêm vào giỏ hàng
+                                </Button> */}
+                                <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
+                                    <FavoriteBorderIcon />Yêu thích
                                 </Button>
-                                {/* <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                            <FavoriteBorderIcon />Yêu thích
-                        </Button> */}
-                                {/* <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                            <FavoriteIcon />Đã thích
-                        </Button> */}
+                                <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
+                                    <FavoriteIcon />Đã thích
+                                </Button>
                             </div>
                         </div>
-                        :
+                        
                         <div></div>
-                    }
+                    {/* } */}
 
 
                 </div>
                 <div className='flex-1'>
-                    <ImageSwiper imgDemo={product?.images || []} />
+                <ImageSwiper imgDemo={[product?.image || '', ...(product?.product?.product_images?.map(img => img.image) || [])]} />
                 </div>
             </div>
 
@@ -382,7 +387,7 @@ if (loading) {
                 </div>
             </div>
 
-            <div className='mb-10'>
+            {/* <div className='mb-10'>
                 <div className="flex items-center mb-4">
                     <span className="font-bold text-2xl">Sản Phẩm Tương Tự</span>
                     <div className="flex-grow border-t border-black ml-4" />
@@ -394,7 +399,7 @@ if (loading) {
                         ))}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div>
                 <div className="flex items-center mb-4">
@@ -406,7 +411,7 @@ if (loading) {
                         {/* <  {DUMP_PRODUCTS.slice(0, 4).map((product) => (
                             <BoxProduct key={product.id} product={product} />
                         ))}> */}
-                        <RecentlyViewed />
+                        {/* <RecentlyViewed /> */}
 
                     </div>
                 </div>
