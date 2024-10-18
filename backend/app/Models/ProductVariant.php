@@ -39,9 +39,13 @@ class ProductVariant extends Model
     public function getDiscountedPriceAttribute()
     {
         if ($this->discount > 0) {
-            return $this->price - ($this->price * ($this->discount / 100));
+            return intval($this->price - ($this->price * ($this->discount / 100)));
         }
-        return $this->price;
+        return intval($this->price);
+    }
+    public function getPriceAttribute($value)
+    {
+    return intval($value); // Loại bỏ phần .00
     }
     public function getStatusStockAttribute()
     {
@@ -63,12 +67,12 @@ class ProductVariant extends Model
             // Kiểm tra xem có pivot và discount_percent hay không
             if ($flashSale && isset($flashSale->pivot->discount_percent)) {
                 $discountPercent = $flashSale->pivot->discount_percent;
-                return $this->price - ($this->price * $discountPercent / 100);
+                return intval($this->price - ($this->price * $discountPercent / 100));
             }
         }
 
         // Nếu không có flash sale hoặc không có giảm giá thì trả về giá gốc
-        return $this->price;
+        return intval($this->price);
     }
 
     public function Cart()

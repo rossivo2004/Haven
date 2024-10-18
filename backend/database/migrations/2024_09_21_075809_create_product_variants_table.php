@@ -21,7 +21,6 @@ return new class extends Migration
             $table->integer('view')->default(0);
             $table->integer('discount')->default(0);
             // $table->string('tag');
-
             $table->timestamps();
         });
     }
