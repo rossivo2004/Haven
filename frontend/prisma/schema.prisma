@@ -1,0 +1,199 @@
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model brands {
+  id         BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String     @db.VarChar(255)
+  image      String?    @db.VarChar(255)
+  tag        String     @db.VarChar(255)
+  created_at DateTime?  @db.Timestamp(0)
+  updated_at DateTime?  @db.Timestamp(0)
+  products   products[]
+}
+
+model carts {
+  id                 BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  product_variant_id BigInt           @db.UnsignedBigInt
+  user_id            BigInt           @db.UnsignedBigInt
+  quantity           Int              @default(1)
+  created_at         DateTime?        @db.Timestamp(0)
+  updated_at         DateTime?        @db.Timestamp(0)
+  product_variants   product_variants @relation(fields: [product_variant_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "carts_product_variant_id_foreign")
+  users              users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "carts_user_id_foreign")
+
+  @@index([product_variant_id], map: "carts_product_variant_id_foreign")
+  @@index([user_id], map: "carts_user_id_foreign")
+}
+
+model categories {
+  id         BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String     @db.VarChar(255)
+  image      String?    @db.VarChar(255)
+  tag        String     @db.VarChar(255)
+  created_at DateTime?  @db.Timestamp(0)
+  updated_at DateTime?  @db.Timestamp(0)
+  products   products[]
+}
+
+model favorites {
+  id                 BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id            BigInt            @db.UnsignedBigInt
+  product_variant_id BigInt?           @db.UnsignedBigInt
+  created_at         DateTime?         @db.Timestamp(0)
+  updated_at         DateTime?         @db.Timestamp(0)
+  product_variants   product_variants? @relation(fields: [product_variant_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "favorites_product_variant_id_foreign")
+  users              users             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "favorites_user_id_foreign")
+
+  @@index([product_variant_id], map: "favorites_product_variant_id_foreign")
+  @@index([user_id], map: "favorites_user_id_foreign")
+}
+
+model flash_sale_products {
+  id                 BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  stock              Int
+  sold               Int              @default(0)
+  discount_percent   Int              @default(0)
+  flash_sale_id      BigInt           @db.UnsignedBigInt
+  product_variant_id BigInt           @db.UnsignedBigInt
+  created_at         DateTime?        @db.Timestamp(0)
+  updated_at         DateTime?        @db.Timestamp(0)
+  flash_sales        flash_sales      @relation(fields: [flash_sale_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "flash_sale_products_flash_sale_id_foreign")
+  product_variants   product_variants @relation(fields: [product_variant_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "flash_sale_products_product_variant_id_foreign")
+
+  @@index([flash_sale_id], map: "flash_sale_products_flash_sale_id_foreign")
+  @@index([product_variant_id], map: "flash_sale_products_product_variant_id_foreign")
+}
+
+model flash_sales {
+  id                  BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  start_time          DateTime              @default(now()) @db.Timestamp(0)
+  end_time            DateTime              @default(now()) @db.Timestamp(0)
+  status              Boolean               @default(false)
+  created_at          DateTime?             @db.Timestamp(0)
+  updated_at          DateTime?             @db.Timestamp(0)
+  flash_sale_products flash_sale_products[]
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+}
+
+model password_reset_tokens {
+  email      String    @id @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String    @db.VarChar(255)
+  token      String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@ignore
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String    @db.VarChar(255)
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String    @db.VarChar(255)
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  expires_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model product_images {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  image      String    @db.VarChar(255)
+  status     Boolean   @default(true)
+  product_id BigInt    @db.UnsignedBigInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  products   products  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "product_images_product_id_foreign")
+
+  @@index([product_id], map: "product_images_product_id_foreign")
+}
+
+model product_variants {
+  id                  BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  name                String                @db.VarChar(255)
+  price               Decimal               @db.Decimal(10, 2)
+  stock               Int
+  image               String?               @db.VarChar(255)
+  view                Int                   @default(0)
+  discount            Int                   @default(0)
+  created_at          DateTime?             @db.Timestamp(0)
+  updated_at          DateTime?             @db.Timestamp(0)
+  product_id          BigInt                @db.UnsignedBigInt
+  variant_value       String                @db.VarChar(255)
+  carts               carts[]
+  favorites           favorites[]
+  flash_sale_products flash_sale_products[]
+  products            products              @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "product_variants_product_id_foreign")
+
+  @@index([product_id], map: "product_variants_product_id_foreign")
+}
+
+model products {
+  id               BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
+  name             String             @db.VarChar(255)
+  description      String?            @db.Text
+  category_id      BigInt             @db.UnsignedBigInt
+  brand_id         BigInt?            @db.UnsignedBigInt
+  created_at       DateTime?          @db.Timestamp(0)
+  updated_at       DateTime?          @db.Timestamp(0)
+  product_images   product_images[]
+  product_variants product_variants[]
+  brands           brands?            @relation(fields: [brand_id], references: [id], onUpdate: Restrict, map: "products_brand_id_foreign")
+  categories       categories         @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "products_category_id_foreign")
+
+  @@index([brand_id], map: "products_brand_id_foreign")
+  @@index([category_id], map: "products_category_id_foreign")
+}
+
+model roles {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+  users      users[]
+}
+
+model users {
+  id          BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String      @db.VarChar(255)
+  email       String      @unique(map: "users_email_unique") @db.VarChar(255)
+  google_id   String?     @db.VarChar(255)
+  facebook_id String?     @db.VarChar(255)
+  password    String      @db.VarChar(255)
+  image       String?     @db.VarChar(255)
+  phone       String?     @db.VarChar(255)
+  address     String?     @db.VarChar(255)
+  status      String      @default("active") @db.VarChar(255)
+  point       Int         @default(0)
+  created_at  DateTime?   @db.Timestamp(0)
+  updated_at  DateTime?   @db.Timestamp(0)
+  role_id     BigInt?     @db.UnsignedBigInt
+  carts       carts[]
+  favorites   favorites[]
+  roles       roles?      @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "users_role_id_foreign")
+
+  @@index([role_id], map: "users_role_id_foreign")
+}

@@ -2,7 +2,7 @@ export interface Variant {
   name: string;
   price: number;
   stock: number;
-  variantValue: string;
+  variant_value: string;
   discount: number;
   DiscountedPrice?: number; // Added optional discountedPrice field
   FlashSalePrice?: number;
@@ -40,6 +40,7 @@ export interface Variant {
     }[]; // Changed to an array of objects with specific fields
     updated_at: string;
     variant_value: string;
+    
   };
 }
 

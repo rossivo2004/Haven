@@ -70,7 +70,7 @@ function BodyProduct() {
     const [activeTab, setActiveTab] = useState<number>(0);
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [priceDiscount, setPriceDiscount] = useState(0);
-
+    const [variantsPr, setVariantsPr] = useState<Variant[]>([]);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
 
@@ -83,6 +83,9 @@ function BodyProduct() {
             setQuantity(value);
         }
     };
+
+
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -102,10 +105,23 @@ function BodyProduct() {
 
     console.log(product);
 
+    useEffect(() => {
+        const fetchProductPromotion = async () => {
+            if (product && product.product_id) { // Ensure product and product_id are defined
+                try {
+                    const response = await axios.get(`${apiConfig.products.getproductvariants}${product.product_id}`, { withCredentials: true });
+                    setVariantsPr(response.data.productVariants.data);
+                } catch (error) {
+                    console.error('Error fetching products:', error);
+                }
+            } else {
+                console.warn('Product or product_id is undefined, skipping fetch.');
+            }
+        };
+        fetchProductPromotion();
+    }, [product]);
 
-
-
-    console.log(id);
+    console.log(variantsPr);
 
 
     useEffect(() => {
@@ -267,6 +283,16 @@ function BodyProduct() {
                     {/* <div className='font-normal text-sm mb-4'>
                         Mã sản phẩm: 2320320320
                     </div> */}
+
+<div className='flex gap-2 mb-4'>
+       {variantsPr?.map((item) => (
+        <a href={`/vi/product/${item.id}`} key={item.id}>
+          <div className={`p-1 border-2 font-medium border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main text-white border-main' : ''}`}> 
+                {item.name}
+          </div>
+        </a>
+    ))}
+    </div>
 
                     <div className='font-normal text-sm mb-5'>
                         {product?.product?.description}
