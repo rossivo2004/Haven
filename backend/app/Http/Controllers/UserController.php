@@ -119,13 +119,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             // Lấy thông tin user sau khi đăng nhập
             $user = Auth::user();
-    
+
             // Lưu ID của user vào session
             session(['user_id' => $user->id]);
-    
+
             // Trả về ID và thông tin của user
             return response()->json([
                 'message' => 'Đăng nhập thành công',
@@ -160,9 +160,9 @@ class UserController extends Controller
 
             if ($findUser) {
                 Auth::login($findUser);
-    
+
                 session(['user_id' => $findUser->id]);
-    
+
                 return response()->json([
                     'message' => 'Đăng nhập Google thành công',
                     'user_id' => $findUser->id,

@@ -57,9 +57,16 @@ Route::group(['prefix' => 'api/register'], function() {
 Route::group(['prefix' => 'api/password'], function() {
     Route::post('/forgot', [UserController::class, 'sendResetCode'])->name('api.password.forgot');
     Route::post('/reset', [UserController::class, 'resetPassword'])->name('api.password.reset');
+    // Xác minh mã reset
+    Route::post('/verify-code', [UserController::class, 'verifyResetCode']);
+
+    // Hiển thị form nhập mật khẩu mới sau khi mã được xác thực
+    Route::get('/new-password/{email}', [UserController::class, 'showNewPasswordForm'])
+        ->name('password.new');
+
+    // Cập nhật mật khẩu mới
+    Route::post('/update', [UserController::class, 'updatePassword']);
 });
-
-
 
 // Routes từ nhánh origin/main
 route::group([
@@ -147,8 +154,8 @@ route::group([
     Route::get('/edit/{flashSaleProduct}', [FlashSaleProductController::class, 'edit'])->name('FlashSale.edit');
     Route::put('/update/{flashSaleProduct}', [FlashSaleProductController::class, 'update'])->name('FlashSale.update');
     Route::delete('/delete/{flashSaleProduct}', [FlashSaleProductController::class, 'destroy'])->name('FlashSale.delete');
-  
- 
+
+
 });
 route::group([
     'prefix' => 'api/favorite', 'middleware'=>'auth'

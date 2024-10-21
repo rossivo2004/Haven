@@ -6,7 +6,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-
+import Cookies from 'js-cookie';
 
 import SearchIcon from '@mui/icons-material/Search';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
@@ -36,7 +36,7 @@ import { removeItem } from '@/src/store/cartSlice';
 import './style.scss'
 import TooltipCu from '../ui/Tootip';
 import apiConfig from '@/src/config/api';
-
+import { logout } from '@/src/store/userSlice';
 import { updateQuantity } from '@/src/store/cartSlice';
 // import { DUMP_PRODUCTS } from '@/src/dump';
 
@@ -53,7 +53,7 @@ const menuItems = [
 function Header({ params }: { params: { lang: string } }) {
     const dispatch = useDispatch();
     const router = useRouter();
-
+    const [userData, setUserData] = useState<any>(null);
     const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Variant[]>([]);
@@ -101,6 +101,28 @@ function Header({ params }: { params: { lang: string } }) {
         categoryColumns.push(CATEGORY.slice(i * 5, i * 5 + 5));
     }
 
+    
+    useEffect(() => {
+        const userId = Cookies.get('user_id'); // Get user_id from cookies
+        if (userId) {
+            fetchUserData(userId); // Fetch user data if user_id exists
+        }
+    }, []);
+
+    const fetchUserData = async (id: string) => {
+        try {
+            const response = await axios.get(`${apiConfig.user.getUserById}${id}`); // Adjust the API endpoint as needed
+            setUserData(response.data); // Store the user data in state
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
+
+    const handleLogout = () => {
+        dispatch(logout()); // Dispatch the logout action
+        setUserData(null); // Clear user data after logout
+    };
+    
     // useEffect(() => {
     //     const getApi = async () => {
     //         setLoading(true);
@@ -332,59 +354,64 @@ function Header({ params }: { params: { lang: string } }) {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <div><PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" /></div>
-                                    <div className="xl:text-sm lg:text-[10px]">
-                                        <div>
-                                            <Link href={`/${lang}/signin`}>{t('login')}</Link>
-                                        </div>
-                                        <div>
-                                            <Link href={`/${lang}/signup`}>{t('register')}</Link>
-                                        </div>
-                                    </div>
-                                    {/* <div>
-                                        <Dropdown placement="bottom-end">
-                                            <DropdownTrigger>
-                                                <Avatar
-                                                    isBordered
-                                                    size='sm'
-                                                    as="button"
-                                                    className="transition-transform"
-                                                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                                                />
-                                            </DropdownTrigger>
-                                            <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                                <DropdownItem key="profile" className="h-14 gap-2">
-                                                    <p className="font-semibold">Signed in as</p>
-                                                    <p className="font-semibold">zoey@example.com</p>
-                                                </DropdownItem>
-                                                <DropdownItem key="settings">
-                                                    <Link href={'/profile'}>
-                                                        Trang cá nhân
-                                                    </Link>
-                                                </DropdownItem>
-                                                <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                                                <DropdownItem key="analytics">
-                                                    <Link href={'/profile/notify'}>
-                                                        Thông báo
-                                                    </Link>
-                                                </DropdownItem>
-                                                <DropdownItem key="system">
-                                                    <Link href={'/profile/order'}>
-                                                        Quản lí đơn hàng
-                                                    </Link>
-                                                </DropdownItem>
-                                                <DropdownItem key="configurations">
-                                                    <Link href={'/profile/promotion'}>
-                                                        Mã giảm giá
-                                                    </Link>
-                                                </DropdownItem>
-                                                <DropdownItem key="logout" color="danger">
-                                                    Đăng xuất
-                                                </DropdownItem>
-                                            </DropdownMenu>
-                                        </Dropdown>
-                                    </div> */}
-                                </div>
+        {userData ? ( // Check if userData exists
+            <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                    <Avatar
+                        isBordered
+                        size='sm'
+                        as="button"
+                        className="transition-transform"
+                        src={userData.avatar || "https://i.pravatar.cc/150?u=a042581f4e29026704d"} // Use user avatar or a default
+                    />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                    <DropdownItem key="profile" className="h-14 gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">{userData.email}</p> {/* Display user email */}
+                    </DropdownItem>
+                    <DropdownItem key="settings">
+                        <Link href={'/profile'}>
+                            Trang cá nhân
+                        </Link>
+                    </DropdownItem>
+                    <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                    <DropdownItem key="analytics">
+                        <Link href={'/profile/notify'}>
+                            Thông báo
+                        </Link>
+                    </DropdownItem>
+                    <DropdownItem key="system">
+                        <Link href={'/profile/order'}>
+                            Quản lí đơn hàng
+                        </Link>
+                    </DropdownItem>
+                    <DropdownItem key="configurations">
+                        <Link href={'/profile/promotion'}>
+                            Mã giảm giá
+                        </Link>
+                    </DropdownItem>
+                    <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
+                                Đăng xuất
+                            </DropdownItem>
+                </DropdownMenu>
+            </Dropdown>
+        ) : (
+            <div className='flex items-center gap-1'>
+                <div>
+                    <PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
+                </div>
+                <div className="xl:text-sm lg:text-[10px]">
+                    <div>
+                        <Link href={`/${lang}/signin`}>{t('login')}</Link>
+                    </div>
+                    <div>
+                        <Link href={`/${lang}/signup`}>{t('register')}</Link>
+                    </div>
+                </div>
+            </div>
+        )}
+    </div>
                                 <TooltipCu position='right' title={
                                     <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative py-3">
                                         <div className="relative">

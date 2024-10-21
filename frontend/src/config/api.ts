@@ -68,6 +68,16 @@ const apiConfig = {
     // /flashsale/addProductToFlashSale/{id}
     addProductToFlashSale : `${baseUrl}/api/flashsaleproduct/store/`,
 
+  },
+
+  user : {
+    login : `${baseUrl}/api/login`,
+    register : `${baseUrl}/api/register/send-code`,
+    verify : `${baseUrl}/api/register/verify-code`,
+
+    // Lấy thông tin user theo id
+    ///users/show/{id}
+    getUserById : `${baseUrl}/api/users/show/`,
   }
 
 };
