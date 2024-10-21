@@ -44,8 +44,10 @@ Route::group(['prefix' => 'api/roles'], function () {
 // Đăng nhập - đăng xuất
 Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
 Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
-Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
-Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+// Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
+// Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+Route::get('/auth/google', [UserController::class, 'googleAuth']);
+Route::get('/auth/google/callback', [UserController::class, 'googleAuth']);
 
 // Đăng ký
 Route::group(['prefix' => 'api/register'], function() {
@@ -56,8 +58,17 @@ Route::group(['prefix' => 'api/register'], function() {
 // Quên mật khẩu
 Route::group(['prefix' => 'api/password'], function() {
     Route::post('/forgot', [UserController::class, 'sendResetCode'])->name('api.password.forgot');
-    Route::post('/reset', [UserController::class, 'resetPassword'])->name('api.password.reset');
+    // Xác minh mã reset
+    Route::post('/verify-code', [UserController::class, 'verifyResetCode']);
+
+    // Hiển thị form nhập mật khẩu mới sau khi mã được xác thực
+    Route::get('/new-password/{email}', [UserController::class, 'showNewPasswordForm'])
+        ->name('password.new');
+
+    // Cập nhật mật khẩu mới
+    Route::post('/update', [UserController::class, 'updatePassword']);
 });
+
 
 
 
