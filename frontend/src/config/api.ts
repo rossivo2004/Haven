@@ -78,6 +78,15 @@ const apiConfig = {
     // Lấy thông tin user theo id
     ///users/show/{id}
     getUserById : `${baseUrl}/api/users/show/`,
+
+        //Gửi mã khôi phục mật khẩu tới email của người dùng.
+        sendResetPasswordCode : `${baseUrl}/api/password/forgot`,
+
+        //Xác minh mã khôi phục mật khẩu được gửi tới email người dùng.
+        verifyResetPasswordCode : `${baseUrl}/api/password/verify-code`,
+
+        //Cập nhật mật khẩu mới cho người dùng sau khi xác minh mã thành công.
+        updatePassword : `${baseUrl}/api/password/update`,
   }
 
 };
