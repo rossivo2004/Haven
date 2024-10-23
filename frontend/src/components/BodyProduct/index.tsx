@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { number } from 'yup';
 
 import { ProductProps, Variant } from '@/src/interface';
@@ -27,6 +28,7 @@ import BreadcrumbNav from '../Breadcrum';
 
 import apiConfig from '@/src/config/api';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 interface CustomRadioProps extends RadioProps {
     isSelected: boolean;
@@ -63,6 +65,7 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
 function BodyProduct() {
     const { id } = useParams(); // get id product
     const [product, setProduct] = useState<Variant | null>(null);
+    const [productFavourite, setProductFavourite] = useState<Variant | null>(null);
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
     const router = useRouter();
     // const image = product?.images || [];
@@ -73,6 +76,7 @@ function BodyProduct() {
     const [variantsPr, setVariantsPr] = useState<Variant[]>([]);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
+    const [isFavorited, setIsFavorited] = useState<boolean>(false);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
@@ -84,8 +88,36 @@ function BodyProduct() {
         }
     };
 
+    // ... existing code ...
 
-    
+    useEffect(() => {
+        const fetchProductFavourite = async () => {
+            const userId = Cookies.get('user_id');
+            if (userId) {
+                try {
+                    const response = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+
+                    // Check if the response data is empty
+                    if (response.data && response.data.length > 0) {
+                        const favorites = response.data; // Assuming this returns an array of favorite products
+                        const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
+                        setIsFavorited(isProductFavorited); // Update state
+                    } else {
+                        // If no favorites found, set isFavorited to false
+                        setIsFavorited(false);
+                    }
+                } catch (error: any) { // Specify the type of error as 'any'
+                    console.error('Error fetching favorites:', error); // Handle errors
+                    setIsFavorited(false); // Ensure isFavorited is false on error
+                }
+            } else {
+                setIsFavorited(false); // Ensure isFavorited is false if no user ID
+            }
+        };
+        fetchProductFavourite();
+    }, [product]);
+
+    // ... existing code ...
 
     useEffect(() => {
         const fetchData = async () => {
@@ -121,9 +153,6 @@ function BodyProduct() {
         fetchProductPromotion();
     }, [product]);
 
-    console.log(variantsPr);
-
-
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
@@ -158,51 +187,8 @@ function BodyProduct() {
         return Math.min(discounted, flashSale).toLocaleString('vi-VN');
     };
 
-    //     const handleAddToCart = () => {
-    //         if (product) {
-    //             const salePrice = product.price - (product.price * product.discount) / 100;
-
-    //             // dispatch(addItem({
-    //             //     id: product.id,
-    //             //     name: product.name,
-    //             //     images: product.images,
-    //             //     price: product.price,
-    //             //     salePrice: salePrice,
-    //             //     quantity: quantity,
-    //             //     select: false,
-    //             //     // stock: product.stock,
-    //             // }));
-
-    //             toast.success('Thêm sản phẩm thành công');
-    //             setQuantity(1);
-    //         } else {
-    //             toast.error('Thêm sản phẩm thất bại');
-    //         }
-    //     };
-
-    //   const handleVariantChange = (variantId: string) => {
-    //     const selectedVariant = product?.variants.find((variant) => variant.id === variantId);
-    //     if (selectedVariant) {
-
-    //         setActiveVariant(selectedVariant.id);
-
-    //         // Update the URL without a full page reload
-    //         const newUrl = `/product/${selectedVariant.id}`;
-    //         router.push(newUrl, undefined);
 
 
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (product && activeVariant) {
-    //         const selectedVariant = product.variants.find(variant => variant.id === activeVariant);
-    //         if (selectedVariant) {
-    //             const discount = selectedVariant.discount ? selectedVariant.price * (1 - selectedVariant.discount / 100) : selectedVariant.price;
-    //             setPriceDiscount(discount);
-    //         }
-    //     }
-    // }, [activeVariant, product]);
 
     if (loading) {
         return (
@@ -212,8 +198,133 @@ function BodyProduct() {
         );
     }
 
+    // ... existing code ...
+
+    // ... existing code ...
+
+    const handleAddToFavorites = async (productVariantId: number) => {
+        const userId = Cookies.get('user_id'); // Get user ID from cookies
+        if (!userId) {
+            toast.error('Bạn cần đăng nhập để thêm sản phẩm vào yêu thích.');
+            return;
+        }
+
+        const body = {
+            user_id: parseInt(userId), // Parse user ID
+            product_variant_id: productVariantId,
+        };
+
+        try {
+            if (isFavorited) {
+                // If already favorited, remove from favorites
+                const response = await axios.post(`${apiConfig.favourite.acitonFavourite}`, body, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true, // Ensure cookies are sent
+                });
+                if (response.status === 204) {
+                    setIsFavorited(false); // Update state
+                    toast.success('Sản phẩm đã được bỏ yêu thích!'); // Thông báo khi bỏ yêu thích
+                }
+            } else {
+                // If not favorited, add to favorites
+                const response = await axios.post(apiConfig.favourite.acitonFavourite, body, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true, // Ensure cookies are sent
+                });
+                if (response.status === 201) {
+                    setIsFavorited(true); // Update state
+                    toast.success('Sản phẩm đã được thêm vào yêu thích!');
+                }
+            }
+        } catch (error: any) {
+            console.error('Error updating favorites:', error);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                toast.error('Có lỗi xảy ra khi cập nhật yêu thích.'); // Thông báo lỗi
+            }
+        }
+    };
+
+    // ... existing code ...
+
+    // ... existing code ...
+
+    // ... existing code ...
+
+    const handleAddToCart = async () => {
+        const body = {
+            quantity: quantity, // Use the quantity state
+            product_variant_id: product?.id, // Ensure product ID is used
+        };
+
+        console.log("Sending to cart:", body); // Debug log
+
+        try {
+            const response = await axios.post(apiConfig.cart.addToCart, body, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                withCredentials: true, // Ensure cookies are sentx
+            });
+
+            // Check if the response structure is as expected
+            if (response.status === 200 && response.data.message) {
+                toast.success(response.data.message); // Use the message from the response
+            } else {
+                console.error('Unexpected response:', response); // Debug log
+                toast.error('Unexpected response from server.');
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+        }
+    };
+
+    // ... existing code ...
+
+    // const addToCart = async () => {
+    //     const body = {
+    //         quantity: quantity, // Use the quantity state
+    //         product_variant_id: product?.id, // Ensure product ID is used
+    //     };
+
+    //     console.log("Sending to cart:", body); // Debug log
+
+    //     try {
+    //         const response = await fetch(apiConfig.cart.addToCart, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(body),
+    //             credentials: 'include', // Ensure cookies are sent
+    //         });
+
+    //         // Kiểm tra mã trạng thái
+    //         if (!response.ok) {
+    //             console.error('Failed to add to cart:', response.status);
+    //             toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+    //             return;
+    //         }
+
+    //         // Chỉ đọc nội dung một lần
+    //         const data = await response.json(); // Đọc nội dung JSON
+    //         console.log('Added to cart:', data);
+    //         toast.success(data.message); // Sử dụng thông điệp từ phản hồi
+    //     } catch (error) {
+    //         console.error('Error adding to cart:', error);
+    //         toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+    //     }
+    // };
+
+    // ... existing code ...
 
 
+    // ... existing code ...
     return (
         <div className="max-w-screen-xl lg:mx-auto mx-4 px-4">
             <div className="py-5 h-[62px]">
@@ -248,8 +359,8 @@ function BodyProduct() {
                     </span></div>
 
                     <div className='flex gap-5 items-center mb-4'>
-                    <div className='font-bold text-3xl text-price'>
-                    {getLowerPrice(product?.DiscountedPrice?.toString(), product?.FlashSalePrice?.toString())} đ
+                        <div className='font-bold text-3xl text-price'>
+                            {getLowerPrice(product?.DiscountedPrice?.toString(), product?.FlashSalePrice?.toString())} đ
                         </div>
                         <div className='flex flex-col font-normal text-base'>
                             {product?.discount !== undefined && product.discount > 0 ? (
@@ -284,70 +395,75 @@ function BodyProduct() {
                         Mã sản phẩm: 2320320320
                     </div> */}
 
-<div className='flex gap-2 mb-4'>
-       {variantsPr?.map((item) => (
-        <a href={`/vi/product/${item.id}`} key={item.id}>
-          <div className={`p-1 border-2 font-medium border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main text-white border-main' : ''}`}> 
-                {item.name}
-          </div>
-        </a>
-    ))}
-    </div>
+                    <div className='flex gap-2 mb-4'>
+                        {variantsPr?.map((item) => (
+                            <a href={`/vi/product/${item.id}`} key={item.id}>
+                                <div className={`p-1 border font-medium border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main text-white border-main' : ''}`}>
+                                    {item.name}
+                                </div>
+                            </a>
+                        ))}
+                    </div>
 
                     <div className='font-normal text-sm mb-5'>
                         {product?.product?.description}
                     </div>
 
                     {/* {product && product.stock !== undefined && product.stock > 0 ? */}
-                        <div>
+                    <div>
 
-                            <div className="flex gap-2">
-                                <Link href={`/vi/shop?category%5B%5D=${product?.product?.category?.name}`}>
-                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
-                                </Link>
-                                <Link href={`/vi/shop?category%5B%5D=${product?.product?.brand?.name}`}>
-                                    <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
-                                </Link>
-                            </div>
-
-                            <div className="flex items-center gap-7 text-black py-5">
-                                <span className="text-base sm:text-xl font-semibold">Số lượng</span>
-                                <div className="flex items-center border border-gray-300">
-                                    <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
-                                    <Divider orientation="vertical" />
-                                    <input
-                                        type="text"
-                                        value={quantity}
-                                        onChange={(e) => handleQuantityChange(Number(e.target.value))}
-                                        min={1}
-                                        className="w-16 text-center border-none outline-none"
-                                    />
-                                    <Divider orientation="vertical" />
-                                    <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
-                                </div>
-
-                            </div>
-
-                            <div className="flex flex-row gap-3">
-                                {/* <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
-                                    <AddShoppingCartIcon /> Thêm vào giỏ hàng
-                                </Button> */}
-                                <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                                    <FavoriteBorderIcon />Yêu thích
-                                </Button>
-                                <Button className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                                    <FavoriteIcon />Đã thích
-                                </Button>
-                            </div>
+                        <div className="flex gap-2">
+                            <Link href={`/vi/shop?category%5B%5D=${product?.product?.category?.name}`}>
+                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
+                            </Link>
+                            <Link href={`/vi/shop?category%5B%5D=${product?.product?.brand?.name}`}>
+                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
+                            </Link>
                         </div>
-                        
-                        <div></div>
+
+                        <div className="flex items-center gap-7 text-black py-5">
+                            <span className="text-base sm:text-xl font-semibold">Số lượng</span>
+                            <div className="flex items-center border border-gray-300">
+                                <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
+                                <Divider orientation="vertical" />
+                                <input
+                                    type="text"
+                                    value={quantity}
+                                    onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                                    min={1}
+                                    className="w-16 text-center border-none outline-none"
+                                />
+                                <Divider orientation="vertical" />
+                                <button className="p-2" onClick={() => handleQuantityChange(quantity + 1)}>+</button>
+                            </div>
+
+                        </div>
+                        <div className="flex flex-row gap-3">
+                            <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
+                                <AddShoppingCartIcon /> Thêm vào giỏ hàng
+                            </Button>
+                            {isFavorited ? ( // Conditional rendering based on isFavorited state
+                                <Button onClick={() => handleAddToFavorites(product?.id as number)} className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
+                                    <FavoriteIcon /> Đã thích
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => handleAddToFavorites(product?.id as number)} // Ensure product ID is treated as a number
+                                    className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7"
+                                >
+                                    <FavoriteBorderIcon /> Yêu thích
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div></div>
                     {/* } */}
 
 
                 </div>
                 <div className='flex-1'>
-                <ImageSwiper imgDemo={[product?.image || '', ...(product?.product?.product_images?.map(img => img.image) || [])]} />
+                    <ImageSwiper imgDemo={[product?.image || '', ...(product?.product?.product_images?.map(img => img.image) || [])]} />
                 </div>
             </div>
 

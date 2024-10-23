@@ -41,6 +41,8 @@ import { updateQuantity } from '@/src/store/cartSlice';
 // import { DUMP_PRODUCTS } from '@/src/dump';
 
 import { useTranslations } from 'next-intl';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -119,9 +121,12 @@ function Header({ params }: { params: { lang: string } }) {
     };
 
     const handleLogout = () => {
+        axios.post(apiConfig.user.logout, { withCredentials: true });
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
+        toast.success('Đăng xuất thành công');
     };
+
     
     // useEffect(() => {
     //     const getApi = async () => {

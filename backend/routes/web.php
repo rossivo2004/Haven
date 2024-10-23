@@ -157,13 +157,17 @@ route::group([
 
 
 });
+
 route::group([
-    'prefix' => 'api/favorite', 'middleware'=>'auth'
+    'prefix' => 'api/favorite',
 ],function(){
     Route::get('/', [FavoriteController::class, 'index'])->name('Favorite.index');
     Route::post('/store', [FavoriteController::class, 'store']);
 });
 
+Route::group(['prefix' => 'api/userfavorite'], function() {
+    Route::get('/{userId}', [FavoriteController::class, 'index'])->name('Favorite.index');
+});
 
 route::group([
     'prefix' => 'api/cart'

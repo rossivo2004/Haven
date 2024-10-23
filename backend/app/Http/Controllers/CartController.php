@@ -18,7 +18,7 @@ class CartController extends Controller
         $productVariant = ProductVariant::findOrFail($request->product_variant_id);
         $quantity = $request->quantity ?? 1;
 
-        if (Auth::check()) { 
+        if (Auth::check()) {
             // Người dùng đã đăng nhập -> thêm sản phẩm vào giỏ hàng trong database
             $cartItem = Cart::where('user_id', Auth::user()->id)
                             ->where('product_variant_id', $productVariant->id)
@@ -49,7 +49,7 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Product added to cart']);
     } catch (\Exception $e) {
-        return response()->json([   
+        return response()->json([
             'success' => false,
             'message' => 'Xảy ra lỗi trong quá trình thêm giỏ hàng',
             'error' => $e->getMessage()
@@ -184,7 +184,7 @@ public function cartTotal()
     // Kiểm tra người dùng đã đăng nhập
     if (Auth::check()) {
         $cartItems = Cart::where('user_id', Auth::user()->id)->get();
-        
+
         foreach ($cartItems as $item) {
             $total += $item->quantity * $item->productVariant->price;
         }

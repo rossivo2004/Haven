@@ -59,8 +59,8 @@ function BodyResetPassword() {
 
                                     if (response.status === 200) {
                                         const { email, otp } = response.data; // Adjust based on your API response
-                                        Cookies.set('email', email, { expires: 7 }); // Store email in cookies for 7 days
-                                        Cookies.set('otp_code', otp, { expires: 7 }); // Store OTP in cookies for 7 days
+                                        // Cookies.set('email', email, { expires: 7 }); // Store email in cookies for 7 days
+                                        // Cookies.set('otp_code', otp, { expires: 7 }); // Store OTP in cookies for 7 days
                                         toast.success("Cập nhật thành công!")
                                     }
                                 } catch (error) {
