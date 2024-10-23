@@ -196,101 +196,13 @@ const AccountSection = () => {
                       fullWidth
                       size="sm"
                     />
-                    <div className="text-nowrap font-bold">Nickname</div>
-                    <Input
-                      {...register("nickname", {
-                        value: user?.nickname,
-                        required: "*Bắt buộc",
-                        maxLength: {
-                          value: 50,
-                          message: "Không quá 50 ký tự!",
-                        },
-                      })}
-                      isInvalid={!!errors.nickname}
-                      errorMessage={errors.nickname?.message || ""}
-                      variant="bordered"
-                      fullWidth
-                      size="sm"
-                    />
+            
                   </div>
                 </div>
 
-                {/* Ngày sinh */}
-                <div className="flex flex-col sm:flex-row gap-5 item-start sm:items-center">
-                  <div className="text-nowrap font-bold">Ngày sinh</div>
-                  <Controller
-                    name="birthday"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <DatePicker
-                        aria-label="date-picker-birthday"
-                        showMonthAndYearPickers
-                        value={value}
-                        onChange={onChange}
-                      />
-                    )}
-                  />
-                </div>
+            
 
-                {/* Giới tính */}
-                {/* <div className="flex flex-row  gap-5 items-center">
-                  <div className="text-nowrap font-bold">Giới tính</div>
-                  <Controller
-                    name="gender"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <RadioGroup
-                        orientation="horizontal"
-                        label=""
-                        aria-label="gender-radio"
-                        value={value}
-                        onChange={onChange}
-                      >
-                        {GENDER.map((g) => (
-                          <Radio value={g.type} key={g.type}>
-                            {g.type}
-                          </Radio>
-                        ))}
-                      </RadioGroup>
-                    )}
-                  />
-                </div> */}
-
-                {/* Quốc tịch */}
-                {/* <div className="flex flex-row gap-5 items-center">
-                  <div className="text-nowrap font-bold">Quốc tịch</div>
-                  <Controller
-                    name="country"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <Select
-                        aria-label="country"
-                        variant="bordered"
-                        selectedKeys={[value]}
-                        onChange={(selected) => {
-                          const country = selected.target.value;
-                          onChange(country); // Cập nhật giá trị khi chọn quốc tịch
-                        }}
-                      >
-                        {COUNTRY.map((country) => (
-                          <SelectItem
-                            key={country.key}
-                            startContent={
-                              <Avatar
-                                alt={country.name}
-                                className="w-6 h-6"
-                                src={country.flag}
-                              />
-                            }
-                          >
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                    )}
-                  />
-                </div> */}
-
+          
                 <Button
                   type="submit"
                   color="warning"

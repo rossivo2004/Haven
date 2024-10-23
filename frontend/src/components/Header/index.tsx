@@ -40,7 +40,6 @@ import { logout } from '@/src/store/userSlice';
 import { updateQuantity } from '@/src/store/cartSlice';
 // import { DUMP_PRODUCTS } from '@/src/dump';
 
-import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -79,7 +78,6 @@ function Header({ params }: { params: { lang: string } }) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
-    const { lang } = params;
 
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -94,7 +92,6 @@ function Header({ params }: { params: { lang: string } }) {
         }
     };
 
-    const t = useTranslations('HomePage');
 
     const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
 
@@ -298,7 +295,7 @@ function Header({ params }: { params: { lang: string } }) {
                                         }}
                                         className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         type="text"
-                                        placeholder={t('input_pl_search')}
+                                        placeholder={"Tìm kiếm sản phẩm..."}
                                     />
                                     <div className="absolute inset-y-0 right-0 flex items-center xl:pr-3 lg:pr-1">
                                         {search && (
@@ -319,7 +316,7 @@ function Header({ params }: { params: { lang: string } }) {
 
                                 {(isDropdownVisible && (isFocused || isMouseOver) && debouncedSearch) && (
                                     <div className="absolute w-full mt-2 bg-white shadow-lg rounded-md z-10">
-                                        <div className="text-xl font-bold mt-2 ml-5">{t('input_pl_search_kq')}</div>
+                                        <div className="text-xl font-bold mt-2 ml-5">Tìm kiếm theo tên sản phẩm</div>
                                         <div className='flex gap-5 p-5'>
                                             <div className='w-1/4'>
                                                 <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-full rounded-lg h-[400px] object-cover' />
@@ -331,7 +328,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                     <ul className='overflow-scroll h-[400px]'>
                                                         {filteredProducts.map((product) => (
                                                             <li key={product.product_id} className="p-2 border-b hover:bg-gray-100">
-                                                                <a href={`/${lang}/product/${product.product_id}`} className="flex gap-4 items-center">
+                                                                <a href={`/product/${product.product_id}`} className="flex gap-4 items-center">
                                                                     <div className='w-14 h-14'>
                                                                         <img className='w-full h-full min-w-14 object-cover' src={product.image} alt={product.name} />
                                                                     </div>
@@ -341,7 +338,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                         ))}
                                                     </ul>
                                                 ) : (
-                                                    <div className="flex items-center justify-center w-full h-full">{t('input_pl_search_kq_faile')}</div>
+                                                    <div className="flex items-center justify-center w-full h-full">Không tìm thấy sản phẩm</div>
                                                 )}
                                             </div>
                                         </div>
@@ -408,10 +405,10 @@ function Header({ params }: { params: { lang: string } }) {
                 </div>
                 <div className="xl:text-sm lg:text-[10px]">
                     <div>
-                        <Link href={`/${lang}/signin`}>{t('login')}</Link>
+                        <Link href={`/signin`}>Đăng nhập</Link>
                     </div>
                     <div>
-                        <Link href={`/${lang}/signup`}>{t('register')}</Link>
+                        <Link href={`/signup`}>Đăng kí</Link>
                     </div>
                 </div>
             </div>
@@ -425,10 +422,10 @@ function Header({ params }: { params: { lang: string } }) {
                                              {cartCount}
                                          </span> */}
                                         </div>
-                                        <Link href={`/${lang}/cart`}>
+                                        <Link href={`/cart`}>
                                             <div>
-                                                <div className="xl:text-sm lg:text-[10px]">{t('cart')}</div>
-                                                <div className="font-semibold"><span>({cartCount})</span> {t('product')}</div>
+                                                <div className="xl:text-sm lg:text-[10px]">Giỏ hàng</div>
+                                                <div className="font-semibold"><span>({cartCount})</span> Sản phẩm</div>
                                             </div>
                                         </Link>
                                     </div>
@@ -437,7 +434,7 @@ function Header({ params }: { params: { lang: string } }) {
                                         <div>
                                             <div className='p-4 min-w-[460px] max-w-[460px]'>
                                                 <div className='flex justify-end mb-4 items-center'>
-                                                    <div className='text-xl mb-2 font-semibold text-black'>{t('y_cart')}</div>
+                                                    <div className='text-xl mb-2 font-semibold text-black'>Giỏ hàng của bạn</div>
                                                 </div>
 
                                                 <div>
@@ -480,12 +477,12 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 </li>
                                                             ))
                                                         ) : (
-                                                            <div className='text-center py-4'>{t('y_cart_empty')}</div>
+                                                            <div className='text-center py-4'>Giỏ hàng trống</div>
                                                         )}
                                                     </ul>
                                                 </div>
                                                 <div className='flex items-center justify-between mt-6'>
-                                                    <div><Link href={`/${lang}/cart`} className='py-1 px-4 rounded-lg bg-main text-white'>{t('y_cart_btn')}</Link></div>
+                                                    <div><Link href={`/cart`} className='py-1 px-4 rounded-lg bg-main text-white'>Xem giỏ hàng</Link></div>
                                                     {/* <div className='text-xl font-semibold'>Tổng: <span className='text-price'>{totalSelectedPrice.toLocaleString('vi-VN')} VND</span> </div> */}
                                                 </div>
                                             </div>
@@ -540,10 +537,10 @@ function Header({ params }: { params: { lang: string } }) {
                         <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                             <ul className='flex gap-16 text-white font-medium'>
                                 <li className='flex items-center'>
-                                    <Link href={'/'}>{t('home_nav')}</Link>
+                                    <Link href={'/'}>TRANG CHỦ</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={`/${lang}/blog`}>{t('blog_nav')}</Link>
+                                    <Link href={`/blog`}>TIN TỨC</Link>
                                 </li>
                                 <li>
 
@@ -551,8 +548,8 @@ function Header({ params }: { params: { lang: string } }) {
                                     <div className='group'>
                                         <TooltipCu position='left' title={
                                             <div className='flex items-center transition-all py-3'>
-                                                <Link href={`/${lang}/shop`}>
-                                                    {t('product_nav')}
+                                                <Link href={`/shop`}>
+                                                SẢN PHẨM
                                                 </Link>
                                                 <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400' />
                                             </div>
@@ -568,7 +565,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                             <div className='text-black text-lg'>Phân loại</div>
                                                             <div className='grid grid-cols-2'>
                                                             {categories.map((item, index) => (
-                                                                <Link key={index} href={`/${lang}/shop?category[]=${item.name}`}>
+                                                                <Link key={index} href={`/shop?category[]=${item.name}`}>
                                                                     <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
                                                                         <div className='mr-2'>
                                                                             <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
@@ -584,7 +581,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                             <div className='text-black text-lg'>Thương hiệu</div>
                                                             <div className='grid grid-cols-2'>
                                                             {brands.map((item, index) => (
-                                                                <Link key={index} href={`/${lang}/shop?brand[]=${item.name}`}>
+                                                                <Link key={index} href={`/shop?brand[]=${item.name}`}>
                                                                     <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
                                                                         <div className='mr-2'>
                                                                             <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
@@ -642,13 +639,13 @@ function Header({ params }: { params: { lang: string } }) {
 
                                 </li> */}
                                 <li className='flex items-center'>
-                                    <Link href={`/${lang}/contact`}>{t('contact_nav')}</Link>
+                                    <Link href={`/contact`}>LIÊN HỆ</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={`/${lang}/tracking`}>{t('lookup_nav')}</Link>
+                                    <Link href={`/tracking`}>TRA CỨU</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={`/${lang}/tracking`}>{t('about_nav')}</Link>
+                                    <Link href={`/tracking`}>VỀ CHÚNG TÔI</Link>
                                 </li>
                             </ul>
                         </div>
@@ -701,7 +698,7 @@ function Header({ params }: { params: { lang: string } }) {
                         <ul className="menu menu-horizontal w-full h-full flex items-center justify-around">
                             <li className='lg:mx-4'><Link href={'/'}><HomeIcon className='h-5 w-5' /></Link></li>
                             <li className='lg:mx-4'> <Button className='p-2 min-w-16' variant='light' onPress={onOpen}><SearchIcon className='h-5 w-5' /></Button></li>
-                            <li className='lg:mx-4'><Link href={`/${lang}/cart`}>  <div className="relative">
+                            <li className='lg:mx-4'><Link href={`/cart`}>  <div className="relative">
                                 <ShoppingBagIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
                                 <span className="w-4 h-4 bg-secondary flex items-center justify-center rounded-full absolute top-0 right-[-4px]">
                                     <div className='text-white'>{cartCount}</div>
@@ -725,7 +722,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             <p className="font-semibold">zoey@example.com</p>
                                         </DropdownItem>
                                         <DropdownItem key="settings">
-                                            <Link href={`/${lang}/profile`}>
+                                            <Link href={`/profile`}>
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>
@@ -762,7 +759,7 @@ function Header({ params }: { params: { lang: string } }) {
                                         onBlur={() => setIsFocused(false)}
                                         className="w-full xl:h-10 lg:h-8 xl:text-sm lg:text-[10px] bg-white rounded-md py-2 xl:pl-4 lg:pl-2 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         type="text"
-                                        placeholder={t('input_pl_search')}
+                                        placeholder={"Tìm kiếm sản phẩm..."}
                                     />
                                 </ModalHeader>
                                 <ModalBody>
@@ -775,7 +772,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                     <ul className="h-screen overflow-y-auto pb-20">
                                                         {filteredProducts.map((product) => (
                                                             <li key={product.product_id} className="p-2 border-b hover:bg-gray-100">
-                                                                <Link href={`/${lang}/product/${product.product_id}`} className="flex gap-4 items-center">
+                                                                <Link href={`/product/${product.product_id}`} className="flex gap-4 items-center">
                                                                     <div className="w-14 h-14">
                                                                         <img
                                                                             className="w-full h-full object-cover"

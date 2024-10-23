@@ -74,7 +74,7 @@ function BodyForgotPassword() {
       await axios.post(apiConfig.user.verifyResetPasswordCode, { email, code: otpCode });
       dispatch(setOtpCode(otpCode)); // Save OTP code in Redux
       toast.success('Xác thực mã thành công.');
-      router.push('/vi/resetpassword');
+      router.push('/resetpassword');
     } catch (error) {
       console.error(error);
       alert('Invalid OTP. Please try again.');

@@ -82,7 +82,7 @@ useEffect(() => {
       if (response.status === 200) {
         dispatch(clearUser());
         toast.success('Xác thực thành công!');
-        router.push('/vi/signin');
+        router.push('/signin');
       } else {
         toast.error('Xác thực thất bại!');
       }

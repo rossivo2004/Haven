@@ -397,7 +397,7 @@ function BodyProduct() {
 
                     <div className='flex gap-2 mb-4'>
                         {variantsPr?.map((item) => (
-                            <a href={`/vi/product/${item.id}`} key={item.id}>
+                            <a href={`/product/${item.id}`} key={item.id}>
                                 <div className={`p-1 border font-medium border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main text-white border-main' : ''}`}>
                                     {item.name}
                                 </div>
@@ -413,10 +413,10 @@ function BodyProduct() {
                     <div>
 
                         <div className="flex gap-2">
-                            <Link href={`/vi/shop?category%5B%5D=${product?.product?.category?.name}`}>
+                            <Link href={`/shop?category%5B%5D=${product?.product?.category?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
                             </Link>
-                            <Link href={`/vi/shop?category%5B%5D=${product?.product?.brand?.name}`}>
+                            <Link href={`/shop?category%5B%5D=${product?.product?.brand?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
                             </Link>
                         </div>
