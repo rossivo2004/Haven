@@ -392,7 +392,6 @@ class UserController extends Controller
     {
         // Xác thực dữ liệu từ request
         $validator = Validator::make($request->all(), [
-            'google_id' => 'required|string|unique:users,google_id',
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
         ]);
@@ -408,7 +407,6 @@ class UserController extends Controller
             $newUser = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'google_id' => $request->id,
                 'password' => Hash::make('123456dummy'), // Mật khẩu ngẫu nhiên
                 'role_id' => $role->id,
             ]);
