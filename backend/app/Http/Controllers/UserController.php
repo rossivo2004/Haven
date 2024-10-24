@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\PasswordReset;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -119,13 +120,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
+    
             // Lấy thông tin user sau khi đăng nhập
             $user = Auth::user();
-
+    
             // Lưu ID của user vào session
             session(['user_id' => $user->id]);
-
+    
             // Trả về ID và thông tin của user
             return response()->json([
                 'message' => 'Đăng nhập thành công',
@@ -160,9 +161,9 @@ class UserController extends Controller
 
     //         if ($findUser) {
     //             Auth::login($findUser);
-
+    
     //             session(['user_id' => $findUser->id]);
-
+    
     //             return response()->json([
     //                 'message' => 'Đăng nhập Google thành công',
     //                 'user_id' => $findUser->id,
@@ -260,6 +261,8 @@ class UserController extends Controller
             return response()->json(['error' => 'Không thể đăng nhập qua Google', 'details' => $e->getMessage()], 500);
         }
     }
+    
+
 
 
 
@@ -385,5 +388,40 @@ class UserController extends Controller
         return response()->json(['message' => 'Tài khoản đã được tạo thành công'], 200);
     }
 
+    public function saveGoogleUser(Request $request)
+    {
+        // Xác thực dữ liệu từ request
+        $validator = Validator::make($request->all(), [
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+        ]);
 
+        // Kiểm tra nếu có lỗi xác thực
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $role = Role::where('name', 'user')->first();
+
+        if ($role) {
+            $newUser = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make('123456dummy'), // Mật khẩu ngẫu nhiên
+                'role_id' => $role->id,
+            ]);
+
+            // Đăng nhập người dùng mới
+            Auth::login($newUser);
+
+            // Lưu ID của user vào session
+            session(['user_id' => $newUser->id]);
+
+            return response()->json([
+                'user_id' => $newUser->id,
+            ], 200);
+        } else {
+            return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
+        }
+    }
 }

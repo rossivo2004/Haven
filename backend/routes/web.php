@@ -44,8 +44,10 @@ Route::group(['prefix' => 'api/roles'], function () {
 // Đăng nhập - đăng xuất
 Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
 Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
-Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
-Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+// Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
+// Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+Route::get('/auth/google', [UserController::class, 'googleAuth']);
+Route::get('/auth/google/callback', [UserController::class, 'googleAuth']);
 
 // Đăng ký
 Route::group(['prefix' => 'api/register'], function() {
