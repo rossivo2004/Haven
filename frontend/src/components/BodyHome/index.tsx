@@ -37,7 +37,7 @@ import './style.scss'
 
 import { fetchProducts } from "@/src/api/productApi";
 
-import {useTranslations} from 'next-intl';
+// import {useTranslations} from 'next-intl';
 
 import apiConfig from '@/src/config/api';
 
@@ -60,8 +60,8 @@ function BodyHome() {
 
     const [language, setLanguage] = useState('vi'); // Default to 'en'
     const params = useParams(); 
-    const { lang = 'vi' } = params;
-    const t = useTranslations('HomePage');
+    // const { lang = 'vi' } = params;
+    // const t = useTranslations('HomePage');
     const [loading, setLoading] = useState(false);
 
     const [category, setCategory] =  useState<Category[]>([]);
@@ -204,28 +204,28 @@ function BodyHome() {
                             <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50 transition-all">
                                 <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                {t('free_shipping')}
+                                Free shipping
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">{t('free_shipping_title')}</div>
+                                <div className="text-sm text-[#c6c6c6]">For orders from 500k or more</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                {t('24/7_support')}
+                                24/7 Support
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">{t('24/7_support_title')}</div>
+                                <div className="text-sm text-[#c6c6c6]">24/7 online / offline support</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                {t('free_returns')}
+                                Free returns
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">{t('free_returns_title')}</div>
+                                <div className="text-sm text-[#c6c6c6]">Within 7 days</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                {t('order_online')}
+                                Order online
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">Hotline: 0357 420 420</div>
                             </div>
@@ -246,9 +246,9 @@ function BodyHome() {
                         }}
                     >
                         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
-                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">{t('flashsale')}</div>
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Flash Sale</div>
                             <div className="flex items-center">
-                                <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">{t('end_after')}</div>
+                                <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
                                 <div>
                                     <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -256,7 +256,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 15 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            {t('day')}
+                                            Day
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -264,7 +264,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 10 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            {t('hour')}
+                                            Hour
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -272,7 +272,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 24 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            {t('minute')}
+                                            Minute
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -280,7 +280,7 @@ function BodyHome() {
                                                 <span style={customStyle}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            {t('second')}
+                                            Minute
                                             </div>
                                         </div>
                                     </div>
@@ -303,7 +303,7 @@ function BodyHome() {
 
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
-                    <div className="text-black dark:text-white font-bold text-4xl mb-6">{t('category')}</div>
+                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Category</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
@@ -334,7 +334,7 @@ function BodyHome() {
                                         viewport={{ once: true }}
                                         transition={{ duration: 0.8, delay: index * 0.1, ease: "easeOut" }} // Hiệu ứng chậm dần cho mỗi box
                                     >
-                                        <Link href={`${lang}/shop?category[]=${item.name}`} className="w-full">
+                                        <Link href={`/shop?category[]=${item.name}`} className="w-full">
                                             <div className="w-full max-w-[300px] h-auto max-h-[300px] group relative">
                                                 <div className="flex w-full items-center justify-center rounded-full overflow-hidden">
                                                     <img
@@ -372,7 +372,7 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex gap-4">
                             <div className="lg:w-1/4 lg:block hidden">
-                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">{t('featured_products')}</div>
+                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">Featured Products</div>
                                 <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden w-full h-[800px] object-cover rounded-lg" />
                             </div>
                             <div className="flex-1">
@@ -425,7 +425,7 @@ function BodyHome() {
                         <div>
                             <Link href="/shop">
                                 <Button variant="bordered" className="border-main text-main">
-                                    {t('see_more')}
+                                   Xem thêm
                                 </Button>
                             </Link>
                         </div>
@@ -461,9 +461,9 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between items-center mb-6">
-                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">{t('new_products')}</div>
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm mới</div>
                             <div className="font-medium text-sm text-main">
-                                <Link href="/shop?new" className="text-main">{t('see_more')}</Link></div>
+                                <Link href="/shop?new" className="text-main">Xem thêm</Link></div>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2 gap-4">
@@ -500,7 +500,7 @@ function BodyHome() {
                             </div>
                             <div>
                                 <Link href="/shop">
-                                    <Button variant="bordered" className="border-main text-main">{t('see_more')}</Button>
+                                    <Button variant="bordered" className="border-main text-main">Xem thêm</Button>
                                 </Link>
                             </div>
                         </div>
@@ -520,7 +520,7 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between mb-6 items-center">
                             <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hàng Đầu Thế Giới</div>
-                            <div className="font-medium text-sm text-main">{t('see_more')}</div>
+                            <div className="font-medium text-sm text-main">Xem thêm</div>
                         </div>
                         <div>
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
@@ -535,7 +535,7 @@ function BodyHome() {
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex items-center justify-between mb-6">
                         <div className="font-bold text-4xl text-black dark:text-white">Tin tức mới</div>
-                        <div className="font-medium text-sm text-main">{t('see_more')}</div>
+                        <div className="font-medium text-sm text-main">Xem thêm</div>
                     </div>
 
                     <Swiper

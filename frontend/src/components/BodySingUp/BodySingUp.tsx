@@ -3,46 +3,62 @@ import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie'; // Import js-cookie
+import axios from 'axios'; // Import Axios
+import apiConfig from "@/src/config/api";
+import { useRouter } from "next/navigation";    
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { setUser } from '@/src/store/userSlice';
+import { useState } from "react";
+import {Spinner} from "@nextui-org/spinner";
 
 interface SignUpValues {
-    phone: string;
+    name: string;
+    email: string;
     password: string;
 }
 
 function BodySingUp() {
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+    const dispatch = useDispatch(); 
     const validationSchema = Yup.object({
-        phone: Yup.string()
-            .required("Vui lòng nhập số điện thoại")
-            .matches(/^[0-9]+$/, "Số điện thoại không hợp lệ")
-            .min(10, "Số điện thoại phải có ít nhất 10 chữ số"),
+        name: Yup.string()
+            .required("Vui lòng nhập tên")
+            .min(8, "Tên phải có ít nhất 8 ký tự"),
+        email: Yup.string()
+            .required("Vui lòng nhập địa chỉ email")
+            .email("Địa chỉ email không hợp lệ"),
         password: Yup.string()
             .required("Vui lòng nhập mật khẩu")
             .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
         repassword: Yup.string()
             .required("Vui lòng xác nhận mật khẩu")
             .oneOf([Yup.ref('password')], 'Mật khẩu không khớp')
-
     });
 
     const handleCheckSignup = async (values: SignUpValues) => {
+        setLoading(true);
         try {
-            const response = await fetch('/api/signup', {
-                method: 'POST',
+            const response = await axios.post(apiConfig.user.register, values, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values),
             });
-
-            if (response.ok) {
+    
+            if (response.status === 200) {
+                // Save user data to cookies
+                dispatch(setUser(values));
                 toast.success('Đăng kí thành công!');
-                window.location.href = '/signin';
+                router.push('/verify');
             } else {
-                const errorData = await response.json();
-                toast.error(errorData.message || 'Đăng kí thất bại! Vui lòng thử lại.');
+                toast.error('Đăng kí thất bại! Vui lòng thử lại.');
             }
-        } catch (error) {
-            toast.error('Đăng kí thất bại! Vui lòng thử lại.');
+        } catch (error: any) { // Specify the type of error as 'any'
+            // Check if the error response contains a specific message
+           toast.error('Email đã tồn tại!');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -63,7 +79,7 @@ function BodySingUp() {
                     </div>
                     <div>
                         <Formik
-                            initialValues={{ phone: "", password: "", repassword: "" }}
+                            initialValues={{ name: "", email: "", password: "", repassword: "" }}
                             validationSchema={validationSchema}
                             onSubmit={(values) => {
                                 handleCheckSignup(values)
@@ -74,12 +90,25 @@ function BodySingUp() {
                                     <div>
                                         <Field
                                             type="text"
-                                            name="phone"
-                                            placeholder="Số điện thoại"
+                                            name="name"
+                                            placeholder="Họ và tên"
                                             className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
                                         />
                                         <ErrorMessage
-                                            name="phone"
+                                            name="name"
+                                            component="div"
+                                            className="text-red-500 text-sm mt-1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Field
+                                            type="text"
+                                            name="email"
+                                            placeholder="Email"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
+                                        />
+                                        <ErrorMessage
+                                            name="email"
                                             component="div"
                                             className="text-red-500 text-sm mt-1"
                                         />
@@ -111,11 +140,12 @@ function BodySingUp() {
                                         />
                                     </div>
                                     <button
-                                        type="submit"
-                                        className="w-full bg-main text-white py-4 rounded mb-4"
-                                    >
-                                        Đăng kí ngay
-                                    </button>
+            type="submit"
+            className={`w-full bg-main text-white py-4 rounded mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading} // Disable button when loading
+        >
+            {loading ? <Spinner /> : 'Đăng kí ngay'} 
+        </button>
                                 </Form>
                             )}
                         </Formik>

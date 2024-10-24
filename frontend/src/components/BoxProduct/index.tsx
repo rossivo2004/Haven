@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 
 function BoxProduct({ product }: { product: Variant }) {
     const router = useRouter();
-    const { id, name, stock, variantValue, image } = product;
+    const { id, name, stock, image } = product;
     const dispatch = useDispatch();
     const [language, setLanguage] = useState('vi'); // Default to 'en'
     const params = useParams(); 

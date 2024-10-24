@@ -2,11 +2,13 @@
   import { configureStore } from '@reduxjs/toolkit';
   import cartSlice from './cartSlice';
   import recentlyViewedSlice from './recentlyViewedSlice';
+  import userSlice from './userSlice';
 
   export const store = configureStore({
     reducer: {
       cart: cartSlice,
       recentlyViewed: recentlyViewedSlice,
+      user: userSlice,
     },
   });
 

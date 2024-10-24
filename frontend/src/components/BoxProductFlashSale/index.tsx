@@ -24,7 +24,7 @@ function BoxProductFlashSale({ product }: { product: Variant }) {
 
 
     return (
-        <Link href={`/vi/product/${product.id}`} >
+        <Link href={`/product/${product.id}`} >
             <div className="w-full h-auto lg:h-[450px] flex flex-col group mb-2 pt-2 pb-3 rounded-lg">
                 <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                     <Image

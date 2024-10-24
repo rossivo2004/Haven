@@ -2,7 +2,10 @@
 import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-
+import axios from 'axios'; 
+import Cookies from 'js-cookie'; // Add this import
+import apiConfig from "@/src/config/api";
+import { toast } from "react-toastify";
 
 function BodyResetPassword() {
     const validationSchema = Yup.object({
@@ -12,7 +15,6 @@ function BodyResetPassword() {
         repassword: Yup.string()
             .required("Vui lòng xác nhận mật khẩu")
             .oneOf([Yup.ref('password')], 'Mật khẩu không khớp')
-
     });
 
     return (
@@ -34,8 +36,37 @@ function BodyResetPassword() {
                         <Formik
                             initialValues={{ password: "", repassword: "" }}
                             validationSchema={validationSchema}
-                            onSubmit={(values) => {
-                                alert('Đăng kí thành công !');
+                            onSubmit={async (values) => {
+                                try {
+                                    // Retrieve user data from cookies
+                                    const userCookie = Cookies.get('user'); // Get user cookie
+                                    const user = userCookie ? JSON.parse(userCookie) : null; // Parse user cookie
+                                    const email = user ? user.email : null; // Extract email
+
+                                    console.log("Email from cookies:", email); // Debugging line
+
+                                    if (!email) {
+                                        toast.error("Không thể cập nhật!!!")
+                                        return; // Exit if email is not found
+                                    }
+
+                                    // Make the API call to update the password
+                                    const response = await axios.post(apiConfig.user.updatePassword, {
+                                        email: email, // Use email from cookies
+                                        password: values.password,
+                                        password_confirmation: values.repassword,
+                                    });
+
+                                    if (response.status === 200) {
+                                        const { email, otp } = response.data; // Adjust based on your API response
+                                        // Cookies.set('email', email, { expires: 7 }); // Store email in cookies for 7 days
+                                        // Cookies.set('otp_code', otp, { expires: 7 }); // Store OTP in cookies for 7 days
+                                        toast.success("Cập nhật thành công!")
+                                    }
+                                } catch (error) {
+                                    console.error("Error updating password:", error);
+                                    alert('Có lỗi xảy ra, vui lòng thử lại.');
+                                }
                             }}
                         >
                             {() => (
