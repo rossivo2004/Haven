@@ -8,10 +8,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { number } from 'yup';
 
-import { ProductProps, Variant } from '@/src/interface';
+import { CartItem, ItemCart, ProductProps, Variant } from '@/src/interface';
 import { SingleProduct } from '@/src/interface';
 import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
-import { addItem } from '@/src/store/cartSlice';
 import { Button, Divider } from '@nextui-org/react';
 
 // import { useProducts } from '@/src/hooks/product';
@@ -30,9 +29,13 @@ import apiConfig from '@/src/config/api';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+import { addToCart, updateCart } from '@/src/store/cartSlice';
+
 interface CustomRadioProps extends RadioProps {
     isSelected: boolean;
 }
+
+// import { ItemCart } from '@/src/interface';
 
 const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
     const {
@@ -198,9 +201,7 @@ function BodyProduct() {
         );
     }
 
-    // ... existing code ...
 
-    // ... existing code ...
 
     const handleAddToFavorites = async (productVariantId: number) => {
         const userId = Cookies.get('user_id'); // Get user ID from cookies
@@ -249,42 +250,96 @@ function BodyProduct() {
         }
     };
 
-    // ... existing code ...
+// ... existing code ...
 
-    // ... existing code ...
+const handleAddToCart = async () => {
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const body = {
+        user_id: userId ? parseInt(userId) : null, // Parse user ID if it exists
+        product_variant_id: product?.id, // Ensure product ID is used
+        quantity: quantity, // Use the quantity state
+    };
 
-    // ... existing code ...
+    if (!userId) {
+        // If user is not logged in, store in cookie
+        const cartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        cartItems.cart_items.push({
+            user_id: null,
+            product_variant_id: body.product_variant_id,
+            quantity: body.quantity,
+        });
+        Cookies.set('cart_items', JSON.stringify(cartItems), { expires: 7 }); // Store cart in cookie for 7 days
+        toast.success('Sản phẩm đã được thêm vào giỏ hàng tạm thời!'); // Notify user
+    } else {
+        // If user is logged in, check for existing cart items in cookies
+        const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        if (existingCartItems.cart_items.length > 0) {
+            // Prepare items for moving to database
+            const itemsToMove = existingCartItems.cart_items.map((item: CartItem) => ({
+                user_id: userId ? parseInt(userId) : null, // Set user_id to null for each item
+                product_variant_id: item.product_variant_id,
+                quantity: item.quantity,
+            }));
 
-    const handleAddToCart = async () => {
-        const body = {
-            quantity: quantity, // Use the quantity state
-            product_variant_id: product?.id, // Ensure product ID is used
-        };
+            // Move existing cart items to database
+            try {
+                await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
+                    user_id: parseInt(userId),
+                    cart_items: itemsToMove,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    withCredentials: true, // Ensure cookies are sent
+                });
+                // Clear the cart in cookies after moving to database
+                Cookies.remove('cart_items');
+                toast.success('Giỏ hàng tạm thời đã được chuyển vào giỏ hàng của bạn!'); // Notify user
+            } catch (error) {
+                console.error('Error moving cart to database:', error);
+                toast.error('Có lỗi xảy ra khi chuyển giỏ hàng vào cơ sở dữ liệu.'); // Notify error
+            }
+        }
 
-        console.log("Sending to cart:", body); // Debug log
-
+        // Now add the current item to the cart in the database
         try {
-            const response = await axios.post(apiConfig.cart.addToCart, body, {
+            const response = await axios.post(`${apiConfig.cart.addToCart}`, body, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                withCredentials: true, // Ensure cookies are sentx
+                withCredentials: true, // Ensure cookies are sent
             });
 
-            // Check if the response structure is as expected
-            if (response.status === 200 && response.data.message) {
-                toast.success(response.data.message); // Use the message from the response
-            } else {
-                console.error('Unexpected response:', response); // Debug log
-                toast.error('Unexpected response from server.');
+            if (response.status === 200) {
+                dispatch(addToCart({
+                    user_id: parseInt(userId),
+                    product_variant_id: product?.id, // Ensure product ID is used
+                    quantity: quantity, // Use the quantity state
+                    product: product, // Add the product object
+                    product_variant: product?.id, // Add the product_variant if needed
+                } as unknown as ItemCart)); 
+                toast.success('Sản phẩm đã được thêm vào giỏ hàng!'); 
             }
         } catch (error) {
             console.error('Error adding to cart:', error);
-            toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+            toast.error('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.'); // Notify error
         }
-    };
+    }
+};
 
-    // ... existing code ...
+const fetchUpdatedCart = async (userId: string) => {
+    try {
+        const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
+        if (response.data && response.data.cart_items) {
+            // Dispatch an action to update the cart in Redux
+            dispatch(updateCart(response.data.cart_items)); // You need to create this action
+        }
+    } catch (error) {
+        console.error('Error fetching updated cart:', error);
+    }
+};
+
+// ... existing code ...
 
     // const addToCart = async () => {
     //     const body = {
@@ -416,7 +471,7 @@ function BodyProduct() {
                             <Link href={`/shop?category%5B%5D=${product?.product?.category?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
                             </Link>
-                            <Link href={`/shop?category%5B%5D=${product?.product?.brand?.name}`}>
+                            <Link href={`/  shop?category%5B%5D=${product?.product?.brand?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
                             </Link>
                         </div>

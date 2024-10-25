@@ -6,11 +6,12 @@ import { toast } from 'react-toastify';
 import Cookies from 'js-cookie'; // Import js-cookie
 import axios from 'axios'; // Import Axios
 import apiConfig from "@/src/config/api";
-import { useRouter } from "next/navigation";    
+import { useRouter } from "next/navigation";
 import { useDispatch } from 'react-redux'; // Import useDispatch
 import { setUser } from '@/src/store/userSlice';
 import { useState } from "react";
-import {Spinner} from "@nextui-org/spinner";
+import { Spinner } from "@nextui-org/spinner";
+import Dashboard from "../Dashboard/Dashboard";
 
 interface SignUpValues {
     name: string;
@@ -21,7 +22,7 @@ interface SignUpValues {
 function BodySingUp() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const dispatch = useDispatch(); 
+    const dispatch = useDispatch();
     const validationSchema = Yup.object({
         name: Yup.string()
             .required("Vui lòng nhập tên")
@@ -45,18 +46,18 @@ function BodySingUp() {
                     'Content-Type': 'application/json',
                 },
             });
-    
+
             if (response.status === 200) {
                 // Save user data to cookies
                 dispatch(setUser(values));
-                toast.success('Đăng kí thành công!');
+                toast.success('Gửi mã thành công!');
                 router.push('/verify');
             } else {
                 toast.error('Đăng kí thất bại! Vui lòng thử lại.');
             }
         } catch (error: any) { // Specify the type of error as 'any'
             // Check if the error response contains a specific message
-           toast.error('Email đã tồn tại!');
+            toast.error('Email đã tồn tại!');
         } finally {
             setLoading(false);
         }
@@ -140,12 +141,12 @@ function BodySingUp() {
                                         />
                                     </div>
                                     <button
-            type="submit"
-            className={`w-full bg-main text-white py-4 rounded mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={loading} // Disable button when loading
-        >
-            {loading ? <Spinner /> : 'Đăng kí ngay'} 
-        </button>
+                                        type="submit"
+                                        className={`w-full bg-main text-white py-4 rounded mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        disabled={loading} // Disable button when loading
+                                    >
+                                        {loading ? <Spinner /> : 'Đăng kí ngay'}
+                                    </button>
                                 </Form>
                             )}
                         </Formik>
@@ -157,12 +158,7 @@ function BodySingUp() {
                     </div>
 
                     <div className="text-center mb-2 flex gap-3 items-center justify-center">
-                        <button>
-                            <img src="/images/google-logo.png" alt="" className="w-8 h-8" />
-                        </button>
-                        <button>
-                            <img src="/images/facebook-logo.png" alt="" className="w-8 h-8" />
-                        </button>
+                        <Dashboard />
                     </div>
                     <div className="text-center text-base font-normal dark:text-white">
                         <Link href={'/forgotpassword'}>

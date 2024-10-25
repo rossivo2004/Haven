@@ -174,10 +174,28 @@ Route::group(['prefix' => 'api/userfavorite'], function() {
 route::group([
     'prefix' => 'api/cart'
 ],function(){
-    Route::get('/', [CartController::class, 'showCart'])->name('Cart.index');
-    Route::get('/total', [CartController::class, 'cartTotal']);
+    Route::get('/{userId}', [CartController::class, 'showCart'])->name('Cart.index'); //lấy danh sách giỏ hàng của 1 người dùng
+    Route::get('/total/{userId}', [CartController::class, 'cartTotal']); // Tổng tiền giỏ hàng của 1 người dùng
+    Route::get('/point/{userId}', [CartController::class, 'cartPoint']); // Số điểm tích lũy của 1 người dùng trong giỏ hàng
+    Route::post('/movecart', [CartController::class, 'moveCartToDatabase']);
     Route::post('/add', [CartController::class, 'addToCart']);
-    Route::put('/update/{productVariantId}', [CartController::class, 'updateCart']);
-    Route::delete('/delete/{productVariantId}', [CartController::class, 'deleteCart']);
-    Route::delete('/clear', [CartController::class, 'clearCart']);
+    Route::put('/update/{userId}/{productVariantId}', [CartController::class, 'updateCart']); // cập nhật số lượng 1 sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/delete/{userId}/{productVariantId}', [CartController::class, 'deleteCart']); // xóa 1 sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/clear/{userId}', [CartController::class, 'clearCart']); // xóa tất cả sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/selectdelete/{userId}', [CartController::class, 'removeSelectedItems']); // xóa sản phẩm trong giỏ hàng của 1 người dùng theo select
+});
+
+
+route::group([
+    'prefix' => 'api/checkout'
+],function(){
+    Route::get('/', [OrderController::class, 'showOrder']);
+    Route::post('/orders', [OrderController::class, 'storeOrder']);
+});
+
+route::group([
+    'prefix' => 'api/payment'
+],function(){
+    Route::get('/vnpay_return', [PaymentController::class, 'vnpayReturn']);
+    Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']);
 });

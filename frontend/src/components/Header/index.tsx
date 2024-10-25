@@ -27,21 +27,21 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { Input } from '@nextui-org/react';
 import { Navbar, NavbarMenuToggle, NavbarMenuItem, NavbarMenu, NavbarContent, NavbarItem } from "@nextui-org/react"
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
-import { Brand, Category, Variant } from '@/src/interface';
+import { Brand, CartItem, Category, Variant } from '@/src/interface';
 import useDebounce from '@/src/utils';
-import { CATEGORY } from '@/src/dump';
-import { selectTotalItems } from '@/src/store/cartSlice';
-import { removeItem } from '@/src/store/cartSlice';
+import { signIn, signOut, useSession } from "next-auth/react";
 
+import { RootState } from '@/src/store/store';
 import './style.scss'
 import TooltipCu from '../ui/Tootip';
 import apiConfig from '@/src/config/api';
 import { logout } from '@/src/store/userSlice';
-import { updateQuantity } from '@/src/store/cartSlice';
+// import { updateQuantity } from '@/src/store/cartSlice';
 // import { DUMP_PRODUCTS } from '@/src/dump';
 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Image from 'next/image';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -55,7 +55,7 @@ function Header({ params }: { params: { lang: string } }) {
     const dispatch = useDispatch();
     const router = useRouter();
     const [userData, setUserData] = useState<any>(null);
-    const cart = useSelector((state: any) => state.cart.items);
+    // const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Variant[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Variant[]>([]);
@@ -65,7 +65,7 @@ function Header({ params }: { params: { lang: string } }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const totalItems = useSelector(selectTotalItems);
+    // const totalItems = useSelector(selectTotalItems);
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -77,7 +77,7 @@ function Header({ params }: { params: { lang: string } }) {
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
-
+    const [cart, setCart] = useState<CartItem[]>([]);
 
     const [theme, setTheme] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -86,21 +86,48 @@ function Header({ params }: { params: { lang: string } }) {
         return 'light';
     });
 
-    const handleQuantityChange = (id: number, quantity: number) => {
-        if (quantity > 0) {
-            dispatch(updateQuantity({ id, quantity }));
+    const cartItems = useSelector((state: RootState) => state.cart.items); // Get cart items from Redux
+    const cartCounts = cartItems.length; // Get the count of items in the cart
+
+    // const handleQuantityChange = (id: number, quantity: number) => {
+    //     if (quantity > 0) {
+    //         dispatch(updateQuantity({ id, quantity }));
+    //     }
+    // };
+
+
+    useEffect(() => {
+        if (userId) {
+            // Fetch user's cart from the API
+            const fetchUserCart = async () => {
+                try {
+                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
+                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
+                    if (response.data && response.data) { // Check if cart_items exists
+                        setCart(response.data); // Adjust according to your API response structure
+                        setCartCount(response.data.length);
+                    } else {
+                        console.warn('No cart items found in response');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user cart:', error);
+                }
+            };
+            fetchUserCart();
+        } else {
+            // If no user ID, show cart from cookies
+            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+            if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
+                setCart(existingCartItems.cart_items); // Set cart state from cookies
+                setCartCount(existingCartItems.cart_items.length);
+            } else {
+                console.warn('No cart items found in cookies');
+            }
         }
-    };
+    }, []); // Ensure this useEffect runs only once
+    // console.log(cart);
 
 
-    const columns = Math.ceil(CATEGORY.length / 5); // Calculate the number of columns needed
-
-    const categoryColumns = [];
-    for (let i = 0; i < columns; i++) {
-        categoryColumns.push(CATEGORY.slice(i * 5, i * 5 + 5));
-    }
-
-    
     useEffect(() => {
         const userId = Cookies.get('user_id'); // Get user_id from cookies
         if (userId) {
@@ -118,13 +145,14 @@ function Header({ params }: { params: { lang: string } }) {
     };
 
     const handleLogout = () => {
+        signOut();
         axios.post(apiConfig.user.logout, { withCredentials: true });
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
         toast.success('Đăng xuất thành công');
     };
 
-    
+
     // useEffect(() => {
     //     const getApi = async () => {
     //         setLoading(true);
@@ -158,7 +186,7 @@ function Header({ params }: { params: { lang: string } }) {
     }, [])
 
     // console.log(products);
-    console.log(products);
+    // console.log(products);
 
 
     useEffect(() => {
@@ -175,9 +203,9 @@ function Header({ params }: { params: { lang: string } }) {
     }, [debouncedSearch, products]);
 
 
-    useEffect(() => {
-        setCartCount(totalItems);
-    }, [totalItems]);
+    // useEffect(() => {
+    //     setCartCount(totalItems);
+    // }, [totalItems]);
 
     // useEffect(() => {
     //     window.addEventListener('scroll', handleScroll);
@@ -237,7 +265,7 @@ function Header({ params }: { params: { lang: string } }) {
         }
     };
 
-    
+
     const fetchCategory = async () => {
         try {
             const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
@@ -264,6 +292,51 @@ function Header({ params }: { params: { lang: string } }) {
         fetchCategory();
         fecthBrand()
     }, [])
+
+
+
+
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    useEffect(() => {
+        if (userId) { // {{ edit_1 }}
+            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+            if (existingCartItems.cart_items.length > 0) {
+                // Prepare items for moving to database
+                const itemsToMove = existingCartItems.cart_items.map((item: CartItem) => ({
+                    user_id: parseInt(userId), // Set user_id to null for each item
+                    product_variant_id: item.product_variant_id,
+                    quantity: item.quantity,
+                }));
+
+                // Move existing cart items to database
+                const moveCartToDatabase = async () => {
+                    try {
+                        await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
+                            user_id: parseInt(userId), // Handle undefined case
+                            cart_items: itemsToMove,
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            withCredentials: true, // Ensure cookies are sent
+                        });
+                        // Clear the cart in cookies after moving to database
+                        Cookies.remove('cart_items');
+                        toast.success('Giỏ hàng tạm thời đã được chuyển vào giỏ hàng của bạn!'); // Notify user
+                    } catch (error) {
+                        console.error('Error moving cart to database:', error);
+                        toast.error('Có lỗi xảy ra khi chuyển giỏ hàng vào cơ sở dữ liệu.'); // Notify error
+                    }
+                };
+
+                moveCartToDatabase(); // Call the async function
+            }
+        }
+    }, [userId]);
+
+
+
+    
 
     return (
         <div>
@@ -356,64 +429,64 @@ function Header({ params }: { params: { lang: string } }) {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-        {userData ? ( // Check if userData exists
-            <Dropdown placement="bottom-end">
-                <DropdownTrigger>
-                    <Avatar
-                        isBordered
-                        size='sm'
-                        as="button"
-                        className="transition-transform"
-                        src={userData.avatar || "https://i.pravatar.cc/150?u=a042581f4e29026704d"} // Use user avatar or a default
-                    />
-                </DropdownTrigger>
-                <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownItem key="profile" className="h-14 gap-2">
-                        <p className="font-semibold">Signed in as</p>
-                        <p className="font-semibold">{userData.email}</p> {/* Display user email */}
-                    </DropdownItem>
-                    <DropdownItem key="settings">
-                        <Link href={'/profile'}>
-                            Trang cá nhân
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                    <DropdownItem key="analytics">
-                        <Link href={'/profile/notify'}>
-                            Thông báo
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem key="system">
-                        <Link href={'/profile/order'}>
-                            Quản lí đơn hàng
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem key="configurations">
-                        <Link href={'/profile/promotion'}>
-                            Mã giảm giá
-                        </Link>
-                    </DropdownItem>
-                    <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
-                                Đăng xuất
-                            </DropdownItem>
-                </DropdownMenu>
-            </Dropdown>
-        ) : (
-            <div className='flex items-center gap-1'>
-                <div>
-                    <PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
-                </div>
-                <div className="xl:text-sm lg:text-[10px]">
-                    <div>
-                        <Link href={`/signin`}>Đăng nhập</Link>
-                    </div>
-                    <div>
-                        <Link href={`/signup`}>Đăng kí</Link>
-                    </div>
-                </div>
-            </div>
-        )}
-    </div>
+                                    {userData ? ( // Check if userData exists
+                                        <Dropdown placement="bottom-end">
+                                            <DropdownTrigger>
+                                                <Avatar
+                                                    isBordered
+                                                    size='sm'
+                                                    as="button"
+                                                    className="transition-transform"
+                                                    src={userData.avatar || "https://i.pravatar.cc/150?u=a042581f4e29026704d"} // Use user avatar or a default
+                                                />
+                                            </DropdownTrigger>
+                                            <DropdownMenu aria-label="Profile Actions" variant="flat">
+                                                <DropdownItem key="profile" className="h-14 gap-2">
+                                                    <p className="font-semibold">Signed in as</p>
+                                                    <p className="font-semibold">{userData.email}</p> {/* Display user email */}
+                                                </DropdownItem>
+                                                <DropdownItem key="settings">
+                                                    <Link href={'/profile'}>
+                                                        Trang cá nhân
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                                <DropdownItem key="analytics">
+                                                    <Link href={'/profile/notify'}>
+                                                        Thông báo
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="system">
+                                                    <Link href={'/profile/order'}>
+                                                        Quản lí đơn hàng
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="configurations">
+                                                    <Link href={'/profile/promotion'}>
+                                                        Mã giảm giá
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
+                                                    Đăng xuất
+                                                </DropdownItem>
+                                            </DropdownMenu>
+                                        </Dropdown>
+                                    ) : (
+                                        <div className='flex items-center gap-1'>
+                                            <div>
+                                                <PersonIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6" />
+                                            </div>
+                                            <div className="xl:text-sm lg:text-[10px]">
+                                                <div>
+                                                    <Link href={`/signin`}>Đăng nhập</Link>
+                                                </div>
+                                                <div>
+                                                    <Link href={`/signup`}>Đăng kí</Link>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                                 <TooltipCu position='right' title={
                                     <div className="flex items-center gap-1 max-w-[120px] min-w-[120px] relative py-3">
                                         <div className="relative">
@@ -435,44 +508,29 @@ function Header({ params }: { params: { lang: string } }) {
                                             <div className='p-4 min-w-[460px] max-w-[460px]'>
                                                 <div className='flex justify-end mb-4 items-center'>
                                                     <div className='text-xl mb-2 font-semibold text-black'>Giỏ hàng của bạn</div>
+                                                    
                                                 </div>
 
                                                 <div>
                                                     <ul className='max-h-[420px] overflow-hidden overflow-y-auto pr-2 text-black'>
                                                         {cart.length > 0 ? (
                                                             cart.map((item: any) => (
-                                                                <li key={item.id} className='flex items-center gap-4 mb-2'>
+                                                                <li key={item.product_variant.id} className='flex items-center gap-4 mb-2'>
                                                                     <div>
-                                                                        <img src={item.images[0]} alt={item.name} className='w-16 h-16 object-cover' />
+                                                                        <Image src={item.product_variant.image} alt={item.product_variant.name} width={100} height={100} className='w-16 h-16 object-cover' />
                                                                     </div>
                                                                     <div>
-                                                                        <div className='max-w-[220px]'>{item.name}</div>
+                                                                        <div className='max-w-[220px]'>{item.product_variant.name}</div>
 
 
 
-                                                                        <div className="flex items-center">
-                                                                            <button
-                                                                                className="px-3 py-1 border rounded"
-                                                                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                                                            >
-                                                                                -
-                                                                            </button>
-                                                                            <span className="px-4">{item.quantity}</span>
-                                                                            <button
-                                                                                className="px-3 py-1 border rounded"
-                                                                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                                                            >
-                                                                                +
-                                                                            </button>
-                                                                        </div>
+                                                                  
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                            {item.price.toLocaleString('vi-VN')} VND
+                                                                        {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} VND
                                                                         </div>
-                                                                        <div onClick={() => dispatch(removeItem(item.id))}>
-                                                                            <DeleteIcon className='hover:text-red-600 cursor-pointer' />
-                                                                        </div>
+                                                                       
                                                                     </div>
                                                                 </li>
                                                             ))
@@ -549,7 +607,7 @@ function Header({ params }: { params: { lang: string } }) {
                                         <TooltipCu position='left' title={
                                             <div className='flex items-center transition-all py-3'>
                                                 <Link href={`/shop`}>
-                                                SẢN PHẨM
+                                                    SẢN PHẨM
                                                 </Link>
                                                 <KeyboardArrowDownIcon className='group-hover:rotate-180 !transition-transform !duration-400' />
                                             </div>
@@ -561,37 +619,37 @@ function Header({ params }: { params: { lang: string } }) {
                                                             <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
                                                         </div>
                                                         <div className='col-span-3 row-span-2'>
-                                                        <div className='flex flex-col mb-4'>
-                                                            <div className='text-black text-lg'>Phân loại</div>
-                                                            <div className='grid grid-cols-2'>
-                                                            {categories.map((item, index) => (
-                                                                <Link key={index} href={`/shop?category[]=${item.name}`}>
-                                                                    <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                        <div className='mr-2'>
-                                                                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                        </div>
-                                                                        <div>{item.name}</div>
-                                                                    </div>
-                                                                </Link>
-                                                            ))}
+                                                            <div className='flex flex-col mb-4'>
+                                                                <div className='text-black text-lg'>Phân loại</div>
+                                                                <div className='grid grid-cols-2'>
+                                                                    {categories.map((item, index) => (
+                                                                        <Link key={index} href={`/shop?category[]=${item.name}`}>
+                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                <div className='mr-2'>
+                                                                                    <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                                </div>
+                                                                                <div>{item.name}</div>
+                                                                            </div>
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+
                                                             </div>
-                                                          
-                                                        </div>
-                                                        <div>
-                                                            <div className='text-black text-lg'>Thương hiệu</div>
-                                                            <div className='grid grid-cols-2'>
-                                                            {brands.map((item, index) => (
-                                                                <Link key={index} href={`/shop?brand[]=${item.name}`}>
-                                                                    <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                        <div className='mr-2'>
-                                                                            <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                        </div>
-                                                                        <div>{item.name}</div>
-                                                                    </div>
-                                                                </Link>
-                                                            ))}
+                                                            <div>
+                                                                <div className='text-black text-lg'>Thương hiệu</div>
+                                                                <div className='grid grid-cols-2'>
+                                                                    {brands.map((item, index) => (
+                                                                        <Link key={index} href={`/shop?brand[]=${item.name}`}>
+                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                <div className='mr-2'>
+                                                                                    <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
+                                                                                </div>
+                                                                                <div>{item.name}</div>
+                                                                            </div>
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
                                                         </div>
                                                     </div>
                                                 ) : (

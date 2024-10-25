@@ -18,6 +18,7 @@ import ChatBox from "@/src/components/ChatBox";
 
 // import { NextIntlClientProvider } from 'next-intl';
 // import { getMessages } from 'next-intl/server';
+import SessionWrapper from "../components/SessionWrapper/SessionWrapper";
 
 
 export const metadata: Metadata = {
@@ -44,7 +45,8 @@ export default async function RootLayout({
   // const messages = await getMessages({ locale: lang });
 
   return (
-    <html suppressHydrationWarning lang={lang}>
+    <html lang={lang}>
+    {/* <html suppressHydrationWarning lang={lang}> */}
       <head>
         {/* Head components như Google Analytics/Tag Manager có thể giữ nguyên */}
       </head>
@@ -63,7 +65,9 @@ export default async function RootLayout({
               <ToastContainer className="mt-[64px]" />
               <ChatBox />
               <BtnToTop />
-              {children}
+              <SessionWrapper>
+                {children}
+              </SessionWrapper>
               <Analytics />
               <SpeedInsights />
               <Footer />

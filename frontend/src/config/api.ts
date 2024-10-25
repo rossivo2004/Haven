@@ -88,6 +88,8 @@ const apiConfig = {
 
     //Cập nhật mật khẩu mới cho người dùng sau khi xác minh mã thành công.
     updatePassword: `${baseUrl}/api/password/update`,
+
+    saveGoogleUser: `${baseUrl}/api/save-google-user`,
   },
 
   favourite: {
@@ -109,10 +111,10 @@ const apiConfig = {
     addToCart: `${baseUrl}/api/cart/add`,
 
     // Tính tổng tiền các sản phẩm trong giỏ hàng của người dùng chưa hoặc đã đăng nhập
-    getCartTotal: `${baseUrl}/api/cart/total`,
+    getCartTotal: `${baseUrl}/api/cart/total/`,
 
     //Điểm người dùng sẽ lấy trong db nếu người dùng đăng nhập, ngược lại mặc định là 0
-    getPointUser: `${baseUrl}/api/cart/point`,
+    getPointUser: `${baseUrl}/api/cart/point/`,
 
     //Cập nhật số lượng sản phẩm trong giỏ hàng
     ///cart/update/{productVariantId}
@@ -126,6 +128,24 @@ const apiConfig = {
     //Xóa toàn bộ sản phẩm trong giỏ hàng
     // /cart/clear
     clearCart: `${baseUrl}/api/cart/clear`,
+
+    //lấy danh sách giỏ hàng của 1 người dùng
+    getCartByUserId: `${baseUrl}/api/cart/`,
+
+    //Chuyển cart từ cookie sang database
+    moveCartToDatabase: `${baseUrl}/api/cart/movecart`,
+
+    // cập nhật số lượng 1 sản phẩm trong giỏ hàng của 1 người dùng
+    ///update/{userId}/{productVariantId}
+    updateCartByUserId: `${baseUrl}/api/cart/update/`,
+
+    // xóa 1 sản phẩm trong giỏ hàng của 1 người dùng
+    ///delete/{userId}/{productVariantId}
+    deleteCartByUserId: `${baseUrl}/api/cart/delete/`,
+
+    // xóa tất cả sản phẩm trong giỏ hàng của 1 người dùng
+    ///clear/{userId}
+    clearCartByUserId: `${baseUrl}/api/cart/clear/`,
   }
 
 

@@ -19,16 +19,12 @@ class FavoriteController extends Controller
     // Lấy danh sách productVariant của các sản phẩm yêu thích của user
     $favorites = Favorite::where('user_id', $userId)->with('productVariant')->paginate(20);
 
-    if ($favorites->isEmpty()) {
-        return response()->json(['message' => 'No favorite products'], 404);
-    }
-
-    // Trả về danh sách productVariant từ các yêu thích
+    // Trả về danh sách productVariant từ các yêu thích, trả về mảng rỗng nếu không có sản phẩm
     $productVariants = $favorites->map(function($favorite) {
         return $favorite->productVariant; // Chỉ trả về thông tin productVariant
     });
 
-    return response()->json($productVariants);
+    return response()->json($productVariants); // Không cần kiểm tra 404
 }
 
 

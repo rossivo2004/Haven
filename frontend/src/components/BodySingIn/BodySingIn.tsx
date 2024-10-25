@@ -10,6 +10,9 @@ import { setUserId } from "@/src/store/userSlice";// Import your action to set u
 import Cookies from 'js-cookie'; // Import js-cookie for cookie management
 import axios from "axios";
 import apiConfig from "@/src/config/api";
+import { Spinner } from "@nextui-org/react";
+import { useState } from "react";
+import Dashboard from "../Dashboard/Dashboard";
 
 interface SignInValues {
     email: string; // Change phone to email
@@ -19,7 +22,7 @@ interface SignInValues {
 
 function BodySignIn() {
     const dispatch = useDispatch(); // Initialize dispatch
-
+const [loading, setLoading] = useState(false);
 
     const validationSchema = Yup.object({
 
@@ -37,6 +40,7 @@ function BodySignIn() {
 
 
     const handleCheckSignin = async (values: SignInValues) => {
+        setLoading(true);
         try {
             const response = await axios.post(apiConfig.user.login, values); // Use axios to post data
 
@@ -48,6 +52,8 @@ function BodySignIn() {
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại! Vui lòng thử lại.'; // Get error message from response
             toast.error(errorMessage); // Show error message
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -137,9 +143,9 @@ function BodySignIn() {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-main text-white py-2 rounded mb-4"
+                                        className="w-full bg-main text-white py-4 rounded mb-4"
                                     >
-                                        Đăng nhập
+                                        {loading ? <Spinner /> : 'Đăng nhập'}
                                     </button>
 
                                 </Form>
@@ -160,16 +166,7 @@ function BodySignIn() {
 
 <div className="text-center mb-2 flex gap-3 items-center justify-center">
 
-                        <button>
-
-                            <img src="/images/google-logo.png" alt="" className="w-8 h-8" />
-
-                        </button>
-
-                        <button>
-                            <img src="/images/facebook-logo.png" alt="" className="w-8 h-8" />
-
-                        </button>
+<Dashboard />
                     </div>
 
 

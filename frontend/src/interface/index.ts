@@ -40,7 +40,7 @@ export interface Variant {
     }[]; // Changed to an array of objects with specific fields
     updated_at: string;
     variant_value: string;
-    
+
   };
 }
 
@@ -49,7 +49,7 @@ export interface Product {
   name: string;
   category: string;
   brand: string;
-  
+
   variants: Variant[];
 }
 
@@ -214,7 +214,9 @@ export interface IUser {
 
 
 export interface ItemCart {
-  product: ProductProps,
+  user_id: number | null;
+  product_variant
+  : ProductProps,
   quantity: number,
   selected?: boolean,
 }
@@ -263,4 +265,10 @@ export interface IOrders {
   products: ItemCart[],
   totalPayment: number,
   status: "Chưa xác nhận" | "Đã xác nhận",
+}
+
+export interface CartItem {
+  user_id: number | null;
+  product_variant_id: number;
+  quantity: number;
 }

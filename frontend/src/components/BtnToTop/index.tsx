@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
-import './style.scss';
+import './style.css';
 
 function BtnToTop() {
     const [isVisible, setIsVisible] = useState(false);

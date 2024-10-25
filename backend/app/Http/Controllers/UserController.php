@@ -120,13 +120,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             // Lấy thông tin user sau khi đăng nhập
             $user = Auth::user();
-    
+
             // Lưu ID của user vào session
             session(['user_id' => $user->id]);
-    
+
             // Trả về ID và thông tin của user
             return response()->json([
                 'message' => 'Đăng nhập thành công',
@@ -161,9 +161,9 @@ class UserController extends Controller
 
     //         if ($findUser) {
     //             Auth::login($findUser);
-    
+
     //             session(['user_id' => $findUser->id]);
-    
+
     //             return response()->json([
     //                 'message' => 'Đăng nhập Google thành công',
     //                 'user_id' => $findUser->id,
@@ -261,7 +261,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Không thể đăng nhập qua Google', 'details' => $e->getMessage()], 500);
         }
     }
-    
+
 
 
 
@@ -393,7 +393,7 @@ class UserController extends Controller
         // Xác thực dữ liệu từ request
         $validator = Validator::make($request->all(), [
             'name'      => 'required|string|max:255',
-            'email'     => 'required|email|unique:users,email',
+            'email'     => 'required|email',
         ]);
 
         // Kiểm tra nếu có lỗi xác thực
@@ -401,6 +401,17 @@ class UserController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
+        // Kiểm tra xem email đã tồn tại chưa
+        $existingUser = User::where('email', $request->email)->first();
+
+        if ($existingUser) {
+            // Email đã tồn tại, trả về ID của người dùng hiện có
+            return response()->json([
+                'user_id' => $existingUser->id,
+            ], 200);
+        }
+
+        // Nếu email chưa tồn tại, tiếp tục tạo người dùng mới
         $role = Role::where('name', 'user')->first();
 
         if ($role) {
