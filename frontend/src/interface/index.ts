@@ -77,30 +77,17 @@ export interface ProductProps {
   description?: string; // Added optional description field
   select?: boolean; // Added optional description field
   stock?: number; // Added optional
+  DiscountedPrice?: number;
+  FlashSalePrice?: number;
 }
 
-export interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  salePrice: number;
-  quantity: number;
-  discount: number;
-  images: string[];
-  description?: string; // Added optional description field
-  select: boolean; // Added optional description field
-  stock: number; // Added optional
-}
+
 
 export interface Category {
   id: string;
   name: string;
   tag: string;
   image: string;
-}
-
-export interface Brand {
-  id: string;
 }
 
 export interface Brand {
@@ -126,15 +113,6 @@ export interface Blog {
   view: number;
 }
 
-export interface IPromotion {
-  id: number,
-  discount: "10k" | "20k" | "30k" | "50k" | "100k" | "300k"
-  forOrderTo: "500k" | "1 triệu" | "2 triệu" | "3 triệu"
-  startDate: string,
-  endDate: string,
-}
-
-
 
 export interface IUser {
   id: number,
@@ -153,18 +131,18 @@ export interface IUser {
 
 
 
-export interface ItemCart {
-  product: ProductProps,
-  quantity: number,
-  selected?: boolean,
-}
+// export interface ItemCart {
+//   product: ProductProps,
+//   quantity: number,
+//   selected?: boolean,
+// }
 
-export interface IOrders {
-  code?: string,
-  products: ItemCart[],
-  totalPayment: number,
-  status: "Chưa xác nhận" | "Đã xác nhận",
-}
+// export interface IOrders {
+//   code?: string,
+//   products: ItemCart[],
+//   totalPayment: number,
+//   status: "Chưa xác nhận" | "Đã xác nhận",
+// }
 
 export interface Params {
   id: string;
@@ -196,37 +174,22 @@ export interface INotify {
   seen: boolean
 }
 
-export interface IUser {
-  id: number,
-  fullName: string,
-  nickname?: string,
-  birthday?: string,
-  gender?: "Nam" | "Nữ" | "Khác",
-  country?: string,
-  phoneNumber?: string,
-  email?: string,
-  username?: string,
-  password?: string,
-  avatar?: string,
-  point?: number
-}
+// export interface IUser {
+//   id: number,
+//   fullName: string,
+//   nickname?: string,
+//   birthday?: string,
+//   gender?: "Nam" | "Nữ" | "Khác",
+//   country?: string,
+//   phoneNumber?: string,
+//   email?: string,
+//   username?: string,
+//   password?: string,
+//   avatar?: string,
+//   point?: number
+// }
 
 
-
-export interface ItemCart {
-  user_id: number | null;
-  product_variant
-  : ProductProps,
-  quantity: number,
-  selected?: boolean,
-}
-
-export interface IOrders {
-  code?: string,
-  products: ItemCart[],
-  totalPayment: number,
-  status: "Chưa xác nhận" | "Đã xác nhận",
-}
 
 export interface Params {
   id: string;
@@ -253,22 +216,47 @@ export interface BoxProps {
   variant: 'dark' | 'light';
 }
 
-export interface IOrders {
-  code?: string,
-  products: ItemCart[],
-  totalPayment: number,
-  status: "Chưa xác nhận" | "Đã xác nhận",
-}
+// export interface IOrders {
+//   code?: string,
+//   products: ItemCart[],
+//   totalPayment: number,
+//   status: "Chưa xác nhận" | "Đã xác nhận",
+// }
 
-export interface IOrders {
-  code?: string,
-  products: ItemCart[],
-  totalPayment: number,
-  status: "Chưa xác nhận" | "Đã xác nhận",
-}
+// export interface IOrders {
+//   code?: string,
+//   products: ItemCart[],
+//   totalPayment: number,
+//   status: "Chưa xác nhận" | "Đã xác nhận",
+// }
 
 export interface CartItem {
   user_id: number | null;
   product_variant_id: number;
   quantity: number;
+  product_variant
+  : ProductProps,
+  selected?: boolean,
 }
+
+// export interface CartItem {
+//   id: number;
+//   name: string;
+//   price: number;
+//   salePrice: number;
+//   quantity: number;
+//   discount: number;
+//   images: string[];
+//   description?: string; // Added optional description field
+//   select: boolean; // Added optional description field
+//   stock: number; // Added optional
+// }
+
+
+// export interface ItemCart {
+//   user_id: number | null;
+//   product_variant
+//   : ProductProps,
+//   quantity: number,
+//   selected?: boolean,
+// }

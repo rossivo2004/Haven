@@ -145,7 +145,7 @@ const [loading, setLoading] = useState(false);
                                         type="submit"
                                         className="w-full bg-main text-white py-4 rounded mb-4"
                                     >
-                                        {loading ? <Spinner /> : 'Đăng nhập'}
+                                        {loading ? <Spinner size="sm"/> : 'Đăng nhập'}
                                     </button>
 
                                 </Form>

@@ -1,9 +1,9 @@
 // src/store/cartSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ItemCart } from '@/src/interface';
+import { CartItem } from '@/src/interface';
 
 type CartState = {
-    items: ItemCart[];
+    items: CartItem[];
 };
 
 const initialState: CartState = {
@@ -14,10 +14,10 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addToCart(state, action: PayloadAction<ItemCart>) {
+        addToCart(state, action: PayloadAction<CartItem>) {
             state.items.push(action.payload);
         },
-        updateCart(state, action: PayloadAction<ItemCart[]>) { // New action to update the cart
+        updateCart(state, action: PayloadAction<CartItem[]>) { // New action to update the cart
             state.items = action.payload; // Replace the current items with the new items
         },
     },

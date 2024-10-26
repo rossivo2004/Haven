@@ -89,14 +89,9 @@ function Header({ params }: { params: { lang: string } }) {
     const cartItems = useSelector((state: RootState) => state.cart.items); // Get cart items from Redux
     const cartCounts = cartItems.length; // Get the count of items in the cart
 
-    // const handleQuantityChange = (id: number, quantity: number) => {
-    //     if (quantity > 0) {
-    //         dispatch(updateQuantity({ id, quantity }));
-    //     }
-    // };
-
 
     useEffect(() => {
+        const userId = Cookies.get('user_id'); // Get user ID from cookies
         if (userId) {
             // Fetch user's cart from the API
             const fetchUserCart = async () => {
@@ -124,8 +119,40 @@ function Header({ params }: { params: { lang: string } }) {
                 console.warn('No cart items found in cookies');
             }
         }
-    }, []); // Ensure this useEffect runs only once
-    // console.log(cart);
+    }, []); // Add cartCount to the dependency array
+
+    useEffect(() => {
+        const userId = Cookies.get('user_id'); // Get user ID from cookies
+        if (userId) {
+            // Fetch user's cart from the API
+            const fetchUserCart = async () => {
+                try {
+                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
+                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
+                    if (response.data && response.data) { // Check if cart_items exists
+                        setCart(response.data); // Adjust according to your API response structure
+                        setCartCount(response.data.length);
+                    } else {
+                        console.warn('No cart items found in response');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user cart:', error);
+                }
+            };
+            fetchUserCart();
+        } else {
+            // If no user ID, show cart from cookies
+            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+            console.log(existingCartItems);
+
+            if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
+                setCart(existingCartItems.cart_items); // Set cart state from cookies
+                setCartCount(existingCartItems.cart_items.length);
+            } else {
+                console.warn('No cart items found in cookies');
+            }
+        }
+    }, [cartItems]); // Add cartCount to the dependency array
 
 
     useEffect(() => {
@@ -185,8 +212,12 @@ function Header({ params }: { params: { lang: string } }) {
         fetchProduct()
     }, [])
 
+    // useEffect(() => {
+    //     setCart(cartItems); // Update local cart state whenever cartItems changes
+    // }, [cartItems]);
+
     // console.log(products);
-    // console.log(products);
+    console.log(cartItems);
 
 
     useEffect(() => {
@@ -201,20 +232,6 @@ function Header({ params }: { params: { lang: string } }) {
             setIsDropdownVisible(false); // Hide dropdown if search is empty
         }
     }, [debouncedSearch, products]);
-
-
-    // useEffect(() => {
-    //     setCartCount(totalItems);
-    // }, [totalItems]);
-
-    // useEffect(() => {
-    //     window.addEventListener('scroll', handleScroll);
-
-    //     return () => {
-    //         window.removeEventListener('scroll', handleScroll);
-
-    //     };
-    // }, [lastScrollY]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -336,7 +353,7 @@ function Header({ params }: { params: { lang: string } }) {
 
 
 
-    
+
 
     return (
         <div>
@@ -508,7 +525,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             <div className='p-4 min-w-[460px] max-w-[460px]'>
                                                 <div className='flex justify-end mb-4 items-center'>
                                                     <div className='text-xl mb-2 font-semibold text-black'>Giỏ hàng của bạn</div>
-                                                    
+
                                                 </div>
 
                                                 <div>
@@ -521,16 +538,16 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div>
                                                                         <div className='max-w-[220px]'>{item.product_variant.name}</div>
+                                                                        <div className='text-sm text-gray-500'>x{item.quantity}</div>
 
 
 
-                                                                  
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                        {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} VND
+                                                                            {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} VND
                                                                         </div>
-                                                                       
+
                                                                     </div>
                                                                 </li>
                                                             ))

@@ -8,7 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { number } from 'yup';
 
-import { CartItem, ItemCart, ProductProps, Variant } from '@/src/interface';
+import { CartItem, ProductProps, Variant } from '@/src/interface';
 import { SingleProduct } from '@/src/interface';
 import { RadioGroup, Radio, useRadio, VisuallyHidden, RadioProps, cn } from "@nextui-org/react";
 import { Button, Divider } from '@nextui-org/react';
@@ -263,11 +263,31 @@ const handleAddToCart = async () => {
     if (!userId) {
         // If user is not logged in, store in cookie
         const cartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
-        cartItems.cart_items.push({
-            user_id: null,
-            product_variant_id: body.product_variant_id,
-            quantity: body.quantity,
-        });
+        
+        // Check if the product is already in the cart
+        const existingItemIndex = cartItems.cart_items.findIndex((item: CartItem) => item.product_variant_id === body.product_variant_id);
+        
+        if (existingItemIndex > -1) {
+            // If the product is already in the cart, update the quantity
+            cartItems.cart_items[existingItemIndex].quantity += body.quantity;
+        } else {
+            // If the product is not in the cart, add it
+            cartItems.cart_items.push({
+                user_id: null,
+                product_variant_id: body.product_variant_id,
+                quantity: body.quantity,
+                product_variant: product,
+            });
+
+            dispatch(addToCart({
+                user_id: null,
+                product_variant_id: body.product_variant_id,
+                quantity: quantity, // Use the quantity state
+                product: product, // Add the product object
+                product_variant: product?.id, // Add the product_variant if needed
+            } as unknown as CartItem)); 
+        }
+
         Cookies.set('cart_items', JSON.stringify(cartItems), { expires: 7 }); // Store cart in cookie for 7 days
         toast.success('Sản phẩm đã được thêm vào giỏ hàng tạm thời!'); // Notify user
     } else {
@@ -282,23 +302,23 @@ const handleAddToCart = async () => {
             }));
 
             // Move existing cart items to database
-            try {
-                await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
-                    user_id: parseInt(userId),
-                    cart_items: itemsToMove,
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    withCredentials: true, // Ensure cookies are sent
-                });
-                // Clear the cart in cookies after moving to database
-                Cookies.remove('cart_items');
-                toast.success('Giỏ hàng tạm thời đã được chuyển vào giỏ hàng của bạn!'); // Notify user
-            } catch (error) {
-                console.error('Error moving cart to database:', error);
-                toast.error('Có lỗi xảy ra khi chuyển giỏ hàng vào cơ sở dữ liệu.'); // Notify error
-            }
+            // try {
+            //     await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
+            //         user_id: parseInt(userId),
+            //         cart_items: itemsToMove,
+            //     }, {
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //         withCredentials: true, // Ensure cookies are sent
+            //     });
+            //     // Clear the cart in cookies after moving to database
+            //     Cookies.remove('cart_items');
+            //     toast.success('Giỏ hàng tạm thời đã được chuyển vào giỏ hàng của bạn!'); // Notify user
+            // } catch (error) {
+            //     console.error('Error moving cart to database:', error);
+            //     toast.error('Có lỗi xảy ra khi chuyển giỏ hàng vào cơ sở dữ liệu.'); // Notify error
+            // }
         }
 
         // Now add the current item to the cart in the database
@@ -317,7 +337,7 @@ const handleAddToCart = async () => {
                     quantity: quantity, // Use the quantity state
                     product: product, // Add the product object
                     product_variant: product?.id, // Add the product_variant if needed
-                } as unknown as ItemCart)); 
+                } as unknown as CartItem)); 
                 toast.success('Sản phẩm đã được thêm vào giỏ hàng!'); 
             }
         } catch (error) {
