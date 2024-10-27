@@ -87,9 +87,9 @@ class CartController extends Controller
 
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
-    }
+    }  
 
-        if ($userId) {
+        if ($userId) { 
             // Người dùng đã đăng nhập -> thêm sản phẩm vào giỏ hàng trong database
             $cartItem = Cart::where('user_id', $userId)
                             ->where('product_variant_id', $productVariant->id)
@@ -105,7 +105,7 @@ class CartController extends Controller
                     'product_variant_id' => $productVariant->id,
                     'quantity' => $quantity,
                 ]);
-            }
+            }  
         }
         return response()->json(['message' => 'Product added to cart']);
     }
@@ -118,24 +118,24 @@ class CartController extends Controller
             $cartItems = Cart::where('user_id', $userId)
                 ->with('productVariant') // Tải productVariant liên quan
                 ->get();
-
+    
             // Chỉ lấy dữ liệu productVariant
             $cartItems = $cartItems->map(function ($item) {
                 return [
                     'product_variant' => $item->productVariant, // Trả về productVariant
                     'quantity' => $item->quantity,              // Trả về số lượng sản phẩm
-                ];
+                ]; 
             });
-
+    
         } else {
             // Người dùng chưa đăng nhập -> lấy giỏ hàng từ session
             $cart = $request->session()->get('cart_items', []);
-
+    
             // Lấy danh sách các ProductVariant từ session
             $productVariants = ProductVariant::whereIn('id', array_keys($cart))
                 ->with(['product.category', 'product.brand']) // Tải thông tin liên quan
                 ->get();
-
+    
             // Chỉ trả về productVariant
             $cartItems = $productVariants->map(function ($productVariant) {
                 return [
@@ -144,10 +144,10 @@ class CartController extends Controller
                 ];
             });
         }
-
+    
         return response()->json($cartItems);
     }
-
+    
 
 public function deleteCart($userId,$productVariantId)
 {
@@ -241,7 +241,7 @@ public function cartTotal($userId)
     // Kiểm tra người dùng đã đăng nhập
     if ($userId) {
         $cartItems = Cart::where('user_id', $userId)->get();
-
+        
         foreach ($cartItems as $item) {
             $total += $item->quantity * $item->productVariant->price;
         }
