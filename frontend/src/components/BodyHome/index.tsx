@@ -20,9 +20,9 @@ import BoxProductFlashSale from "../BoxProductFlashSale";
 import BoxBlog from "@/src/components/BoxBlog";
 import InfiniteScroll from "../InfiniteScroll";
 
-import { DUMP_PRODUCTS } from "@/src/dump";
-import { CATEGORY } from "@/src/dump";
-import { BLOG } from "@/src/dump";
+// import { DUMP_PRODUCTS } from "@/src/dump";
+// import { CATEGORY } from "@/src/dump";
+// import { BLOG } from "@/src/dump";
 
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
@@ -550,11 +550,11 @@ function BodyHome() {
                             },
                         }}
                     >
-                        {BLOG.slice(0, 4).map((blog, index) => (
+                        {/* {BLOG.slice(0, 4).map((blog, index) => (
                             <SwiperSlide key={index} className="lg:hidden">
                                 <BoxBlog blog={blog} />
                             </SwiperSlide>
-                        ))}
+                        ))} */}
 
                     </Swiper>
 

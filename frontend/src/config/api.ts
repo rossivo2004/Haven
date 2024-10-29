@@ -146,9 +146,9 @@ const apiConfig = {
     // xóa tất cả sản phẩm trong giỏ hàng của 1 người dùng
     ///clear/{userId}
     clearCartByUserId: `${baseUrl}/api/cart/clear/`,
-  }
+  },
 
-
+  
 
 
 };

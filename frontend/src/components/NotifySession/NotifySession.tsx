@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import AppContainer from '../AppContainer/AppContainer'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { NAV_PROFILE } from '@/src/dump';
+// import { NAV_PROFILE } from '@/src/dump';
 import RedeemIcon from '@mui/icons-material/Redeem';
 import { Avatar, Divider, Image } from '@nextui-org/react'
 import React, { Suspense, useEffect, useState } from 'react'

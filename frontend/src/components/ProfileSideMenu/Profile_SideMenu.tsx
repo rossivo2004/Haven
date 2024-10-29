@@ -37,22 +37,6 @@ function Profile_SideMenu() {
                             </Link>
                         </li>
                         <li className=" border-b border-black py-4">
-                            <Link href={`${hiddenMenuPaths[1]}`}>
-                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[1]}`  ? 'active_nav_profile' : ''}`}>
-                                    <div><ArchiveOutlinedIcon /></div>
-                                    <div>Số địa chỉ</div>
-                                </div>
-                            </Link>
-                        </li>
-                        <li className=" border-b border-black py-4">
-                            <Link href={`${hiddenMenuPaths[2]}`}>
-                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[2]}`  ? 'active_nav_profile' : ''}`}>
-                                    <div><NotificationsNoneOutlinedIcon /></div>
-                                    <div>Thông báo</div>
-                                </div>
-                            </Link>
-                        </li>
-                        <li className=" border-b border-black py-4">
                             <Link href={`${hiddenMenuPaths[3]}`}>
                                 <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[3]}`  ? 'active_nav_profile' : ''}`}>
                                     <div><DiscountOutlinedIcon /></div>

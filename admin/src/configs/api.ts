@@ -71,6 +71,24 @@ const apiConfig = {
     // /flashsale/addProductToFlashSale/{id}
     addProductToFlashSale : `${baseUrl}/api/flashsaleproduct/store/`,
 
+  },
+
+  users: {
+    getAll: `${baseUrl}/api/users/`,
+
+    createUser: `${baseUrl}/api/users/store/`,
+
+    ///users/show/{id}
+    getUserById: `${baseUrl}/api/users/show/`,
+
+    updateUser: `${baseUrl}/api/users/update/`,
+    updateUserAdmin: `${baseUrl}/api/users/update/admin/`,
+
+    deleteUser: `${baseUrl}/api/users/delete/`,
+  },
+
+  roles: {
+    getAll: `${baseUrl}/api/roles/`,
   }
 };
 
