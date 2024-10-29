@@ -21,11 +21,11 @@ class PaymentController extends Controller
         }
 
         $vnp_Url = env('VNP_URL');
-        $vnp_Returnurl = env('VNP_RETURN_URL');
+        $vnp_Returnurl = env('VNP_RETURN_URL') . '/' . $order_id;
         $vnp_TmnCode = env('VNP_TMN_CODE');//Mã website tại VNPAY 
         $vnp_HashSecret = env('VNP_HASH_SECRET'); //Chuỗi bí mật
-        $vnp_TxnRef = $order->id; //Mã đơn hàng. 
-        $vnp_OrderInfo = "Thanh toán hóa đơn đơn hàng $vnp_TxnRef";
+        $vnp_TxnRef = $order->invoice_code; //Mã đơn hàng. 
+        $vnp_OrderInfo = "Thanh toán hóa đơn đơn hàng $order->invoice_code";
         $vnp_OrderType = "Haven";
         $vnp_Amount = $order->total * 100;
         $vnp_Locale = "VN";
@@ -87,7 +87,7 @@ class PaymentController extends Controller
     }
 
     // Hàm xử lý callback sau khi VNPay thanh toán
-    public function vnpayReturn(Request $request)
+    public function vnpayReturn(Request $request, $orderID)
 {
     // Lấy dữ liệu phản hồi
     $responseData = $request->toArray();
@@ -114,7 +114,7 @@ class PaymentController extends Controller
     }
 
     // Lưu thông tin thanh toán vào cơ sở dữ liệu
-    $order = Order::find($responseData['vnp_TxnRef']);
+    $order = Order::find($orderID);
     if (!$order) {
         return response()->json(['status' => false, 'message' => 'Đơn hàng không tồn tại'], 404);
     }

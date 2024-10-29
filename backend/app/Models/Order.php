@@ -22,7 +22,9 @@ class Order extends Model
         'payment_transpot', 
         'payment_method', 
         'payment_status', 
-        'user_id'
+        'user_id',
+        'invoice_code',
+        'refunded_stock'
     ];
 
     public function user() {
