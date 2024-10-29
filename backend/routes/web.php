@@ -194,11 +194,14 @@ route::group([
     Route::get('/showorder/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
     Route::get('/showorderdetail/{order}', [OrderController::class, 'showOrderdetail']); // lấy chi tiết của 1 đơn hàng
     Route::post('/orders', [OrderController::class, 'checkout']); // tạo đơn hàng
+    Route::post('/orders/cancelorder/{orderId}', [OrderController::class, 'cancelOrder']); // Hủy đơn hàng
+    Route::post('/orders/reorder/{orderId}', [OrderController::class, 'reorder']); // mua lại đơn hàng
+    Route::put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
 });
 
 route::group([
     'prefix' => 'api/payment'
 ],function(){
-    Route::get('/vnpay_return', [PaymentController::class, 'vnpayReturn']); // trả về dữ liệu lưu vào db
+    Route::get('/vnpay_return/{orderID}', [PaymentController::class, 'vnpayReturn']); // trả về dữ liệu lưu vào db
     Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']); // thanh toán vnpay
 });
