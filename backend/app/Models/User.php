@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     // Các trường được phép mass assignment
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id',
+        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id', 'point',
     ];
 
     // Các trường sẽ bị ẩn khi trả về model
@@ -25,6 +25,14 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function orders() {
+        return $this->hasMany(Order::class);
+    }
+
+    public function payments() {
+        return $this->hasMany(Payment::class);
     }
 
     /**

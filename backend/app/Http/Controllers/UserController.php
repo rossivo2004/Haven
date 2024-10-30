@@ -75,7 +75,7 @@ class UserController extends Controller
             'role_id' => 'required|integer',
             'phone' => 'nullable|string',
             'address' => 'nullable|string',
-            'status' => 'required|boolean',
+         'status' => 'required|in:active,banned',
             'image' => 'nullable'
         ]);
 
@@ -120,13 +120,13 @@ class UserController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-    
+
             // Lấy thông tin user sau khi đăng nhập
             $user = Auth::user();
-    
+
             // Lưu ID của user vào session
             session(['user_id' => $user->id]);
-    
+
             // Trả về ID và thông tin của user
             return response()->json([
                 'message' => 'Đăng nhập thành công',
@@ -152,14 +152,6 @@ class UserController extends Controller
 
 
     // Reset Password API
-
-    // Hiển thị form quên mật khẩu
-    public function showForgotForm()
-    {
-        return view('forgot-password');
-    }
-
-    // Gửi mã khôi phục qua email
     public function sendResetCode(Request $request)
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
@@ -174,36 +166,49 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Mã khôi phục đã được gửi'], 200);
     }
-
-    // Hiển thị form đặt lại mật khẩu
-    public function showResetForm()
-    {
-        return view('reset-password');
-    }
-
-    // Đặt lại mật khẩu
-    public function resetPassword(Request $request)
+    // 2. Xác minh mã reset
+    public function verifyResetCode(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email|exists:password_resets,email',
             'code' => 'required|numeric|digits:5',
-            'password' => 'required|confirmed|min:6',
         ]);
 
         $reset = PasswordReset::where('email', $request->email)
                               ->where('token', $request->code)
-                              ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+                              ->where('created_at', '>=', Carbon::now()->subMinutes(10))
                               ->first();
 
         if (!$reset) {
-            return response()->json(['error' => 'Mã không hợp lệ hoặc đã hết hạn'], 400);
+            return response()->json(['error' => 'Mã xác thực không đúng hoặc đã hết hạn'], 400);
         }
 
-        User::where('email', $request->email)->update(['password' => Hash::make($request->password)]);
+        return response()->json(['message' => 'Mã xác thực đúng'], 200);
+    }
+
+    // 3. Hiển thị form nhập mật khẩu mới
+    public function showNewPasswordForm($email)
+    {
+        return view('new-password', ['email' => $email]);
+    }
+
+    // 4. Cập nhật mật khẩu mới
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
         PasswordReset::where('email', $request->email)->delete();
 
-        return response()->json(['message' => 'Mật khẩu đã được đặt lại'], 200);
+        return response()->json(['message' => 'Mật khẩu đã được cập nhật thành công'], 200);
     }
+
 
     // Đăng ký API
 

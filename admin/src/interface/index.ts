@@ -58,3 +58,31 @@ export interface ProductVa {
   variant_value: string;
   newImage?: File;
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  google_id: string | null;
+  facebook_id: string | null;
+  image: string | null;
+  phone: string | null;
+  address: string | null;
+  status: string;
+  point: number;
+  created_at: string;
+  updated_at: string;
+  role_id: number;
+  role: {
+      id: number;
+      name: string;
+      created_at: string | null;
+      updated_at: string | null;
+  };
+}
+
+export interface Role {
+  id: number;
+  name: string;
+}

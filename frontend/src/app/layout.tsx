@@ -1,4 +1,4 @@
-import "../../styles/globals.css";
+import "../styles/globals.css";
 import { Metadata, Viewport } from "next";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
@@ -16,8 +16,9 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';  // Thêm import Script từ Next.js
 import ChatBox from "@/src/components/ChatBox";
 
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+// import { NextIntlClientProvider } from 'next-intl';
+// import { getMessages } from 'next-intl/server';
+import SessionWrapper from "../components/SessionWrapper/SessionWrapper";
 
 
 export const metadata: Metadata = {
@@ -41,17 +42,18 @@ export default async function RootLayout({
 }) {
 
   // Lấy messages dựa trên ngôn ngữ từ params
-  const messages = await getMessages({ locale: lang });
+  // const messages = await getMessages({ locale: lang });
 
   return (
-    <html suppressHydrationWarning lang={lang}>
+    <html lang={lang}>
+    {/* <html suppressHydrationWarning lang={lang}> */}
       <head>
         {/* Head components như Google Analytics/Tag Manager có thể giữ nguyên */}
       </head>
 
       <body className="bg-white dark:bg-black">
         <StoreProvider>
-          <NextIntlClientProvider locale={lang} messages={messages}>
+          {/* <NextIntlClientProvider locale={lang} messages={messages}> */}
             {/* Google Tag Manager (noscript) */}
             <noscript>
               <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5MQ3DL62"
@@ -63,12 +65,14 @@ export default async function RootLayout({
               <ToastContainer className="mt-[64px]" />
               <ChatBox />
               <BtnToTop />
-              {children}
+              <SessionWrapper>
+                {children}
+              </SessionWrapper>
               <Analytics />
               <SpeedInsights />
               <Footer />
             </Providers>
-          </NextIntlClientProvider>
+          {/* </NextIntlClientProvider> */}
         </StoreProvider>
       </body>
     </html>

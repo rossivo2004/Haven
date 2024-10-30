@@ -41,6 +41,10 @@ function BodyShop() {
     const [sortOrder, setSortOrder] = useState<string>(''); // Add state for sort order
     const [loading, setLoading] = useState<boolean>(false);
 
+    // console.log(variants);
+    
+
+
     const fetchProduct = async () => {
         setLoading(true); // Start loading
         try {

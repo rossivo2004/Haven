@@ -12,11 +12,9 @@ import { useParams } from 'react-router-dom';
 
 function BoxProduct({ product }: { product: Variant }) {
     const router = useRouter();
-    const { id, name, stock, variantValue, image } = product;
+    const { id, name, stock, image } = product;
     const dispatch = useDispatch();
-    const [language, setLanguage] = useState('vi'); // Default to 'en'
     const params = useParams(); 
-    const { lang = 'vi' } = params;
 
     // Validate variants
     // const firstVariant = Array.isArray(variants) && variants.length > 0 
@@ -45,14 +43,14 @@ function BoxProduct({ product }: { product: Variant }) {
         }
     };
 
-    useEffect(() => {
-        const currentLang = window.location.pathname.startsWith('/vi') ? 'vi' : 'en';
-        setLanguage(currentLang);
-    }, []);
+    // useEffect(() => {
+    //     const currentLang = window.location.pathname.startsWith('/vi') ? 'vi' : 'en';
+    //     setLanguage(currentLang);
+    // }, []);
 
 
     return (
-        <Link href={`/${lang}/product/${id}`} >
+        <Link href={`   /product/${id}`} >
             <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 pb-3 rounded-lg">
                 <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                     <Image

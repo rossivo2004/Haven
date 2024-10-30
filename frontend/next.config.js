@@ -7,6 +7,7 @@ const nextConfig = {
     images: {
         domains:['th.bing.com', 'res.cloudinary.com'],
       },
+      reactStrictMode: false,
 }
 
 module.exports = withNextIntl(nextConfig);

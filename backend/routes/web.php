@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
 use App\Http\Controllers\PostController;
 
@@ -41,6 +43,7 @@ Route::group(['prefix' => 'api/users'], function() {
     Route::get('/show/{user}', [UserController::class, 'show'])->name('users.show');
     Route::put('/update/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.delete');
+    Route::put('/update/admin/{user}', [UserController::class, 'updateAdmin'])->name('users.updateAdmin');
 });
 
 // Role API routes
@@ -68,6 +71,15 @@ Route::group(['prefix' => 'api/register'], function() {
 Route::group(['prefix' => 'api/password'], function() {
     Route::post('/forgot', [UserController::class, 'sendResetCode'])->name('api.password.forgot');
     Route::post('/reset', [UserController::class, 'resetPassword'])->name('api.password.reset');
+    // Xác minh mã reset
+    Route::post('/verify-code', [UserController::class, 'verifyResetCode']);
+
+    // Hiển thị form nhập mật khẩu mới sau khi mã được xác thực
+    Route::get('/new-password/{email}', [UserController::class, 'showNewPasswordForm'])
+        ->name('password.new');
+
+    // Cập nhật mật khẩu mới
+    Route::post('/update', [UserController::class, 'updatePassword']);
 });
 
 
@@ -158,24 +170,49 @@ route::group([
     Route::get('/edit/{flashSaleProduct}', [FlashSaleProductController::class, 'edit'])->name('FlashSale.edit');
     Route::put('/update/{flashSaleProduct}', [FlashSaleProductController::class, 'update'])->name('FlashSale.update');
     Route::delete('/delete/{flashSaleProduct}', [FlashSaleProductController::class, 'destroy'])->name('FlashSale.delete');
-  
- 
+
+
 });
-route::group([
-    'prefix' => 'api/favorite', 'middleware'=>'auth'
-],function(){
-    Route::get('/', [FavoriteController::class, 'index'])->name('Favorite.index');
+Route::group(['prefix' => 'api/favorite'], function() {
+        // Route::get('/', [FavoriteController::class, 'index'])->name('Favorite.index');
     Route::post('/store', [FavoriteController::class, 'store']);
+});
+
+Route::group(['prefix' => 'api/userfavorite'], function() {
+    Route::get('/{userId}', [FavoriteController::class, 'index'])->name('Favorite.index');
 });
 
 
 route::group([
     'prefix' => 'api/cart'
 ],function(){
-    Route::get('/', [CartController::class, 'showCart'])->name('Cart.index');
-    Route::get('/total', [CartController::class, 'cartTotal']);
+    Route::get('/{userId}', [CartController::class, 'showCart'])->name('Cart.index'); //lấy danh sách giỏ hàng của 1 người dùng
+    Route::get('/total/{userId}', [CartController::class, 'cartTotal']); // Tổng tiền giỏ hàng của 1 người dùng
+    Route::get('/point/{userId}', [CartController::class, 'cartPoint']); // Số điểm tích lũy của 1 người dùng trong giỏ hàng
+    Route::post('/movecart', [CartController::class, 'moveCartToDatabase']);
     Route::post('/add', [CartController::class, 'addToCart']);
-    Route::put('/update/{productVariantId}', [CartController::class, 'updateCart']);
-    Route::delete('/delete/{productVariantId}', [CartController::class, 'deleteCart']);
-    Route::delete('/clear', [CartController::class, 'clearCart']);
+    Route::put('/update/{userId}/{productVariantId}', [CartController::class, 'updateCart']); // cập nhật số lượng 1 sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/delete/{userId}/{productVariantId}', [CartController::class, 'deleteCart']); // xóa 1 sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/clear/{userId}', [CartController::class, 'clearCart']); // xóa tất cả sản phẩm trong giỏ hàng của 1 người dùng
+    Route::delete('/selectdelete/{userId}', [CartController::class, 'removeSelectedItems']); // xóa sản phẩm trong giỏ hàng của 1 người dùng theo select
+});
+
+
+route::group([
+    'prefix' => 'api/checkout'
+],function(){
+    Route::get('/showorder', [OrderController::class, 'show']); // lấy danh sach đơn hàng tất cả
+    Route::get('/showorder/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
+    Route::get('/showorderdetail/{order}', [OrderController::class, 'showOrderdetail']); // lấy chi tiết của 1 đơn hàng
+    Route::post('/orders', [OrderController::class, 'checkout']); // tạo đơn hàng
+    Route::post('/orders/cancelorder/{orderId}', [OrderController::class, 'cancelOrder']); // Hủy đơn hàng
+    Route::post('/orders/reorder/{orderId}', [OrderController::class, 'reorder']); // mua lại đơn hàng
+    Route::put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
+});
+
+route::group([
+    'prefix' => 'api/payment'
+],function(){
+    Route::get('/vnpay_return/{orderID}', [PaymentController::class, 'vnpayReturn']); // trả về dữ liệu lưu vào db
+    Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']); // thanh toán vnpay
 });
