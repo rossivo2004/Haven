@@ -7,6 +7,8 @@ use DOMDocument;
 use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+
 
 class PostController extends Controller
 {
@@ -28,7 +30,7 @@ class PostController extends Controller
         @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $images = $dom->getElementsByTagName('img');
 
-        foreach ($images as $key => $img) {
+        foreach ($images as $img) {
             $src = $img->getAttribute('src');
 
             if (strpos($src, 'data:image/') === 0) {
@@ -52,13 +54,16 @@ class PostController extends Controller
         }
 
         $content = $dom->saveHTML();
+
         $post = Post::create([
             'title' => $request->title,
             'content' => $content,
+            'id_user' => Auth::id() 
         ]);
 
         return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
     }
+
 
     public function show($id)
     {
@@ -75,23 +80,29 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['error' => 'Post not found'], 404);
         }
-
+    
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'id_user' => 'nullable|exists:users,id' // Kiểm tra id_user nếu có
+        ]);
+    
         $content = $request->content;
         $dom = new DOMDocument();
         @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
+    
         $images = $dom->getElementsByTagName('img');
-
-        foreach ($images as $key => $img) {
+    
+        foreach ($images as $img) {
             $src = $img->getAttribute('src');
-
+    
             if (strpos($src, 'data:image/') === 0) {
                 $data = base64_decode(explode(',', explode(';', $src)[1])[1]);
-
+    
                 $tempImage = tmpfile();
                 fwrite($tempImage, $data);
                 $tempFilePath = stream_get_meta_data($tempImage)['uri'];
-
+    
                 try {
                     $uploadedFileUrl = Cloudinary::upload($tempFilePath)->getSecurePath();
                     $img->removeAttribute('src');
@@ -104,15 +115,19 @@ class PostController extends Controller
                 }
             }
         }
-
+    
         $content = $dom->saveHTML();
+    
+        // Cập nhật bài viết, bao gồm id_user nếu được cung cấp
         $post->update([
             'title' => $request->title,
             'content' => $content,
+            'id_user' => $request->id_user ?? $post->id_user // Giữ nguyên id_user nếu không có trong request
         ]);
-
+    
         return response()->json(['message' => 'Post updated successfully', 'post' => $post], 200);
     }
+    
 
     public function destroy($id)
     {
