@@ -594,7 +594,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             </svg>
                                         </label>
                                     </div>
-                                    <div className="border border-white h-6"></div>
+                                    {/* <div className="border border-white h-6"></div>
                                     <div className='pl-2'>
                                         <select
                                             value={language}
@@ -603,7 +603,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             <option className='text-black' value="vi">Vie</option>
                                             <option className='text-black' value="en">Eng</option>
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -635,16 +635,16 @@ function Header({ params }: { params: { lang: string } }) {
                                                         <div className='row-span-2'>
                                                             <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
                                                         </div>
-                                                        <div className='col-span-3 row-span-2'>
-                                                            <div className='flex flex-col mb-4'>
+                                                        <div className='col-span-3 row-span-2 flex'>
+                                                            <div className='flex flex-col items-start pl-2 w-1/2'>
                                                                 <div className='text-black text-lg'>Phân loại</div>
-                                                                <div className='grid grid-cols-2'>
+                                                                <div className='flex flex-col'>
                                                                     {categories.map((item, index) => (
                                                                         <Link key={index} href={`/shop?category[]=${item.name}`}>
-                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                                <div className='mr-2'>
+                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                                </div>
+                                                                                </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
                                                                         </Link>
@@ -652,15 +652,15 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 </div>
 
                                                             </div>
-                                                            <div>
+                                                            <div className='w-1/2'>
                                                                 <div className='text-black text-lg'>Thương hiệu</div>
-                                                                <div className='grid grid-cols-2'>
+                                                                <div className='flex flex-col items-start pl-2'>
                                                                     {brands.map((item, index) => (
                                                                         <Link key={index} href={`/shop?brand[]=${item.name}`}>
-                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                                <div className='mr-2'>
+                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                                </div>
+                                                                                </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
                                                                         </Link>

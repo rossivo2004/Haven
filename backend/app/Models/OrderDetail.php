@@ -20,4 +20,9 @@ class OrderDetail extends Model
     public function productVariant() {
         return $this->belongsTo(ProductVariant::class);
     }
+
+    public function getPriceAttribute($value)
+    {
+    return intval($value); // Loại bỏ phần .00
+    }
 }

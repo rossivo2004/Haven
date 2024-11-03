@@ -90,6 +90,8 @@ const apiConfig = {
     updatePassword: `${baseUrl}/api/password/update`,
 
     saveGoogleUser: `${baseUrl}/api/save-google-user`,
+
+    updateUser: `${baseUrl}/api/users/update/`,
   },
 
   favourite: {
@@ -147,6 +149,35 @@ const apiConfig = {
     ///clear/{userId}
     clearCartByUserId: `${baseUrl}/api/cart/clear/`,
   },
+
+
+  order: {
+    //Tạo đơn hàng
+    createOrder: `${baseUrl}/api/checkout/orders`,
+
+    //Trừ điểm khi dùng
+    subtractionPoint: `${baseUrl}/api/checkout/deduct-points`,
+
+    //Show order user
+    ///showorder/{userId}
+    showOrderUser: `${baseUrl}/api/checkout/showorder/`,
+
+    //Show order theo id
+    ///showorderdetail/{order}
+    showOrderDetail: `${baseUrl}/api/checkout/showorderdetail/`,
+
+    //Show order theo mã đơn hàg
+    ///showorderdetailcode/{code}
+    showOrderDetailCode: `${baseUrl}/api/checkout/showorderdetailcode/`,
+
+    // Trừ điểm user
+    deductPoints : `${baseUrl}/api/checkout/deduct-points`,
+  },
+
+
+  payment: {
+    createPayment: `${baseUrl}/api/payment/vnpay_payment`
+  }
 
   
 

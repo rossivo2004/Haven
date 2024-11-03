@@ -65,8 +65,25 @@ const Body_Cart = () => {
     }, []); // Ensure this useEffect runs only once
     console.log(cart);
 
+    const handleCheckout = () => {
+        const selectedItemsArray = Array.from(selectedItems);
+        const checkoutData = {
+            productId: selectedItemsArray,
+            selectedItems: selectedItemsArray.map(itemId => {
+                const item = cart.find(item => item.product_variant.id === itemId);
+                return {
+                    id: itemId,
+                    quantity: item?.quantity || 0, // Get quantity for each selected item
+                    name: item?.product_variant.name || '', // Get name for each selected item
+                    image: item?.product_variant.image || '' // Get image for each selected item
+                };
+            }),
+            totalAmount: totalAmount, // Save total amount
+            pointCart: loyaltyPoints, // Save point
+        };
+        Cookies.set('checkout_data', JSON.stringify(checkoutData)); // Save selected items and total amount to cookies
+    };
 
-    // ... existing code ...
     const updateQuantity = async (item: CartItem, newQuantity: number) => {
         // Ensure quantity does not go below 1
         if (newQuantity < 1) {
@@ -294,9 +311,9 @@ const Body_Cart = () => {
                         </div>
 
                         {selectedItems.size > 0 ? (
-                            <Link href={'/checkout'}>
-                                <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
-                            </Link>
+                           <Link href={'/checkout'} onClick={handleCheckout}> // Call handleCheckout on click
+                           <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
+                       </Link>
                         ) : (
                             <div className="w-full text-center">
                                 <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm <br /> để thanh toán</p>

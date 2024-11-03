@@ -35,7 +35,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import './style.scss'
 
-import { fetchProducts } from "@/src/api/productApi";
+// import { fetchProducts } from "@/src/api/productApi";
 
 // import {useTranslations} from 'next-intl';
 
@@ -44,27 +44,22 @@ import apiConfig from '@/src/config/api';
 import { Category, Variant } from "@/src/interface";
 import axios from "axios";
 
-interface ProductIn {
-    id: number;
-    name: string;
-    price: string;
-    images: string[];
-}
+
 
 function BodyHome() {
-    const [productData, setProductData] = useState<ProductIn | null>(null);
+    const [productData, setProductData] = useState<Variant[]>([])
     const [productDataSale, setProductDataSale] = useState<Variant[]>([]); // Change initial state to an empty array
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
 
 
-    const [language, setLanguage] = useState('vi'); // Default to 'en'
-    const params = useParams(); 
+    // const [language, setLanguage] = useState('vi'); // Default to 'en'
+    // const params = useParams(); 
     // const { lang = 'vi' } = params;
     // const t = useTranslations('HomePage');
     const [loading, setLoading] = useState(false);
 
-    const [category, setCategory] =  useState<Category[]>([]);
+    const [category, setCategory] = useState<Category[]>([]);
 
     const fetchCategory = async () => {
         setLoading(true); // Start loading
@@ -92,17 +87,17 @@ function BodyHome() {
             return [];
         }
     };
-    
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
                 const response = await axios.get(`${apiConfig.flashsale.getAllFlashsale}`);
                 const flashSales = response.data.flashSales.data;
-    
+
                 // Filter flash sales with status 1
                 const activeFlashSales = flashSales.filter((sale: any) => sale.status === 1);
-    
+
                 // Fetch products for each active flash sale
                 const productsPromises = activeFlashSales.map((sale: any) => fetchFlashSaleProducts(sale.id));
                 const products = await Promise.all(productsPromises);
@@ -113,16 +108,27 @@ function BodyHome() {
                 setLoading(false);
             }
         };
-    
+
         fetchData();
     }, []);
 
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`${apiConfig.products.getallproductvariants}`);
+            setProductData(response.data.productvariants.data);
+        } catch (error) {
+            console.error("Error fetching product data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
     useEffect(() => {
-        console.log(productDataSale); // Log chỉ khi productDataSale thay đổi
-    }, [productDataSale]); 
-    
-    // console.log(productData);
-    
+        fetchProducts();
+    }, [])
+
+    console.log(productData);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -137,15 +143,15 @@ function BodyHome() {
         "--value": counter,
     };
 
-    useEffect(() => {
-        const getProducts = async () => {
-            const data = await fetchProducts();
-            const dataNew = data.slice(0, 60);
-            setProductData(dataNew);
-        };
+    // useEffect(() => {
+    //     const getProducts = async () => {
+    //         const data = await fetchProducts();
+    //         const dataNew = data.slice(0, 60);
+    //         setProductData(dataNew);
+    //     };
 
-        getProducts();
-    }, []);
+    //     getProducts();
+    // }, []);
 
     //   console.log(productData);
 
@@ -204,28 +210,28 @@ function BodyHome() {
                             <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50 transition-all">
                                 <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Free shipping
+                                    Free shipping
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">For orders from 500k or more</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                24/7 Support
+                                    24/7 Support
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">24/7 online / offline support</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Free returns
+                                    Free returns
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">Within 7 days</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Order online
+                                    Order online
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">Hotline: 0357 420 420</div>
                             </div>
@@ -246,7 +252,7 @@ function BodyHome() {
                         }}
                     >
                         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
-                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Flash Sale</div>
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
                             <div className="flex items-center">
                                 <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
                                 <div>
@@ -256,7 +262,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 15 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            Day
+                                                Day
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -264,7 +270,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 10 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            Hour
+                                                Hour
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -272,7 +278,7 @@ function BodyHome() {
                                                 <span style={{ "--value": 24 } as CSSProperties}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            Minute
+                                                Minute
                                             </div>
                                         </div>
                                         <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -280,7 +286,7 @@ function BodyHome() {
                                                 <span style={customStyle}></span>
                                             </span>
                                             <div className="text-[10px]">
-                                            Minute
+                                                Minute
                                             </div>
                                         </div>
                                     </div>
@@ -303,7 +309,7 @@ function BodyHome() {
 
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
-                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Category</div>
+                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Phân loại sản phẩm</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
@@ -372,7 +378,7 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex gap-4">
                             <div className="lg:w-1/4 lg:block hidden">
-                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">Featured Products</div>
+                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">Sản phẩm nổi bật</div>
                                 <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden w-full h-[800px] object-cover rounded-lg" />
                             </div>
                             <div className="flex-1">
@@ -425,7 +431,7 @@ function BodyHome() {
                         <div>
                             <Link href="/shop">
                                 <Button variant="bordered" className="border-main text-main">
-                                   Xem thêm
+                                    Xem thêm
                                 </Button>
                             </Link>
                         </div>
@@ -470,9 +476,12 @@ function BodyHome() {
                             <div className="lg:col-span-2 md:col-span-3 col-span-2">
                                 <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                             </div>
-                            {/* {flatProducts.slice(0, 6).map((product) => (
-                                <BoxProduct key={product.id} product={product} />
-                            ))} */}
+                            {productData
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by created_at
+    .slice(0, 6) // Get the first 6 products
+    .map((product) => (
+        <BoxProduct key={product.id} product={product} />
+    ))}
                         </div>
 
 

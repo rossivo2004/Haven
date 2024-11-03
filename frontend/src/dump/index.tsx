@@ -50,12 +50,12 @@
 //   { id: 3, name: "COD (Thanh toán khi nhận hàng)" },
 // ]
 
-// export const DUMP_SHIPPING_METHOD = [
-//   { id: 1, name: "Grab Food" },
-//   { id: 2, name: "Giao hàng nhanh" },
-//   { id: 3, name: "Shopee Express" },
-//   { id: 4, name: "J&T Express" },
-// ]
+export const DUMP_SHIPPING_METHOD = [
+  { id: 1, name: "Grab Food" },
+  { id: 2, name: "Giao hàng nhanh" },
+  { id: 3, name: "Shopee Express" },
+  { id: 4, name: "J&T Express" },
+]
 
 // export const DUMP_SERVICES = [
 //   {

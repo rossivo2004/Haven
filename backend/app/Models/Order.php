@@ -10,18 +10,18 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'total', 
+        'total',
         'full_name',
-        'phone', 
-        'email', 
-        'status', 
-        'province', 
-        'district', 
-        'ward', 
-        'address', 
-        'payment_transpot', 
-        'payment_method', 
-        'payment_status', 
+        'phone',
+        'email',
+        'status',
+        'province',
+        'district',
+        'ward',
+        'address',
+        'payment_transpot',
+        'payment_method',
+        'payment_status',
         'user_id',
         'invoice_code',
         'refunded_stock'
@@ -37,5 +37,10 @@ class Order extends Model
 
     public function orderDetails() {
         return $this->hasMany(OrderDetail::class);
+    }
+
+    public function getTotalAttribute($value)
+    {
+        return intval($value); // Loại bỏ phần .00
     }
 }
