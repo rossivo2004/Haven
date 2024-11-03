@@ -208,7 +208,7 @@ class ProductController extends Controller
      */
     public function detail(ProductVariant $productVariant)
     {
-        $productVariant->view =+ 1; 
+        $productVariant->view += 1; 
         $productVariant->update();
         return response()->json([
             'productVariant' => $productVariant,
