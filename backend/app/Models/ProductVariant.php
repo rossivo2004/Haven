@@ -74,7 +74,19 @@ class ProductVariant extends Model
         // Nếu không có flash sale hoặc không có giảm giá thì trả về giá gốc
         return intval($this->price);
     }
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
 
+    public function getQuantitySoldAttribute()
+    {
+        return $this->orderDetails()
+            ->whereHas('order', function ($query) {
+                $query->where('status', 'complete');
+            })
+            ->sum('quantity');
+    }
     public function Cart()
     {
         return $this->hasMany(Cart::class);
@@ -131,6 +143,6 @@ class ProductVariant extends Model
             }
         }
     }
-    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart'];
+    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart','QuantitySold'];
     protected $with = ['flashSales','product'];
 }
