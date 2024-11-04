@@ -73,6 +73,7 @@ class ProductVariantController extends Controller
      */
     public function show(ProductVariant $productVariant)
     {
+        $productVariant->increment('view');
         return response()->json([
             'success' => true,
             'product' => $productVariant
