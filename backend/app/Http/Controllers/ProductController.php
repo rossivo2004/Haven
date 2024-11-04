@@ -208,8 +208,7 @@ class ProductController extends Controller
      */
     public function detail(ProductVariant $productVariant)
     {
-        $productVariant->view += 1; 
-        $productVariant->update();
+        $productVariant->increment('view');
         return response()->json([
             'productVariant' => $productVariant,
             'productImages' => ProductImage::where('product_id',$productVariant->product->id)->get(),
