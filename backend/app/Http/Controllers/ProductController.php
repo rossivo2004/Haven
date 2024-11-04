@@ -208,8 +208,7 @@ class ProductController extends Controller
      */
     public function detail(ProductVariant $productVariant)
     {
-        $productVariant->view =+ 1; 
-        $productVariant->update();
+       
         return response()->json([
             'productVariant' => $productVariant,
             'productImages' => ProductImage::where('product_id',$productVariant->product->id)->get(),
@@ -235,7 +234,7 @@ class ProductController extends Controller
 
     public function getProductVariants(Product $product)
     {
-    
+        
         return response()->json([
             'success' => true,
             'productVariants' => ProductVariant::where('product_id', $product->id)->paginate(20),

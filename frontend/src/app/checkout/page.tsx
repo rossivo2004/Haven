@@ -1,9 +1,9 @@
-// import BodyCheckout from "@/src/components/BodyCheckout";
+import BodyCheckout from "@/src/components/BodyCheckout";
 
 function page() {
     return ( 
         <div>
-            {/* <BodyCheckout /> */}
+            <BodyCheckout />
         </div>
      );
 }

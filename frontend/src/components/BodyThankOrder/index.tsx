@@ -25,12 +25,12 @@ function BodyThankOrder() {
   return (
     <div className="flex flex-col items-center justify-center mt-28">
       <div className="text-3xl font-medium">Cảm ơn vì bạn đã đặt hàng</div>
-      <div className="text-lg mb-2">
+      {/* <div className="text-lg mb-2">
         Đơn hàng của bạn{" "}
         <Link href="/" className="font-medium text-blue-500 underline">
           1432040234
         </Link>
-      </div>
+      </div> */}
       <div className="mb-2">
         <img src="/images/tonton-tonton-sticker.gif" alt="Order confirmation gif" />
       </div>

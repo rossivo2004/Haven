@@ -62,6 +62,9 @@ function BodyShop() {
         }
     };
 
+    console.log(variants);
+    
+
     const fetchCategory = async () => {
         try {
             const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
@@ -93,18 +96,47 @@ function BodyShop() {
     console.log(variants);
 
 
+    // useEffect(() => {
+    //     const params = new URLSearchParams(window.location.search);
+    //     const page = parseInt(params.get('page') || '1', 10);
+    //     const prices = params.getAll('price');
+    //     const categories = params.getAll('category[]'); // Đảm bảo sử dụng đúng tên tham số
+
+    //     setCurrentPage(page);
+    //     setPriceFilter(prices);
+    //     setCateFilter(categories);
+    //     const sort = params.get('sort'); // Lấy tham số sort từ URL
+    //     setSortOrder(sort || ''); // Khôi phục sortOrder từ URL
+    // }, []);
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const page = parseInt(params.get('page') || '1', 10);
         const prices = params.getAll('price');
-        const categories = params.getAll('category[]'); // Đảm bảo sử dụng đúng tên tham số
-
-        setCurrentPage(page);
+        const categories = params.getAll('category[]');
+        const brands = params.getAll('brand[]'); // Lấy các tham số brand từ URL
+    
         setPriceFilter(prices);
         setCateFilter(categories);
-        const sort = params.get('sort'); // Lấy tham số sort từ URL
-        setSortOrder(sort || ''); // Khôi phục sortOrder từ URL
+        setBrandFilter(brands); // Cập nhật state cho brandFilter
+        const sort = params.get('sort');
+        setSortOrder(sort || '');
     }, []);
+
+    // useEffect(() => {
+    //     const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter]; // Include brand filter
+    //     setFilter(combinedFilter);
+
+    //     const params = new URLSearchParams();
+    //     if (priceFilter.length > 0) priceFilter.forEach(value => params.append('price', value));
+    //     if (cateFilter.length > 0) cateFilter.forEach(value => params.append('category[]', value)); // Ensure correct parameter name
+    //     if (brandFilter.length > 0) brandFilter.forEach(value => params.append('brand[]', value)); // Ensure correct parameter name
+
+    //     // Only add sortOrder to URL if it's not empty
+    //     if (sortOrder) params.set('sort', sortOrder);
+
+    //     params.set('page', currentPage.toString());
+    //     router.push(`?${params.toString()}`, { scroll: false });
+    // }, [priceFilter, cateFilter, brandFilter, currentPage, router, sortOrder]); // Add brandFilter to dependencies
 
 
     useEffect(() => {
@@ -121,8 +153,9 @@ function BodyShop() {
 
         params.set('page', currentPage.toString());
         router.push(`?${params.toString()}`, { scroll: false });
-    }, [priceFilter, cateFilter, brandFilter, currentPage, router, sortOrder]); // Add brandFilter to dependencies
 
+        fetchProduct(); // Fetch products after updating filters and sorting
+    }, [priceFilter, cateFilter, brandFilter, currentPage, router, sortOrder]); // Add brandFilter to dependencies
 
     const handlePriceFilterChange = (values: string[]) => {
         setPriceFilter(values);
@@ -151,18 +184,18 @@ function BodyShop() {
     const resetFilter = () => {
         setPriceFilter([]);
         setCateFilter([]);
+        setBrandFilter([]); // Ensure brand filter is also reset
         setFilter([]); // Reset unified filter as well
     };
 
-    const handleSort = (order: string) => {
+    function handleSort(order: string) {
         setSortOrder(order); // Set the sort order state
         if (order === 'low-to-high') {
-            setVariants(prev => [...prev].sort((a, b) => a.price - b.price));
+            setVariants(prev => [...prev].sort((a, b) => Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0) - Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0)));
         } else if (order === 'high-to-low') {
-            setVariants(prev => [...prev].sort((a, b) => b.price - a.price));
+            setVariants(prev => [...prev].sort((a, b) => Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0) - Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0)));
         }
-    };
-
+    }
 
 
     // Slice for pagination
@@ -429,11 +462,15 @@ function BodyShop() {
                         <div className='h-[380px] flex justify-center items-center'>
                             <Loading />
                         </div> // Show loading indicator
+                    ) : variants.length === 0 ? ( // Check if there are no products
+                        <div className='h-[380px] flex justify-center items-center'>
+                            <p className='text-lg'>Không có sản phẩm</p> {/* Message for no products */}
+                        </div>
                     ) : (
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 mt-4">
-                            {variants.map((product: Variant) => (
-                                <BoxProduct key={String(product.product_id)} product={product} />
-                            ))}
+                             {variants.map((product: Variant, index: number) => ( // Added index as a second parameter
+            <BoxProduct key={`${product.product_id}-${index}`} product={product} /> // Updated key to include index
+        ))}
                         </div>
                     )}
 

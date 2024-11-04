@@ -15,7 +15,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
 use App\Http\Controllers\PostController;
-
+use App\Http\Controllers\StatisticsController;
+use App\Models\ProductImage;
 
 // Quản lý roles
 Route::resource('roles', RoleController::class);
@@ -202,11 +203,13 @@ route::group([
     'prefix' => 'api/checkout'
 ],function(){
     Route::get('/showorder', [OrderController::class, 'show']); // lấy danh sach đơn hàng tất cả
-    Route::get('/showorder/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
+    Route::get('/showorderuser/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
     Route::get('/showorderdetail/{order}', [OrderController::class, 'showOrderdetail']); // lấy chi tiết của 1 đơn hàng
+    Route::get('/showorderdetailcode/{ordercode}', [OrderController::class, 'showOrderdetailcode']); // lấy chi tiết của 1 đơn hàng dựa tên mã đơn hàng
     Route::post('/orders', [OrderController::class, 'checkout']); // tạo đơn hàng
     Route::post('/orders/cancelorder/{orderId}', [OrderController::class, 'cancelOrder']); // Hủy đơn hàng
     Route::post('/orders/reorder/{orderId}', [OrderController::class, 'reorder']); // mua lại đơn hàng
+    Route::post('/deduct-points', [OrderController::class, 'deductPoints']); // trừ điểm tích lũy của người dùng đã sử dụng
     Route::put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
 });
 
@@ -215,4 +218,10 @@ route::group([
 ],function(){
     Route::get('/vnpay_return/{orderID}', [PaymentController::class, 'vnpayReturn']); // trả về dữ liệu lưu vào db
     Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']); // thanh toán vnpay
+});
+
+route::group([
+    'prefix' => 'api/statics'
+],function(){
+    Route::get('/', [StatisticsController::class, 'getMonthlyStatistics']); // Thống kê doanh thu theo tháng, sản phẩm bán chạy, bán ít theo tháng
 });

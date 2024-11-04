@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -39,6 +39,7 @@ const DashboardCard: React.FC<CardData> = ({
 };
 
 const BodyDashboard: React.FC = () => {
+    // const [static, setStatic] = useState<Static[]>([]);
 
     const cardsData: CardData[] = [
         {

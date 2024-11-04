@@ -1,29 +1,54 @@
-
-
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+'use client'
+import apiConfig from "@/src/config/api";
+import { Order, OrderTracking } from "@/src/interface";
+import axios from "axios";
+import { useParams } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
 
 function BodyTrackingorder() {
+    const { id } = useParams();
+    const [order, setOrder] = useState<OrderTracking | null>(null);
+    const [orderPayment_transpot, setOrderPayment_transpot] = useState(0);
+
+    const fetchOrder = async () => {
+        try {
+            const response = await axios.get(`${apiConfig.order.showOrderDetailCode}${id}`); // Use axios.get
+            setOrder(response.data.order);
+            setOrderPayment_transpot(response.data.order.payment_transpot)
+
+        } catch (error) {
+            console.error("Error fetching order:", error);
+        }
+    }
+    useEffect(() => {
+        fetchOrder();
+    }, [])
+
+    console.log(order);
+
+
     return (
         <div className="flex lg:flex-row flex-col-reverse lg:mt-10 gap-5">
-            <div className="lg:w-2/3 w-full ">
-            <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm mb-6">
-  <div className="flex items-center space-x-4">
-    <div>
-      <h3 className="font-medium lg:text-2xl text-lg">Thông Tin Nhận Hàng</h3>
-      <p className="text-sm text-gray-600">
-        Nguyễn Hữu Tiến <span className="mx-2">|</span> 0901 22 33 44
-      </p>
-    </div>
-  </div>
-  <div className="flex items-center space-x-4 text-right">
-    <p className="text-sm text-gray-600">
-      388 J, P. An Khánh, Q. Ninh Kiều, TP. Cần Thơ
-    </p>
-  </div>
-</div>
+            <div className="lg:w-3/5 w-full ">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm mb-6">
+                    <div className="flex items-center space-x-4">
+                        <div>
+                            <h3 className="font-medium lg:text-2xl text-lg">Thông Tin Nhận Hàng</h3>
+                            <p className="text-sm text-gray-600">
+                                {order?.full_name} <span className="mx-2">|</span> {order?.phone}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-4 text-right">
+                        <p className="text-sm text-gray-600">
+                            {order?.address}, {order?.ward}, {order?.district}, {order?.province}
+                        </p>
+                    </div>
+                </div>
 
 
-                <div className="p-6 border bg-gray-50 mb-6">
+                {/* <div className="p-6 border bg-gray-50 mb-6">
                     <h2 className="lg:text-2xl text-lg font-medium mb-6">Hóa Đơn Điện Tử</h2>
                     <div className="grid grid-cols-3 gap-y-4">
                         <div className="font-semibold text-gray-700">Tên công ty:</div>
@@ -41,54 +66,29 @@ function BodyTrackingorder() {
                         <div className="font-semibold text-gray-700">Số nhà, đường:</div>
                         <div className="col-span-2 text-right">310 đường 30/4</div>
                     </div>
-                </div>
+                </div> */}
 
                 <div>
                     <div className="p-4 space-y-6">
-                        {/* Product 1 */}
-                        <div className="flex justify-between items-start">
-                            {/* Product Image and Details */}
-                            <div className="flex items-start gap-2">
-                                <img src="/path-to-image-1.jpg" alt="Product 1" className="w-24 h-24 object-contain mr-4" />
-                                <div>
-                                    <div className="lg:text-xl text-base font-medium">Ba Chỉ Bò Nhập Khẩu Đông Lạnh Trust Farm (Khay 300g)</div>
-                                    <div className="text-gray-600 text-sm">
-                                        Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.
+                        {order?.order_details.map((item) => (
+                            <div className="flex justify-between items-start" key={item.id}>
+                                {/* Product Image and Details */}
+                                <div className="flex items-start gap-2 justify-center">
+                                <img src={item.product_variant.image} alt="Product 1" className="w-24 h-24 object-cover mr-4" />
+                                    <div>
+                                        <div className="lg:text-xl text-base font-medium">{item.product_variant.name}</div>
+                                        <div className="text-gray-600 text-sm mt-2">Số lượng: {item?.quantity}</div>
                                     </div>
-                                    <div className="text-gray-600 text-sm mt-2">Số lượng: 01</div>
+                                </div>
+                                {/* Product Price */}
+                                <div className="text-right">
+                                    <div className="lg:text-xl text-base font-semibold">{item?.price.toLocaleString()} đ</div>
                                 </div>
                             </div>
-                            {/* Product Price */}
-                            <div className="text-right">
-                                <div className="lg:text-xl text-base font-semibold">499.000 đ</div>
-                                <div className="text-red-500 text-sm">-49.000 đ</div>
-                                <div className="text-gray-500 text-sm">đã giảm giá</div>
-                            </div>
-                        </div>
-                        {/* Product 2 */}
-                        <div className="flex lg:flex-row flex-col justify-between lg:items-start items-end">
-                            {/* Product Image and Details */}
-                            <div className="flex lg:items-start">
-                                <img src="/path-to-image-2.jpg" alt="Product 2" className="w-24 h-24 object-contain mr-4" />
-                                <div>
-                                    <div className="lg:text-xl text-base font-semibold">S2 XÚC XÍCH DINH DƯỠNG - IQ NGON (MỚI) - 210G</div>
-                                    <div className="text-gray-600 text-sm">
-                                        Mô tả sản phẩm 1, Mô tả sản phẩm 2, Mô tả sản phẩm 3, Mô tả sản phẩm 4.
-                                    </div>
-                                    <div className="text-gray-600 text-sm mt-2">Số lượng: 01</div>
-                                </div>
-                            </div>
-                            {/* Product Price */}
-                            <div className="lg:text-right text-left">
-                            <div className="lg:text-xl text-base font-semibold">499.000 đ</div>
-                                <div className="text-red-500 text-sm">-49.000 đ</div>
-                                <div className="text-gray-500 text-sm">đã giảm giá</div>
-                            </div>
-                        </div>
+                        ))}
+
+
                     </div>
-
-
-                    <div>Tổng Khối Lượng Giỏ Hàng: <span className="font-bold">0.5Kg</span></div>
                 </div>
             </div>
 
@@ -100,23 +100,33 @@ function BodyTrackingorder() {
                     <div className="mb-6">
                         <div className="text-sm font-medium mb-2">Tình trạng đơn hàng</div>
                         <ul className="steps steps-vertical lg:steps-horizontal">
-                            <li className="step step-primary">Đơn hàng đã đặt</li>
-                            <li className="step step-primary">Đã duyệt</li>
-                            <li className="step">Đang giao hàng</li>
-                            <li className="step">Giao hàng thành công</li>
+                            <li className={`step ${order?.status === "pending" || order?.status === "preparing" || order?.status === "transport" || order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Đơn hàng đang chờ</li>
+                            <li className={`step ${order?.status === "preparing" || order?.status === "transport" || order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Đã duyệt</li>
+                            <li className={`step ${order?.status === "transport" || order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Đang giao hàng</li>
+                            <li className={`step ${order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Giao hàng thành công</li>
+                            <li className={`step ${order?.status === "canceled" ? 'step-primary' : ''}`}>Đã hủy</li>
                         </ul>
                         <hr className="border-gray-300" />
                     </div>
                     {/* Shipping Method */}
                     <div className="mb-6">
                         <div className="text-sm font-medium mb-2">Phương thức vận chuyển</div>
-                        <div className="text-gray-600">GrabFood</div>
+                        <div className="text-gray-600">
+                            {orderPayment_transpot == 1 && "Grab Food"}
+                            {orderPayment_transpot == 2 && "Giao hàng nhanh"}
+                            {orderPayment_transpot == 3 && "Shopee Express"}
+                            {orderPayment_transpot == 4 && "J&T Express"}
+                        </div>
                         <hr className="border-gray-300 mt-2" />
                     </div>
                     {/* Payment Method */}
                     <div className="mb-6">
                         <div className="text-sm font-medium mb-2">Hình thức thanh toán</div>
-                        <div className="text-gray-600">COD (Thanh toán khi nhận hàng)</div>
+                        <div className="text-gray-600">
+                            {order?.payment_method === "1" ? "Thanh toán khi nhận hàng (COD)" :
+                                order?.payment_method === "2" ? "Thanh toán trực tuyến" :
+                                    "Chưa xác định"}
+                        </div>
                         <hr className="border-gray-300 mt-2" />
                     </div>
                     {/* Estimated Delivery Time */}
@@ -127,7 +137,7 @@ function BodyTrackingorder() {
                     </div>
                     {/* Order Summary */}
                     <div className="space-y-2 mb-6">
-                        <div className="flex justify-between text-gray-600">
+                        {/* <div className="flex justify-between text-gray-600">
                             <span>Tổng tiền</span>
                             <span>00,000,000</span>
                         </div>
@@ -142,10 +152,10 @@ function BodyTrackingorder() {
                         <div className="flex justify-between text-gray-600">
                             <span>Số điểm tích lũy</span>
                             <span>50</span>
-                        </div>
+                        </div> */}
                         <div className="flex justify-between font-semibold">
                             <span>Tổng thanh toán</span>
-                            <span>00,000,000</span>
+                            <span>{(order?.total ?? 0).toLocaleString('vi-VN', { minimumFractionDigits: 0 })}</span> 
                         </div>
                     </div>
                     {/* Confirmation Button */}

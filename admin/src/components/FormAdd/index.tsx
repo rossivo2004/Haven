@@ -589,7 +589,7 @@ const CreateProduct = () => {
                             <div>
                                 <h1 className="text-xl font-semibold mb-4">Sản phẩm chính</h1>
                                 <div className="mb-4">
-                                    <label htmlFor="name_product" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="name_product" className="block text-sm font-medium text-gray-700 mb-1">
                                         Tên sản phẩm
                                     </label>
                                     <Input
@@ -606,7 +606,7 @@ const CreateProduct = () => {
                                 <div className='flex gap-5'>
                                     {/* Categories */}
                                     <div className="mb-4 flex-1">
-                                        <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">
                                             Phân loại
                                         </label>
                                         <Select
@@ -629,7 +629,7 @@ const CreateProduct = () => {
 
                                     {/* Brands */}
                                     <div className="mb-4 flex-1">
-                                        <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700 mb-1">
                                             Thương hiệu
                                         </label>
                                         <Select
@@ -651,7 +651,7 @@ const CreateProduct = () => {
                                     </div>
                                 </div>
                                 <div className="mb-4">
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                                         Mô tả sản phẩm
                                     </label>
                                     <Textarea
@@ -669,7 +669,7 @@ const CreateProduct = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
                                         Hình ảnh
                                     </label>
                                     <Input
@@ -736,7 +736,7 @@ const CreateProduct = () => {
                                 {showVariantForm && variants.map((variant, index) => (
                                     <div className="mb-4 border-b pb-4" key={index}>
                                         <div className="mb-4">
-                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Tên sản phẩm biến thể
                                             </label>
                                             <Input
@@ -752,7 +752,7 @@ const CreateProduct = () => {
                                             {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giá sản phẩm biến thể
                                             </label>
                                             <Input
@@ -769,7 +769,7 @@ const CreateProduct = () => {
                                             {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Số lượng sản phẩm biến thể
                                             </label>
                                             <Input
@@ -786,7 +786,7 @@ const CreateProduct = () => {
                                             {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giá trị biến thể
                                             </label>
                                             <Input
@@ -802,7 +802,7 @@ const CreateProduct = () => {
                                             {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giảm giá (%)
                                             </label>
                                             <Input
@@ -819,7 +819,7 @@ const CreateProduct = () => {
                                             {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Hình ảnh biến thể
                                             </label>
                                             <Input
@@ -984,7 +984,7 @@ const CreateProduct = () => {
                                             <form onSubmit={handleUpdate} encType="multipart/form-data">
                                                 <div>
                                                     <div className="mb-4">
-                                                        <label htmlFor="name_product" className="block text-sm font-medium text-gray-700">
+                                                        <label htmlFor="name_product" className="block text-sm font-medium text-gray-700 mb-1">
                                                             Tên sản phẩm
                                                         </label>
                                                         <Input
@@ -1003,7 +1003,7 @@ const CreateProduct = () => {
                                                     <div className='flex gap-5'>
                                                         {/* Categories */}
                                                         <div className="mb-4 flex-1">
-                                                            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Phân loại
                                                             </label>
                                                             <Select
@@ -1028,7 +1028,7 @@ const CreateProduct = () => {
 
                                                         {/* Brands */}
                                                         <div className="mb-4 flex-1">
-                                                            <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Thương hiệu
                                                             </label>
                                                             <Select
@@ -1053,7 +1053,7 @@ const CreateProduct = () => {
                                                         </div>
                                                     </div>
                                                     <div className="mb-4">
-                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                                                             Mô tả
                                                         </label>
                                                         <Textarea
@@ -1083,7 +1083,7 @@ const CreateProduct = () => {
                                             </form >
                                             <div className='mb-4'>
                                                 <div className='mb-2'>
-                                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1 mb-1">
                                                         Hình ảnh sản phẩm
                                                     </label>
 
@@ -1104,7 +1104,7 @@ const CreateProduct = () => {
                                                 </div>
 
                                                 <div className="mb-2">
-                                                    <label htmlFor="new_images" className="block text-sm font-medium text-gray-700">
+                                                    <label htmlFor="new_images" className="block text-sm font-medium text-gray-700 mb-1">
                                                         Thêm ảnh mới
                                                     </label>
                                                     <Input
@@ -1227,7 +1227,7 @@ const CreateProduct = () => {
                                                 {showVariantForm && variants.map((variant, index) => (
                                                     <div className="mb-4 border-b pb-4" key={index}>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Name Product Variant
                                                             </label>
                                                             <Input
@@ -1243,7 +1243,7 @@ const CreateProduct = () => {
                                                             {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Price
                                                             </label>
                                                             <Input
@@ -1259,7 +1259,7 @@ const CreateProduct = () => {
                                                             {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Stock
                                                             </label>
                                                             <Input
@@ -1275,7 +1275,7 @@ const CreateProduct = () => {
                                                             {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Variant Value
                                                             </label>
                                                             <Input
@@ -1291,7 +1291,7 @@ const CreateProduct = () => {
                                                             {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Discount
                                                             </label>
                                                             <Input
@@ -1309,7 +1309,7 @@ const CreateProduct = () => {
 
 
                                                         <div className="mb-4">
-                                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Upload Variant Image
                                                             </label>
                                                             <Input
