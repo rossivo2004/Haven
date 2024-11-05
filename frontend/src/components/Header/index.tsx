@@ -467,22 +467,22 @@ function Header({ params }: { params: { lang: string } }) {
                                                         Trang cá nhân
                                                     </Link>
                                                 </DropdownItem>
-                                                <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                                {/* <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                                 <DropdownItem key="analytics">
                                                     <Link href={'/profile/notify'}>
                                                         Thông báo
                                                     </Link>
-                                                </DropdownItem>
+                                                </DropdownItem> */}
                                                 <DropdownItem key="system">
                                                     <Link href={'/profile/order'}>
                                                         Quản lí đơn hàng
                                                     </Link>
                                                 </DropdownItem>
-                                                <DropdownItem key="configurations">
+                                                {/* <DropdownItem key="configurations">
                                                     <Link href={'/profile/promotion'}>
                                                         Mã giảm giá
                                                     </Link>
-                                                </DropdownItem>
+                                                </DropdownItem> */}
                                                 <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
                                                     Đăng xuất
                                                 </DropdownItem>
@@ -637,8 +637,8 @@ function Header({ params }: { params: { lang: string } }) {
                                                         </div>
                                                         <div className='col-span-3 row-span-2 flex'>
                                                             <div className='flex flex-col items-start pl-2 w-1/2'>
-                                                                <div className='text-black text-lg'>Phân loại</div>
-                                                                <div className='flex flex-col'>
+                                                                <div className='text-black text-lg font-semibold'>Phân loại</div>
+                                                                <div className='flex flex-col items-start'>
                                                                     {categories.map((item, index) => (
                                                                         <Link key={index} href={`/shop?category[]=${item.name}`}>
                                                                             <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
@@ -653,7 +653,7 @@ function Header({ params }: { params: { lang: string } }) {
 
                                                             </div>
                                                             <div className='w-1/2'>
-                                                                <div className='text-black text-lg'>Thương hiệu</div>
+                                                                <div className='text-black text-lg font-semibold'>Thương hiệu</div>
                                                                 <div className='flex flex-col items-start pl-2'>
                                                                     {brands.map((item, index) => (
                                                                         <Link key={index} href={`/shop?brand[]=${item.name}`}>
@@ -720,7 +720,7 @@ function Header({ params }: { params: { lang: string } }) {
                                     <Link href={`/tracking`}>TRA CỨU</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={`/tracking`}>VỀ CHÚNG TÔI</Link>
+                                    <Link href={`/about`}>VỀ CHÚNG TÔI</Link>
                                 </li>
                             </ul>
                         </div>
@@ -801,19 +801,18 @@ function Header({ params }: { params: { lang: string } }) {
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>
-                                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                         <DropdownItem key="analytics">
-                                            <Link href={'/profile'}>
-                                                Trang cá nhân
+                                            <Link href={'/profile/order'}>
+                                                Quản lý đơn hàng
                                             </Link>
                                         </DropdownItem>
-                                        <DropdownItem key="system">System</DropdownItem>
+                                        {/* <DropdownItem key="system">System</DropdownItem>
                                         <DropdownItem key="configurations">Configurations</DropdownItem>
                                         <DropdownItem key="help_and_feedback">
                                             Help & Feedback
-                                        </DropdownItem>
-                                        <DropdownItem key="logout" color="danger">
-                                            Log Out
+                                        </DropdownItem> */}
+                                        <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                                            Đăng xuất
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>

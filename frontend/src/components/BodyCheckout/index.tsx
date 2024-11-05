@@ -531,7 +531,7 @@ function BodyCheckout() {
                                         <span className='text-2xl text-price'>{sum.toLocaleString()}</span>
                                     </div>
                                 </div>
-                                <Button type='submit' className="w-full mt-4 bg-main font-semibold text-white">{loading ? <Spinner color='default' /> : 'Đặt hàng'}</Button>
+                                <Button disabled={loading} type='submit' className="w-full mt-4 bg-main font-semibold text-white">{loading ? <Spinner color='default' /> : 'Đặt hàng'}</Button>
                             </div>
                         </div>
                     </div>

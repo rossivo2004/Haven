@@ -27,7 +27,7 @@ export default function RootLayout({
           <Sidebar />
           <div className="flex-1 pl-0 md:pl-0 lg:pl-0">
             <Header />
-            <div className="pt-16 px-4 mt-2 md:pl-64 lg:pl-64"> {/* Add padding top to accommodate header */}
+            <div className="pt-20 px-4 mt-2 md:pl-64 lg:pl-64"> {/* Add padding top to accommodate header */}
               {children}
             </div>
           </div>

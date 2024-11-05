@@ -5,13 +5,15 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
+import Loading from "../ui/Loading";
 
 function BodyTrackingorder() {
     const { id } = useParams();
     const [order, setOrder] = useState<OrderTracking | null>(null);
     const [orderPayment_transpot, setOrderPayment_transpot] = useState(0);
-
+    const [isLoading, setIsLoading] = useState(true);
     const fetchOrder = async () => {
+        setIsLoading(true);
         try {
             const response = await axios.get(`${apiConfig.order.showOrderDetailCode}${id}`); // Use axios.get
             setOrder(response.data.order);
@@ -19,6 +21,8 @@ function BodyTrackingorder() {
 
         } catch (error) {
             console.error("Error fetching order:", error);
+        } finally {
+            setIsLoading(false);
         }
     }
     useEffect(() => {
@@ -29,9 +33,14 @@ function BodyTrackingorder() {
 
 
     return (
-        <div className="flex lg:flex-row flex-col-reverse lg:mt-10 gap-5">
-            <div className="lg:w-3/5 w-full ">
-                <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm mb-6">
+            isLoading ? (
+            <div className="flex justify-center items-center h-screen">
+                <Loading />
+            </div>
+        ) : (
+            <div className="flex lg:flex-row flex-col-reverse lg:mt-10 gap-5">
+                <div className="lg:w-3/5 w-full ">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm mb-2">
                     <div className="flex items-center space-x-4">
                         <div>
                             <h3 className="font-medium lg:text-2xl text-lg">Thông Tin Nhận Hàng</h3>
@@ -69,20 +78,24 @@ function BodyTrackingorder() {
                 </div> */}
 
                 <div>
-                    <div className="p-4 space-y-6">
+
+                    <div className="py-4 px-4 space-y-6">
                         {order?.order_details.map((item) => (
-                            <div className="flex justify-between items-start" key={item.id}>
-                                {/* Product Image and Details */}
-                                <div className="flex items-start gap-2 justify-center">
-                                <img src={item.product_variant.image} alt="Product 1" className="w-24 h-24 object-cover mr-4" />
-                                    <div>
-                                        <div className="lg:text-xl text-base font-medium">{item.product_variant.name}</div>
-                                        <div className="text-gray-600 text-sm mt-2">Số lượng: {item?.quantity}</div>
+                            <div>
+                                <div className="mb-2 text-xl ">Bạn đang xem đơn hàng: <span className="font-semibold">{order.invoice_code}</span></div>
+                                <div className="flex justify-between items-center" key={item.id}>
+                                    {/* Product Image and Details */}
+                                    <div className="flex items-center gap-2 justify-center">
+                                        <img src={item.product_variant.image} alt="Product 1" className="w-24 h-24 object-cover mr-4" />
+                                        <div>
+                                            <div className="lg:text-xl text-base font-medium">{item.product_variant.name}</div>
+                                            <div className="text-gray-600 text-sm mt-2">Số lượng: {item?.quantity}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                {/* Product Price */}
-                                <div className="text-right">
-                                    <div className="lg:text-xl text-base font-semibold">{item?.price.toLocaleString()} đ</div>
+                                    {/* Product Price */}
+                                    <div className="text-right">
+                                        <div className="lg:text-xl text-base font-semibold">{item?.price.toLocaleString()} đ</div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -155,7 +168,7 @@ function BodyTrackingorder() {
                         </div> */}
                         <div className="flex justify-between font-semibold">
                             <span>Tổng thanh toán</span>
-                            <span>{(order?.total ?? 0).toLocaleString('vi-VN', { minimumFractionDigits: 0 })}</span> 
+                            <span>{(order?.total ?? 0).toLocaleString('vi-VN', { minimumFractionDigits: 0 })} đ</span>
                         </div>
                     </div>
                     {/* Confirmation Button */}
@@ -169,7 +182,8 @@ function BodyTrackingorder() {
 
             </div>
         </div>
-    );
+    ));
+
 }
 
 export default BodyTrackingorder;

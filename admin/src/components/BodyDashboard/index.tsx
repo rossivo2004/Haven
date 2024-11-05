@@ -1,111 +1,133 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
-
 import Chart_Price from '../Chart_Price';
+import axios from 'axios';
+import apiConfig from '@/configs/api';
 
-interface CardData {
-    icon: React.ReactNode;
-    title: string;
-    value: string | number;
-    change: string;
-    changeType: "positive" | "negative";
-    timeFrame: string;
-}
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import Person2Icon from '@mui/icons-material/Person2';
+import CreateHalfDoughnutChart from '../CirclePrice';
+import StackedLineChart from '../StackedLineChart';
 
-const DashboardCard: React.FC<CardData> = ({
-    icon,
-    title,
-    value,
-    change,
-    changeType,
-    timeFrame,
-}) => {
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-            <div className="text-3xl">{icon}</div>
-            <h4 className="text-gray-700 mt-2">{title}</h4>
-            <p className="text-2xl font-semibold mt-1">{value}</p>
-            <p
-                className={`mt-1 ${changeType === "positive" ? "text-green-500" : "text-red-500"
-                    }`}
-            >
-                {change} than {timeFrame}
-            </p>
-        </div>
-    );
-};
+
+
 
 const BodyDashboard: React.FC = () => {
-    // const [static, setStatic] = useState<Static[]>([]);
+    const [staticss, setStaticss] = useState<any>([]);
+    const [sumProduct, setSumProduct] = useState<any>([]);
+    const [sumOrder, setSumOrder] = useState<any>([]);
+    const [sumUser, setSumUser] = useState<any>([]);
+    const [totalRevenue, setTotalRevenue] = useState<number>(0);
+    const [previousMonthRevenue, setPreviousMonthRevenue] = useState<number>(0);
+    const [monthCurrent, setMonthCurrent] = useState<{ month: string; revenue: number }[]>([]);
+    const [monthPrevious, setMonthPrevious] =useState<{ month: string; revenue: number }[]>([]);
+    useEffect(() => {
+        axios.get(`${apiConfig.static.getProduct}`).then(res => {
+            setSumProduct(res.data);
+        });
 
-    const cardsData: CardData[] = [
-        {
-            icon: <AttachMoneyIcon />,
-            title: "Today's Money",
-            value: "$53k",
-            change: "+55%",
-            changeType: "positive",
-            timeFrame: "last week",
-        },
-        {
-            icon: <PersonIcon />,
-            title: "Today's Users",
-            value: "2,300",
-            change: "+3%",
-            changeType: "positive",
-            timeFrame: "last month",
-        },
-        {
-            icon: <PersonAddIcon />,
-            title: "New Clients",
-            value: "3,462",
-            change: "-2%",
-            changeType: "negative",
-            timeFrame: "yesterday",
-        },
-        {
-            icon: <SignalCellularAltIcon />,
-            title: "Sales",
-            value: "$103,430",
-            change: "+5%",
-            changeType: "positive",
-            timeFrame: "yesterday",
-        },
-    ];
+        axios.get(`${apiConfig.static.getOrder}`).then(res => {
+            setSumOrder(res.data);
+        });
+
+        axios.get(`${apiConfig.static.getUser}`).then(res => {
+            setSumUser(res.data);
+        });
+
+        axios.get(`${apiConfig.static.getAll}`).then(res => {
+            // setStaticss(res.data);
+            // Assuming res.data.revenue is an array of objects with a revenue property
+            const total = res.data.revenue.reduce((acc: number, item: any) => acc + parseFloat(item.revenue), 0);
+            setTotalRevenue(total);
+        });
+
+        axios.get(`${apiConfig.static.getComparison}`).then(res => {
+            setStaticss(res.data);
+            setMonthCurrent(res.data.current_month_revenue);
+            setMonthPrevious(res.data.previous_month_revenue);
+        });
+    }, []);
+
+    console.log(monthPrevious);
+    
+
 
     return (
         <div>
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-5">
-                {cardsData.map((card, index) => (
-                    <DashboardCard
-                        key={index}
-                        icon={card.icon}
-                        title={card.title}
-                        value={card.value}
-                        change={card.change}
-                        changeType={card.changeType}
-                        timeFrame={card.timeFrame}
-                    />
-                ))}
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-5 mb-6 ">
+                <div className="bg-white p-4 rounded-lg flex items-center justify-start gap-4 h-[104px] shadow">
+                    <div className="w-[60px] h-[60px] flex items-center justify-center rounded-full bg-pink-100 "><Inventory2Icon className='text-pink-700' /></div>
+                    <div className='flex flex-col items-start justify-center'>
+                        <h4 className="font-semibold text-[#555555] text-[22px]">{sumProduct.total_product_variant}</h4>
+                        <p className=" text-[14px] text-[#333333]">Sản phẩm</p>
+                    </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg flex items-center justify-start gap-4 h-[104px] shadow">
+                    <div className="w-[60px] h-[60px] flex items-center justify-center rounded-full bg-blue-100 "><MonetizationOnIcon className='text-blue-700' /></div>
+                    <div className='flex flex-col items-start justify-center'>
+                        <h4 className="font-semibold text-[#555555] text-[22px]">{totalRevenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h4>
+                        <p className=" text-[14px] text-[#333333]">Doanh thu</p>
+                    </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg flex items-center justify-start gap-4 h-[104px] shadow">
+                    <div className="w-[60px] h-[60px] flex items-center justify-center rounded-full bg-orange-100 "><ShoppingBagIcon className='text-orange-700' /></div>
+                    <div className='flex flex-col items-start justify-center'>
+                        <h4 className="font-semibold text-[#555555] text-[22px]">{sumOrder.total_orders}</h4>
+                        <p className=" text-[14px] text-[#333333]">Tổng đơn hàng</p>
+                    </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg flex items-center justify-start gap-4 h-[104px] shadow">
+                    <div className="w-[60px] h-[60px] flex items-center justify-center rounded-full bg-green-100 "><Person2Icon className='text-green-700' /></div>
+                    <div className='flex flex-col items-start justify-center'>
+                        <h4 className="font-semibold text-[#555555] text-[22px]">{sumUser.total_users}</h4>
+                        <p className=" text-[14px] text-[#333333]">Người dùng</p>
+                    </div>
+                </div>
             </div>
 
-            <div>
-                <Chart_Price />
+            <div className='flex p-4 bg-white rounded-lg shadow gap-4 mb-4'>
+                <div className='w-4/6 '><Chart_Price /></div>
+                <div className='flex-1 flex flex-col items-center justify-center'>
+                    <div className='w-[320px] h-[320px] mb-4'>
+                    <CreateHalfDoughnutChart percentage={staticss} />
+                    </div>
+                    <div className='flex items-center justify-center gap-6'>
+                        <div className='flex items-center justify-center gap-2'>
+                            <div className='w-[40px] h-[40px] flex items-center justify-center rounded-lg bg-pink-100'>
+                                <AttachMoneyIcon className='text-pink-700' />
+                            </div>
+                            <div className='flex flex-col items-start justify-center'>
+                                <div className='text-[13px] text-[#333333]'>{monthCurrent[0]?.month}</div>
+                                <div className='text-[16px] font-semibold text-[#555555]'>
+                                    {monthCurrent[0]?.revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                </div>
+                            </div>
+                        </div>
+                        <div className='flex items-center justify-center gap-2'>
+                            <div className='w-[40px] h-[40px] flex items-center justify-center rounded-lg bg-pink-100'>
+                                <AttachMoneyIcon className='text-pink-700' />
+                            </div>
+                            <div className='flex flex-col items-start justify-center'>
+                                <div className='text-[13px] text-[#333333]'>{monthPrevious[0]?.month}</div>
+                                <div className='text-[16px] font-semibold text-[#555555]'>
+                                    {monthPrevious[0]?.revenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div>
-            <iframe
-  src="https://vercel.com/duys-projects-07028252/haven/analytics"
-  width="100%"
-  height="600"
-  frameBorder="0"
-></iframe>
-
-
+            <div className='p-4 bg-white rounded-lg shadow'>
+                <div className='text-[18px] font-bold text-[#333333] mb-2'>Thống kê đơn hàng</div>
+            <StackedLineChart />
             </div>
+
         </div>
 
     );

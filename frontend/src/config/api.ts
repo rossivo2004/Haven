@@ -160,7 +160,7 @@ const apiConfig = {
 
     //Show order user
     ///showorder/{userId}
-    showOrderUser: `${baseUrl}/api/checkout/showorder/`,
+    showOrderUser: `${baseUrl}/api/checkout/showorderuser/`,
 
     //Show order theo id
     ///showorderdetail/{order}

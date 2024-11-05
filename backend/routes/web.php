@@ -213,4 +213,11 @@ route::group([
     'prefix' => 'api/statics'
 ],function(){
     Route::get('/', [StatisticsController::class, 'getMonthlyStatistics']); // Thống kê doanh thu theo tháng, sản phẩm bán chạy, bán ít theo tháng
+    Route::get('/user', [StatisticsController::class, 'getUserStatistics']); // Thống kê có bao nhiêu người dùng
+    Route::get('/order', [StatisticsController::class, 'getOrderStatistics']); // Thống kê có bao nhiêu đơn hàng (có làm thêm có bao nhiêu đơn hàng thành công và thất bai)
+    Route::get('/product', [StatisticsController::class, 'getProductVariantStatics']); // Thống kê có bao nhiêu sản phẩm biến thể
+    // Route::get('/blog', [StatisticsController::class, 'getBlogStatics']); // Thống kê có bao nhiêu bài viết
+    Route::get('/category', [StatisticsController::class, 'getCategoryStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo category
+    Route::get('/brand', [StatisticsController::class, 'getBrandStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo brand
+    Route::get('/comparison', [StatisticsController::class, 'getRevenueComparison']); // Thống kê so sánh % tháng này so với tháng trước
 });

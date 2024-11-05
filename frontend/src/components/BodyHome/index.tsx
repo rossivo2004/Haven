@@ -384,25 +384,14 @@ function BodyHome() {
                             <div className="flex-1">
                                 <div className="flex w-full flex-col items-center lg:items-end">
                                     <div className="font-bold lg:text-4xl text-2xl lg:hidden">Sản Phẩm Nổi Bật</div>
-                                    <Tabs aria-label="Disabled Options" className="mb-6" variant="bordered" color="warning"
-                                        classNames={{
-                                            tabContent: "group-data-[selected=true]:text-white"
-                                        }}
-                                    >
-                                        <Tab key="photos" title="Photos" className="py-0">
-                                            <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full">
-                                                {/* {flatProducts.slice(0, 6).map((product) => (
-                                                    <BoxProduct key={product.id} product={product} />
-                                                ))} */}
+                                    <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full pt-[64px]">
+                                            {productData
+              .sort((a, b) => (b.views || 0) - (a.views || 0)) // Sort by views in descending order, using 0 as fallback
+              .slice(0, 6) 
+                .map((product) => (
+                    <BoxProduct key={product.id} product={product} />
+                ))}
                                             </div>
-                                        </Tab>
-                                        <Tab key="music" title="Music">
-                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                        </Tab>
-                                        <Tab key="videos" title="Videos">
-                                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                        </Tab>
-                                    </Tabs>
                                 </div>
                             </div>
                         </div>
@@ -516,7 +505,7 @@ function BodyHome() {
                     </div>
                 </motion.div>
 
-                <motion.div
+                {/* <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
@@ -533,13 +522,13 @@ function BodyHome() {
                         </div>
                         <div>
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                                {/* {flatProducts.slice(0, 8).map((product) => (
+                                {flatProducts.slice(0, 8).map((product) => (
                                     <BoxProduct key={product.id} product={product} />
-                                ))} */}
+                                ))}
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </motion.div> */}
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex items-center justify-between mb-6">

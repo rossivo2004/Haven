@@ -276,7 +276,15 @@ const handleAddToCart = async () => {
                 user_id: null,
                 product_variant_id: body.product_variant_id,
                 quantity: body.quantity,
-                product_variant: product,
+                product_variant: {
+                    id: product?.id, // Add the product_variant if needed
+                    image: product?.image,
+                    name: product?.name,
+                    price: product?.price,
+                    Discount: product?.discount,
+                    FlashSalePrice: product?.FlashSalePrice,
+                    DiscountedPrice: product?.DiscountedPrice,
+                }
             });
 
             dispatch(addToCart({

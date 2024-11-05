@@ -112,8 +112,15 @@ const Body_Cart = () => {
                 setLoading(false);
             }
         } else {
-            // If not logged in, update quantity in cookies
-            // ... existing code ...
+            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}') as { cart_items: CartItem[] }; // Specify type for existingCartItems
+            const updatedCartItems = existingCartItems.cart_items.map((cartItem: CartItem) => // Explicitly define cartItem type
+                cartItem.product_variant.id === item.product_variant.id
+                    ? { ...cartItem, quantity: newQuantity }
+                    : cartItem
+            );
+            Cookies.set('cart_items', JSON.stringify({ cart_items: updatedCartItems }));
+            setCart(updatedCartItems);
+            toast.success('Cập nhật số lượng thành công trong giỏ hàng');
         }
     };
     // ... existing code ...
@@ -140,17 +147,17 @@ const Body_Cart = () => {
         // Calculate total amount and loyalty points whenever cart changes
         const calculateTotals = () => {
             const total = cart.reduce((acc, item) => {
-                if (selectedItems.has(item.product_variant.id)) { // Only include selected items
-                    return acc + (Math.min(item.product_variant.DiscountedPrice ?? 0, item.product_variant.FlashSalePrice ?? 0) * item.quantity);
+                if (item.product_variant.id !== undefined && selectedItems.has(item.product_variant.id)) { // Ensure item.id is defined
+                    return acc + (Math.min(item.product_variant.DiscountedPrice ?? 0, item.product_variant.FlashSalePrice ?? 0) * (item.quantity || 0)); // Ensure quantity is a number
                 }
-                return acc;
+                return acc; // Ensure to return acc when item is not selected
             }, 0);
             setTotalAmount(total);
             setLoyaltyPoints(total * 0.01); // 1% of total amount as loyalty points
         };
 
         calculateTotals();
-    }, [cart, selectedItems]);
+    }, [cart, selectedItems]); 
 
     console.log(totalAmount, loyaltyPoints);
 
@@ -172,14 +179,14 @@ const Body_Cart = () => {
         if (cart.length === selectedItems.size) {
             setSelectedItems(new Set()); // Deselect all if all are selected
         } else {
-            const allItemIds = new Set(cart.map(item => item.product_variant.id));
-            setSelectedItems(allItemIds); // Select all items
+            const allItemIds = new Set(cart.map(item => item.product_variant.id).filter((id): id is number => id !== undefined));
+            setSelectedItems(allItemIds);
         }
     };
 
 
     return (
-        <div className="max-w-7xl mx-auto ">
+        <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center">
                 <div className="py-5 h-[62px]">
                     <BreadcrumbNav
@@ -214,7 +221,7 @@ const Body_Cart = () => {
                                         <img src={item.product_variant.image} alt={'âffff'} className="w-24 h-24 mr-4 rounded" />
                                         <div>
                                             <p className="text-xl font-semibold">{item.product_variant.name}</p>
-                                            <p className="text-sm text-gray-600">fssdf</p>
+                                            {/* <p className="text-sm text-gray-600">fssdf</p> */}
                                             <div className="flex items-center mt-2">
                                                 <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded">-</button>
                                                 <span className="px-4">{item.quantity}</span>
@@ -255,7 +262,7 @@ const Body_Cart = () => {
 
 
 <div className='flex justify-between items-center'>
-    <div>
+    {/* <div>
         <div className="flex justify-end">
             {selectedItems.size > 0 && ( // Only show if there are selected items
                 <div className="text-red-600 cursor-pointer">
@@ -264,7 +271,7 @@ const Body_Cart = () => {
                 </div>
             )}
         </div>
-    </div>
+    </div> */}
     {/* {cart.length > 0 ? (
         <div className="text-right font-semibold">
             Tổng Khối Lượng Giỏ Hàng: <span className="text-black">0.5Kg</span>
@@ -311,7 +318,7 @@ const Body_Cart = () => {
                         </div>
 
                         {selectedItems.size > 0 ? (
-                           <Link href={'/checkout'} onClick={handleCheckout}> // Call handleCheckout on click
+                           <Link href={'/checkout'} onClick={handleCheckout}> 
                            <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
                        </Link>
                         ) : (

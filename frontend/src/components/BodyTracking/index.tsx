@@ -51,7 +51,7 @@ function BodyTracking() {
                     <div className='text-4xl font-semibold mb-4'>Tra cứu đơn hàng</div>
                     <div>
                         <form onSubmit={handleTracking}>
-                            <div className='mb-6'>
+                            <div className='mb-2'>
                                 <label htmlFor="trackingCode" className='text-xl mb-2'>Mã đơn hàng</label>
                                 <Input 
                                     id="trackingCode" 

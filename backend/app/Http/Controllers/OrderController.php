@@ -11,80 +11,106 @@ use App\Models\Payment;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
+use App\Models\FlashSaleProduct;
 
 class OrderController extends Controller
 {
     public function checkout(Request $request)
-{
-    $user_id = $request->input('user_id', null);
-    $orderData = $request->only([
-        'invoice_code', 'full_name', 'phone', 'email', 'total',
-        'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method'
-    ]);
-    $paymentStatus = 'unpaid';
+    {
+        $user_id = $request->input('user_id', null);
+        $orderData = $request->only([
+            'invoice_code', 'full_name', 'phone', 'email', 'total',
+            'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method'
+        ]);
+        $paymentStatus = 'unpaid';
 
-    // Lấy danh sách sản phẩm từ yêu cầu
-    $products = $request->input('product_variant_id', []);
+        // Lấy danh sách sản phẩm từ yêu cầu
+        $products = $request->input('product_variant_id', []);
 
-    // Kiểm tra nếu giỏ hàng trống
-    if (empty($products)) {
-        return response()->json([
-            'message' => 'Giỏ hàng trống hoặc sản phẩm không hợp lệ'
-        ], 400);
-    }
-
-    // Tạo đơn hàng
-    $order = Order::create(array_merge($orderData, [
-        'user_id' => $user_id,
-        'status' => 'pending',
-        'payment_status' => $paymentStatus,
-    ]));
-
-    // Gửi mail xác nhận đơn hàng
-    Mail::to($orderData['email'])->send(new OrderConfirmationMail($order));
-
-    // Thêm sản phẩm vào chi tiết đơn hàng và cập nhật stock
-    foreach ($products as $item) {
-        $productVariant = ProductVariant::find($item['id']);
-        if ($productVariant) {
-            $quantity = $item['quantity'];
-            OrderDetail::create([
-                'order_id' => $order->id,
-                'product_variant_id' => $productVariant->id,
-                'quantity' => $quantity,
-                'price' => $productVariant->price,
-            ]);
-
-            // Trừ stock
-            $productVariant->stock -= $quantity;
-            $productVariant->save();
+        // Kiểm tra nếu giỏ hàng trống
+        if (empty($products)) {
+            return response()->json([
+                'message' => 'Giỏ hàng trống hoặc sản phẩm không hợp lệ'
+            ], 400);
         }
-    }
 
+        // Tạo đơn hàng
+        $order = Order::create(array_merge($orderData, [
+            'user_id' => $user_id,
+            'status' => 'pending',
+            'payment_status' => $paymentStatus,
+        ]));
+
+        // Gửi mail xác nhận đơn hàng
+        Mail::to($orderData['email'])->send(new OrderConfirmationMail($order));
+
+        // Thêm sản phẩm vào chi tiết đơn hàng và cập nhật stock
+        foreach ($products as $item) {
+            $productVariant = ProductVariant::find($item['id']);
+            if ($productVariant) {
+                $quantity = $item['quantity'];
+
+                // Kiểm tra nếu sản phẩm nằm trong flash sale
+                $flashSaleProduct = FlashSaleProduct::where('product_variant_id', $productVariant->id)->first();
+                if ($flashSaleProduct) {
+                    // Nếu sản phẩm nằm trong flash sale, trừ stock trong cả ProductVariant và flash_sale_product
+                    if ($flashSaleProduct->stock >= $quantity && $productVariant->stock >= $quantity) {
+                        $flashSaleProduct->stock -= $quantity;
+                        $flashSaleProduct->sold += $quantity;
+                        $flashSaleProduct->save();
+
+                        $productVariant->stock -= $quantity;
+                        $productVariant->save();
+                    } else {
+                        return response()->json([
+                            'message' => 'Số lượng sản phẩm trong flash sale hoặc kho chính không đủ'
+                        ], 400);
+                    }
+                } else {
+                    // Nếu không nằm trong flash sale, chỉ trừ stock trong ProductVariant
+                    if ($productVariant->stock >= $quantity) {
+                        $productVariant->stock -= $quantity;
+                        $productVariant->save();
+                    } else {
+                        return response()->json([
+                            'message' => 'Số lượng sản phẩm không đủ trong kho'
+                        ], 400);
+                    }
+                }
+
+                // Tạo chi tiết đơn hàng
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_variant_id' => $productVariant->id,
+                    'quantity' => $quantity,
+                    'price' => $productVariant->price,
+                ]);
+            }
+        }
     // Cộng điểm thưởng nếu là người dùng đã đăng nhập
-    $loyaltyPoints = 0;
-    if ($user_id) {
-        $user = User::find($user_id);
-        if ($user) {
-            $loyaltyPoints = $orderData['total'] * 0.01;
-            $user->point += $loyaltyPoints;
-            $user->save();
+        $loyaltyPoints = 0;
+        if ($user_id) {
+            $user = User::find($user_id);
+            if ($user) {
+                $loyaltyPoints = $orderData['total'] * 0.01;
+                $user->point += $loyaltyPoints;
+                $user->save();
+            }
         }
-    }
 
-    // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
-    if ($user_id) {
-        Cart::where('user_id', $user_id)
-            ->whereIn('product_variant_id', array_column($products, 'id'))
-            ->delete();
-    }
+        // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
+        if ($user_id) {
+            Cart::where('user_id', $user_id)
+                ->whereIn('product_variant_id', array_column($products, 'id'))
+                ->delete();
+        }
 
-    return response()->json([
-        'message' => 'Order created successfully!',
-        'order' => $order,
-        'loyalty_points_added' => $loyaltyPoints
-    ], 201);
-}
+        return response()->json([
+            'message' => 'Order created successfully!',
+            'order' => $order,
+            'loyalty_points_added' => $loyaltyPoints
+        ], 201);
+    }
 
 
 

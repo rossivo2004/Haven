@@ -26,6 +26,11 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
     public function flashSales() {
         return $this->belongsToMany(FlashSale::class, FlashSaleProduct::class)
                     ->withPivot('id','discount_percent', 'stock','sold');
@@ -35,7 +40,7 @@ class ProductVariant extends Model
     {
         return $this->hasMany(FlashSaleProduct::class);
     }
-    
+
     public function getDiscountedPriceAttribute()
     {
         if ($this->discount > 0) {
@@ -74,75 +79,66 @@ class ProductVariant extends Model
         // Nếu không có flash sale hoặc không có giảm giá thì trả về giá gốc
         return intval($this->price);
     }
-    public function orderDetails()
-    {
-        return $this->hasMany(OrderDetail::class);
-    }
 
-    public function getQuantitySoldAttribute()
-    {
-        return $this->orderDetails()
-            ->whereHas('order', function ($query) {
-                $query->where('status', 'complete');
-            })
-            ->sum('quantity');
-    }
     public function Cart()
     {
         return $this->hasMany(Cart::class);
     }
 
-    
+
     public function getFavoritedAttribute()
     {
-        if (Auth::check()) {  
+        if (Auth::check()) {
             // $user = User::find(Auth::user()->id);
             $favorited = Favorite::where([
-                'user_id' => Auth::user()->id, 
-                'product_variant_id' => $this->id,            
+                'user_id' => Auth::user()->id,
+                'product_variant_id' => $this->id,
             ])->first();
-    
+
             return $favorited ? true : false;
         } else {
-            return false;  
+            return false;
         }
     }
-    
+
     public function getStoredCartAttribute()
     {
-        if (Auth::check()) {  
+        if (Auth::check()) {
             // $user = User::find(Auth::user()->id);
                 $check_pro = Cart::where([
-                    'user_id' => Auth::user()->id, 
-                    'product_variant_id' => $this->id, 
+                    'user_id' => Auth::user()->id,
+                    'product_variant_id' => $this->id,
                 ])->first();
                 // return $check_pro ? true : false;
                 return $check_pro ? true : false;
-            
+
         } else {
             $cart = Session::get('cart', []);
             if (isset($cart[$this->id])) {
-                return true;  
+                return true;
             } else {
-                return false;  
+                return false;
             }
         }
     }
     public function getQuantityInCartAttribute(){
         if (Auth::check()) {
            return Cart::where([
-                'user_id' => Auth::user()->id, 
-                'product_variant_id' => $this->id, 
+                'user_id' => Auth::user()->id,
+                'product_variant_id' => $this->id,
             ])->pluck('quantity')->first();
         }else{
             $cart = Session::get('cart', []);
             if (isset($cart[$this->id])) {
-                return $cart[$this->id];  
+                return $cart[$this->id];
             } else {
-                return 0;  
+                return 0;
             }
         }
     }
-    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart','QuantitySold'];
+
+
+
+    protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart'];
     protected $with = ['flashSales','product'];
 }

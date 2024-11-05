@@ -9,9 +9,35 @@ import DiscountOutlinedIcon from '@mui/icons-material/DiscountOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { hiddenMenuPaths } from '@/src/utils';
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import apiConfig from '@/src/config/api';
+import { User } from '@/src/interface';
+import { useEffect, useState } from 'react';
+
 
 function Profile_SideMenu() {
     const pathname = usePathname()
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [user, setUser] = useState<User | null>(null); 
+
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get(`${apiConfig.user.getUserById}${userId}`, { withCredentials: true });
+            console.log('Fetched cart data:', response.data);
+            if (response.data) {
+                setUser(response.data);
+            } else {
+                console.warn('No cart items found in response');
+            }
+        } catch (error) {
+            console.error('Error fetching user cart:', error);
+        }
+    };
+    useEffect(() => {
+    fetchUser();
+  }, [userId]);
+
 
     return (
         <div>
@@ -24,7 +50,7 @@ function Profile_SideMenu() {
                                 <div><Avatar src="https://i.pravatar.cc/150?u=a04258114e29026302d" size="lg" /></div>
                                 <div className='flex flex-col'>
                                     <div className='text-base font-normal'>Tài khoản của</div>
-                                    <div className='text-2xl font-medium'>Nguyễn Hữu Tíến</div>
+                                    <div className='text-2xl font-medium'>{user?.name}</div>
                                 </div>
                             </div>
                         </li>

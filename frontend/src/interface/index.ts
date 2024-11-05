@@ -6,6 +6,7 @@ export interface Variant {
   discount: number;
   DiscountedPrice?: number; // Added optional discountedPrice field
   FlashSalePrice?: number;
+  views?: number;
   flash_sales: {
     ProductFlashSaleCount: number;
     StatusFlashSaleStock: string;
@@ -235,10 +236,18 @@ export interface CartItem {
   user_id: number | null;
   product_variant_id: number;
   quantity: number;
-  product_variant
-  : ProductProps,
-  selected?: boolean,
+  product_variant: {
+    name?: string; // Optional name of the product
+    image?: string; // Optional image URL of the product
+    price?: number; // Optional price of the product
+    discount?: number; // Optional discount percentage
+    FlashSalePrice?: number; // Optional flash sale price
+    DiscountedPrice?: number; // Optional discounted price
+    id?: number; // Optional ID of the product
+  }
 }
+
+
 
 export interface Order {
   id: number;
