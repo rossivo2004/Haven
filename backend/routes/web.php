@@ -14,11 +14,22 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\StatisticsController;
 use App\Models\ProductImage;
 
 // Quản lý roles
 Route::resource('roles', RoleController::class);
+
+// Define API routes for posts
+Route::prefix('api/posts')->group(function () {
+    Route::get('/', [PostController::class, 'index']); 
+    Route::post('/store', [PostController::class, 'store']); 
+    Route::get('/show/{id}', [PostController::class, 'show']); 
+    Route::put('/update/{id}', [PostController::class, 'update']); 
+    Route::delete('/delete/{id}', [PostController::class, 'destroy']); 
+});
+
 // Quản lý users
 Route::resource('api/roles', RoleController::class);
 
