@@ -18,6 +18,7 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { EyeIcon } from "./EyeIcon";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 interface Variant {
     name: string;
@@ -401,7 +402,7 @@ const CreateProduct = () => {
     const fetchProducts = async (page = 1) => {
         setLoadingProducts(true); // Start loading
         try {
-            const response = await axios.get(`${apiConfig.products.getAll}?page=${page}`, { withCredentials: true });
+            const response = await axios.get(`${apiConfig.products.getAll}?page=${page}&per_page=5`, { withCredentials: true });
             setProducts(response.data.products.data);
             setPagination(response.data.products); // Update pagination data
         } catch (error) {
@@ -571,7 +572,7 @@ const CreateProduct = () => {
                     Quản lý sản phẩm
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button color="primary" onPress={onOpen}>
+                    <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
                         Thêm sản phẩm
                     </Button>
                     {/* <div>
@@ -709,7 +710,7 @@ const CreateProduct = () => {
                                                             input.files = dataTransfer.files; // Update the input files
                                                         }
                                                     }}
-                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-lg w-6 h-6"
                                                 >
                                                     X
                                                 </button>
@@ -896,10 +897,7 @@ const CreateProduct = () => {
             )}
 
             <div>
-                <Tabs aria-label="Options">
-                    <Tab key="SanphamChinh" title="Sản phẩm chính">
-                        <Card>
-                            {loadingProducts ? ( // Conditional rendering of the spinner
+            {loadingProducts ? ( // Conditional rendering of the spinner
                                 <div className="flex justify-center items-center h-32">
                                     <Spinner size="lg" color="primary" />
                                     <p className="ml-2 text-lg">Loading products...</p>
@@ -908,11 +906,11 @@ const CreateProduct = () => {
                                 <div>
                                     <Table aria-label="Example static collection table">
                                         <TableHeader>
-                                            <TableColumn>Tên</TableColumn>
-                                            <TableColumn>Danh mục</TableColumn>
-                                            <TableColumn>Thương hiệu</TableColumn>
-                                            <TableColumn>Số lượng biến thể</TableColumn>
-                                            <TableColumn>STATUS</TableColumn>
+                                            <TableColumn><div className=''>Tên</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Danh mục</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Thương hiệu</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Số lượng biến thể</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Thao tác</div></TableColumn>
                                         </TableHeader>
                                         <TableBody>
                                             {products.map((product, index) => {
@@ -937,11 +935,11 @@ const CreateProduct = () => {
                                                                 <div>{product?.name || "Unnamed product"}</div>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell>{product.brand?.name}</TableCell>
-                                                        <TableCell>{product.category?.name}</TableCell>
-                                                        <TableCell>{product.ProductVariantCount}</TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.brand?.name}</div></TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.category?.name}</div></TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.ProductVariantCount}</div></TableCell>
                                                         <TableCell>
-                                                            <div className='flex items-center gap-2'>
+                                                            <div className='flex items-center justify-center gap-2'>
                                                                 <span
                                                                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
                                                                     onClick={() => handleOpenEditProductModal(product)} // Pass the entire product object
@@ -960,10 +958,6 @@ const CreateProduct = () => {
                                 </div>
 
                             )}
-                        </Card>
-                    </Tab>
-                    {/* Other tabs here... */}
-                </Tabs>
 
                 <Modal
                     size="5xl"
@@ -1083,7 +1077,7 @@ const CreateProduct = () => {
                                             </form >
                                             <div className='mb-4'>
                                                 <div className='mb-2'>
-                                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1 mb-1">
+                                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                                                         Hình ảnh sản phẩm
                                                     </label>
 
@@ -1094,9 +1088,9 @@ const CreateProduct = () => {
                                                                 <img src={img.image} alt="" className='w-[200px] h-[200px] object-cover' />
                                                                 <button
                                                                     onClick={() => handleDeleteProductImage(img.id)}
-                                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-lg w-6 h-6 flex items-center justify-center"
                                                                 >
-                                                                    X
+                                                                    <DeleteOutlineIcon />
                                                                 </button>
                                                             </div>
                                                         ))}
@@ -1187,7 +1181,7 @@ const CreateProduct = () => {
                                                                 />
                                                                 <div className='flex gap-2'>
                                                                     <Button type="submit" color="primary">Lưu thay đổi</Button>
-                                                                    <Button onClick={() => setEditingVariant(null)}>Hủy</Button>
+                                                                    <Button onClick={() => setEditingVariant(null)} color='danger'>Hủy</Button>
                                                                 </div>
                                                             </form>
                                                         ) : (
@@ -1394,7 +1388,7 @@ const CreateProduct = () => {
                                                                 <Button color="primary" onPress={() => handleAddNewVariant(selectedProduct.id)}>
                                                                     Thêm biến thể
                                                                 </Button>
-                                                                <Button color="secondary" onPress={() => setShowNewVariantForm(false)}>
+                                                                <Button color="danger" onPress={() => setShowNewVariantForm(false)}>
                                                                     Hủy
                                                                 </Button>
                                                             </div>

@@ -124,7 +124,11 @@ const apiConfig = {
 
   static: {
     //Show static
-    getAll: `${baseUrl}/api/static/`,
+    getAll: `${baseUrl}/api/statics`,
+    getProduct: `${baseUrl}/api/statics/product`,
+    getOrder: `${baseUrl}/api/statics/order`,
+    getUser: `${baseUrl}/api/statics/user`,
+    getComparison: `${baseUrl}/api/statics/comparison`,
   }
 };
 

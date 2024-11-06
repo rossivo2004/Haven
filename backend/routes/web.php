@@ -38,13 +38,14 @@ Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin
 
 });
 
-Route::middleware(['auth', 'check.status'])->group(function () {
+Route::middleware(['check.status'])->group(function () {
     // Đăng nhập - đăng xuất
     Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
     Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
     Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
     Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
 });
+
 
 // Quản lý users
 Route::group(['prefix' => 'api/users'], function() {
@@ -229,4 +230,11 @@ route::group([
     'prefix' => 'api/statics'
 ],function(){
     Route::get('/', [StatisticsController::class, 'getMonthlyStatistics']); // Thống kê doanh thu theo tháng, sản phẩm bán chạy, bán ít theo tháng
+    Route::get('/user', [StatisticsController::class, 'getUserStatistics']); // Thống kê có bao nhiêu người dùng
+    Route::get('/order', [StatisticsController::class, 'getOrderStatistics']); // Thống kê có bao nhiêu đơn hàng (có làm thêm có bao nhiêu đơn hàng thành công và thất bai)
+    Route::get('/product', [StatisticsController::class, 'getProductVariantStatics']); // Thống kê có bao nhiêu sản phẩm biến thể
+    // Route::get('/blog', [StatisticsController::class, 'getBlogStatics']); // Thống kê có bao nhiêu bài viết
+    Route::get('/category', [StatisticsController::class, 'getCategoryStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo category
+    Route::get('/brand', [StatisticsController::class, 'getBrandStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo brand
+    Route::get('/comparison', [StatisticsController::class, 'getRevenueComparison']); // Thống kê so sánh % tháng này so với tháng trước
 });

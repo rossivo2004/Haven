@@ -313,7 +313,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <label htmlFor="password" aria-label="">Mật khẩu</label>
                                         <Input
                                             endContent={
@@ -331,7 +331,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                                             onChange={handleChange}
                                             className="w-full"
                                         />
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div>
                                 <Button 

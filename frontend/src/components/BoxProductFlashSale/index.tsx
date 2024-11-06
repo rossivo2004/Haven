@@ -71,7 +71,7 @@ function BoxProductFlashSale({ product }: { product: Variant }) {
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <Image src={'/images/flashsale.png'} width={30} height={30} alt="Flashsale"/>
-                            <div className="dark:text-white">Đã bán <span className="font-semibold text-[#FFC535]">{product.flash_sales[0].pivot.sold}/{product.flash_sales[0].pivot.stock}</span> sản phẩm</div>
+                            <div className="dark:text-white">Còn <span className="font-semibold text-[#FFC535]">{product.flash_sales[0].pivot.stock}</span> sản phẩm</div>
                         </div>
                         <Progress aria-label="Loading..." value={(product.flash_sales[0].pivot.sold / product.flash_sales[0].pivot.stock) * 100} 
                          classNames={{

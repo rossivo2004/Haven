@@ -3,8 +3,10 @@
 import './style.css';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 import { Accordion, AccordionItem, CheckboxGroup, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, Button, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Slider } from '@mui/material'
 
 import BreadcrumbNav from '../Breadcrum';
 import BoxProduct from '../BoxProduct';
@@ -26,8 +28,10 @@ import Loading from '../ui/Loading';
 
 function BodyShop() {
     const itemsPerPage = 12;
+    const initialDisplayCount = 6; // Set initial display count to 6
+    const [displayCount, setDisplayCount] = useState<number>(initialDisplayCount); // State for number of products to display
     const router = useRouter();
-    const [currentPage, setCurrentPage] = useState<number>(1);
+    // const [currentPage, setCurrentPage] = useState<number>(1);
     const [priceFilter, setPriceFilter] = useState<string[]>([]);
     const [cateFilter, setCateFilter] = useState<string[]>([]);
     const [brandFilter, setBrandFilter] = useState<string[]>([]); // Update state for brand filter
@@ -41,16 +45,15 @@ function BodyShop() {
     const [sortOrder, setSortOrder] = useState<string>(''); // Add state for sort order
     const [loading, setLoading] = useState<boolean>(false);
 
-    // console.log(variants);
-    
+    const [priceRange, setPriceRange] = useState<number[]>([0, 1000000]);
 
-
-    const fetchProduct = async () => {
+    const fetchProduct = useCallback(async () => {
         setLoading(true); // Start loading
         try {
             const params = new URLSearchParams();
             cateFilter.forEach(category => params.append('category[]', category)); // Add selected categories to params
             brandFilter.forEach(brand => params.append('brand[]', brand)); // Add selected brands to params
+            params.append('priceRanges[]', `${priceRange[0]}-${priceRange[1]}`); // Add price range to params
 
             const response = await axios.get(`${apiConfig.products.getallproductvariants}?${params.toString()}`, { withCredentials: true });
 
@@ -60,125 +63,91 @@ function BodyShop() {
         } finally {
             setLoading(false); // End loading
         }
-    };
-
-    console.log(variants);
-    
+    }, [cateFilter, brandFilter, priceRange]);
 
     const fetchCategory = async () => {
         try {
             const response = await axios.get(apiConfig.categories.getAll, { withCredentials: true });
-
             setCategories(response.data.categories.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
-        } finally {
         }
     };
 
-    const fecthBrand = async () => {
+    const fetchBrand = async () => {
         try {
             const response = await axios.get(apiConfig.brands.getAll, { withCredentials: true });
-
             setBrands(response.data.brands.data);
         } catch (error) {
-            console.error('Error fetching categories:', error);
-        } finally {
+            console.error('Error fetching brands:', error);
         }
     };
 
     useEffect(() => {
         fetchCategory();
-        fecthBrand()
-        fetchProduct()
-    }, [filter])
-
-    console.log(variants);
-
-
-    // useEffect(() => {
-    //     const params = new URLSearchParams(window.location.search);
-    //     const page = parseInt(params.get('page') || '1', 10);
-    //     const prices = params.getAll('price');
-    //     const categories = params.getAll('category[]'); // Đảm bảo sử dụng đúng tên tham số
-
-    //     setCurrentPage(page);
-    //     setPriceFilter(prices);
-    //     setCateFilter(categories);
-    //     const sort = params.get('sort'); // Lấy tham số sort từ URL
-    //     setSortOrder(sort || ''); // Khôi phục sortOrder từ URL
-    // }, []);
+        fetchBrand();
+        fetchProduct();
+    }, [filter]);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const prices = params.getAll('price');
         const categories = params.getAll('category[]');
-        const brands = params.getAll('brand[]'); // Lấy các tham số brand từ URL
-    
+        const brands = params.getAll('brand[]'); // Get brand parameters from URL
+
         setPriceFilter(prices);
         setCateFilter(categories);
-        setBrandFilter(brands); // Cập nhật state cho brandFilter
+        setBrandFilter(brands); // Update state for brand filter
         const sort = params.get('sort');
         setSortOrder(sort || '');
+
+        // Set priceRange based on URL parameters if available
+        const priceRangeParam = prices.length > 0 ? prices[0].split('-').map(Number) : [0, 1000000];
+        setPriceRange(priceRangeParam);
     }, []);
 
-    // useEffect(() => {
-    //     const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter]; // Include brand filter
-    //     setFilter(combinedFilter);
-
-    //     const params = new URLSearchParams();
-    //     if (priceFilter.length > 0) priceFilter.forEach(value => params.append('price', value));
-    //     if (cateFilter.length > 0) cateFilter.forEach(value => params.append('category[]', value)); // Ensure correct parameter name
-    //     if (brandFilter.length > 0) brandFilter.forEach(value => params.append('brand[]', value)); // Ensure correct parameter name
-
-    //     // Only add sortOrder to URL if it's not empty
-    //     if (sortOrder) params.set('sort', sortOrder);
-
-    //     params.set('page', currentPage.toString());
-    //     router.push(`?${params.toString()}`, { scroll: false });
-    // }, [priceFilter, cateFilter, brandFilter, currentPage, router, sortOrder]); // Add brandFilter to dependencies
-
-
     useEffect(() => {
-        const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter]; // Include brand filter
+        const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter]; // Include price filter
         setFilter(combinedFilter);
 
         const params = new URLSearchParams();
-        if (priceFilter.length > 0) priceFilter.forEach(value => params.append('price', value));
+        if (priceFilter.length > 0) priceFilter.forEach(value => params.append('price', value)); // Add price filter to params
         if (cateFilter.length > 0) cateFilter.forEach(value => params.append('category[]', value)); // Ensure correct parameter name
         if (brandFilter.length > 0) brandFilter.forEach(value => params.append('brand[]', value)); // Ensure correct parameter name
 
         // Only add sortOrder to URL if it's not empty
         if (sortOrder) params.set('sort', sortOrder);
 
-        params.set('page', currentPage.toString());
+        // params.set('page', currentPage.toString());
         router.push(`?${params.toString()}`, { scroll: false });
 
         fetchProduct(); // Fetch products after updating filters and sorting
-    }, [priceFilter, cateFilter, brandFilter, currentPage, router, sortOrder]); // Add brandFilter to dependencies
+    }, [priceFilter, cateFilter, brandFilter, router, sortOrder]);
 
     const handlePriceFilterChange = (values: string[]) => {
         setPriceFilter(values);
-        setCurrentPage(1);
+        // setCurrentPage(1);
     };
 
     const handleCategoryFilterChange = (values: string[]) => {
         setCateFilter(values);
-        setCurrentPage(1);
+        // setCurrentPage(1);
     };
 
     const handleBrandFilterChange = (values: string[]) => {
         setBrandFilter(values);
-        setCurrentPage(1);
+        // setCurrentPage(1);
     };
 
     const handleChipClose = (filterItem: string) => {
         if (priceFilter.includes(filterItem)) {
             setPriceFilter(prev => prev.filter(item => item !== filterItem));
-        } else {
+        } else if (cateFilter.includes(filterItem)) {
             setCateFilter(prev => prev.filter(item => item !== filterItem));
+        } else {
+            setBrandFilter(prev => prev.filter(item => item !== filterItem));
         }
-        setCurrentPage(1);
+        // setCurrentPage(1);
     };
 
     const resetFilter = () => {
@@ -197,12 +166,19 @@ function BodyShop() {
         }
     }
 
+    const handlePriceRangeChange = (event: Event, value: number | number[], activeThumb: number) => {
+        if (Array.isArray(value)) {
+            setPriceRange(value);
+        }
+        // setCurrentPage(1); // Reset to first page on filter change
+    };
 
-    // Slice for pagination
+    const handleLoadMore = () => {
+        setDisplayCount(prevCount => prevCount + itemsPerPage); // Increase the display count
+    };
 
     return (
         <div>
-
             <div className="py-5 h-[62px]">
                 <BreadcrumbNav
                     items={[
@@ -228,7 +204,7 @@ function BodyShop() {
                         >
                             <CheckboxGroup value={cateFilter} onChange={handleCategoryFilterChange}>
                                 {categories.map((item, index) => (
-                                    <Checkbox className='font-medium' value={item.name}>{item.name}</Checkbox>
+                                    <Checkbox className='font-medium' value={item.name} key={index}>{item.name}</Checkbox>
                                 ))}
                             </CheckboxGroup>
                         </AccordionItem>
@@ -239,159 +215,81 @@ function BodyShop() {
                             aria-label="brand"
                             title="Thương hiệu sản phẩm"
                         >
-                            <CheckboxGroup value={brandFilter} onChange={handleBrandFilterChange}> {/* Update to use brandFilter */}
+                            <CheckboxGroup value={brandFilter} onChange={handleBrandFilterChange}>
                                 {brands.map((item, index) => (
-                                    <Checkbox className='font-medium' value={item.name}>{item.name}</Checkbox>
+                                    <Checkbox className='font-medium' value={item.name} key={index}>{item.name}</Checkbox>
                                 ))}
                             </CheckboxGroup>
                         </AccordionItem>
 
-                        {/* <AccordionItem
-                            key="brands"
+                        <AccordionItem
+                            key="price"
                             indicator={<ChevronLeftIcon />}
-                            aria-label="brands"
-                            title="Thương hiệu sản phẩm"
+                            aria-label="price"
+                            title="Lọc theo giá"
                         >
-                            <CheckboxGroup value={priceFilter} onChange={handlePriceFilterChange}>
-                                {brands.map((item, index) => (
-                                    <Checkbox className='font-medium' value={item.tag}>{item.name}</Checkbox>
-                                ))}
-                            </CheckboxGroup>
-                        </AccordionItem> */}
+                            <div className="my-4">
+                                <div className="text-lg">Lọc theo giá:</div>
+                                <Slider
+                                    value={priceRange}
+                                    onChange={handlePriceRangeChange}
+                                    valueLabelDisplay="auto"
+                                    min={0}
+                                    max={500000}
+                                    step={10000}
+                                />
+                                <div className="flex justify-between mb-2">
+                                    <span>{priceRange[0].toLocaleString()}đ</span>
+                                    <span>{priceRange[1].toLocaleString()}đ</span>
+                                </div>
+                                <Button onClick={() => handlePriceFilterChange([`${priceRange[0]}-${priceRange[1]}`])} variant="bordered">
+                                    Áp dụng bộ lọc
+                                </Button>
+                            </div>
+                        </AccordionItem>
                     </Accordion>
                 </div>
 
-
                 {/* Product Listing */}
                 <div className="flex-1 relative">
-                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start sticky top-[120px] dark:bg-black bg-white z-20">
+                    <div className="h-[80px] lg:h-[80px] lg:block flex lg:items-center flex-col lg:flex-row items-start sticky lg:top-[120px] top-[0px] dark:bg-black bg-white z-20">
                         <div className="mr-4 mb-2 flex lg:justify-between justify-end items-center h-full w-full gap-2">
                             {filter.length > 0 || priceFilter.length > 0 ? (
                                 <div className="flex-1 flex items-center">
                                     <div className="text-base font-normal flex items-center gap-2">
                                         <div className='dark:text-white'>Bộ lọc đã chọn:</div>
-                                        <div className="w-auto lg:h-20 hidden h-auto overflow-scroll hidden-scrollbar lg:flex gap-2 items-center" style={{ whiteSpace: 'nowrap' }}>
-
-                                            {/* Price Filters */}
-                                            {/* {priceFilter.map((filter) => {
-                    const [min, max] = filter.split('-').map((value) => formatVND(parseFloat(value)));
-                    return (
-                      <Chip
-                        key={filter}
-                        onClose={() => handleChipClose(filter)}
-                        variant="bordered"
-                        className="text-base mr-2"
-                      >
-                        {max ? `${min} - ${max}` : `${min}+`}
-                      </Chip>
-                    );
-                  })} */}
-
-                                            {/* Category Filter Select */}
-                                            {filter.length > 3 ? (
-                                                <Dropdown className='dark:text-white'>
-                                                    <DropdownTrigger>
-                                                        <Button variant="bordered" endContent={<KeyboardArrowDownIcon />}>
-                                                            {`${filter.length} bộ lọc`}
-                                                        </Button>
-                                                    </DropdownTrigger>
-                                                    <DropdownMenu aria-label="Selected Filters" disallowEmptySelection closeOnSelect={false}>
-                                                        {filter.map((filterItem, index) => (
-                                                            <DropdownItem key={index} onClick={() => handleChipClose(filterItem)}>
-                                                                <div className="flex items-center justify-between">
-                                                                    {/* Update to show category name instead of ID */}
-                                                                    {categories.find(category => category.id === filterItem)?.name || filterItem}
-                                                                    <CloseIcon fontSize="small" />
-                                                                </div>
-                                                            </DropdownItem>
-                                                        ))}
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                            ) : (
-                                                filter.map((filterItem) => (
-                                                    <div
-                                                        key={filterItem}
-                                                        className="text-base mr-2 flex items-center h-10 px-2 rounded-lg bg-gray-100"
-                                                    >
-                                                        <button
-                                                            onClick={() => handleChipClose(filterItem)}
-                                                            className="ml-2 hover:text-red-700"
-                                                        >
-                                                            {/* Update to show category name instead of ID */}
-                                                            {categories.find(category => category.id === filterItem)?.name || filterItem}
+                                        {([...Array.from(new Set([...priceFilter, ...filter]))].length > 3) ? (
+                                            <Dropdown>
+                                                <DropdownTrigger>
+                                                    <Button variant="bordered">
+                                                        {`+${([...Array.from(new Set([...priceFilter, ...filter]))].length)} bộ lọc`}
+                                                    </Button>
+                                                </DropdownTrigger>
+                                                <DropdownMenu variant="faded" aria-label="More Filters" className='dark:text-white'>
+                                                    {[...Array.from(new Set([...priceFilter, ...filter]))].map((filterItem) => (
+                                                        <DropdownItem key={filterItem} onClick={() => handleChipClose(filterItem)}>
+                                                            {filterItem} <CloseIcon fontSize="small" />
+                                                        </DropdownItem>
+                                                    ))}
+                                                </DropdownMenu>
+                                            </Dropdown>
+                                        ) : (
+                                            <div className="w-auto lg:h-20 hidden h-auto overflow-scroll hidden-scrollbar lg:flex gap-2 items-center" style={{ whiteSpace: 'nowrap' }}>
+                                                {/* Display selected filters as chips */}
+                                                {[...Array.from(new Set([...priceFilter, ...filter]))].map((filterItem) => (
+                                                    <div key={filterItem} className="text-base mr-2 flex items-center h-10 px-2 rounded-lg bg-gray-100">
+                                                        <button onClick={() => handleChipClose(filterItem)} className="ml-2 hover:text-red-700">
+                                                            {filterItem} {/* Display selected filter */}
                                                             <CloseIcon fontSize="small" />
                                                         </button>
                                                     </div>
-                                                ))
-                                            )}
-
-
-                                            <div className="lg:block hidden">
-                                                <Button onClick={resetFilter} variant="bordered">
-                                                    Xóa bộ lọc <CloseIcon />
-                                                </Button>
+                                                ))}
                                             </div>
-                                        </div>
-                                        <div className="w-auto lg:h-20 flex h-auto overflow-scroll hidden-scrollbar lg:hidden gap-2 items-center" style={{ whiteSpace: 'nowrap' }}>
-
-                                            {/* Price Filters */}
-                                            {/* {priceFilter.map((filter) => {
-                    const [min, max] = filter.split('-').map((value) => formatVND(parseFloat(value)));
-                    return (
-                      <Chip
-                        key={filter}
-                        onClose={() => handleChipClose(filter)}
-                        variant="bordered"
-                        className="text-base mr-2"
-                      >
-                        {max ? `${min} - ${max}` : `${min}+`}
-                      </Chip>
-                    );
-                  })} */}
-
-                                            {/* Category Filter Select */}
-                                            {filter.length > 1 ? (
-                                                <Dropdown>
-                                                    <DropdownTrigger>
-                                                        <Button variant="bordered" endContent={<KeyboardArrowDownIcon />}>
-                                                            {`${filter.length} bộ lọc`}
-                                                        </Button>
-                                                    </DropdownTrigger>
-                                                    <DropdownMenu aria-label="Selected Filters">
-                                                        {filter.map((filterItem, index) => (
-                                                            <DropdownItem key={index} onClick={() => handleChipClose(filterItem)}>
-
-                                                                <div className="flex items-center justify-between">
-                                                                    {filterItem}
-                                                                    <CloseIcon fontSize="small" />
-                                                                </div>
-                                                            </DropdownItem>
-                                                        ))}
-                                                    </DropdownMenu>
-                                                </Dropdown>
-                                            ) : (
-                                                filter.map((filterItem) => (
-                                                    <div
-                                                        key={filterItem}
-                                                        className="text-base mr-2 flex items-center h-10 px-2 rounded-lg bg-gray-100"
-                                                    >
-                                                        <button
-                                                            onClick={() => handleChipClose(filterItem)}
-                                                            className="ml-2 hover:text-red-700"
-                                                        >
-                                                            {filterItem}
-                                                            <CloseIcon fontSize="small" />
-                                                        </button>
-                                                    </div>
-                                                ))
-                                            )}
-
-
-                                            <div className="lg:block hidden">
-                                                <Button onClick={resetFilter} variant="bordered">
-                                                    Xóa bộ lọc <CloseIcon />
-                                                </Button>
-                                            </div>
+                                        )}
+                                        <div className="lg:block hidden">
+                                            <Button onClick={resetFilter} variant="bordered">
+                                                Xóa bộ lọc <CloseIcon />
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -429,25 +327,63 @@ function BodyShop() {
                                             <>
                                                 <ModalHeader className="flex flex-col gap-1">Lọc</ModalHeader>
                                                 <ModalBody>
-                                                    <Accordion selectionMode="multiple" className="px-0" defaultExpandedKeys={["category", "price"]}>
-                                                        <AccordionItem key="price" indicator={<ChevronLeftIcon />} aria-label="Price" title="Price">
-                                                            <CheckboxGroup value={priceFilter} onChange={handlePriceFilterChange}>
-                                                                <Checkbox value="0-99000">0 - 99.000</Checkbox>
-                                                                <Checkbox value="100000-199000">100.000 - 199.000</Checkbox>
-                                                                <Checkbox value="200000-299000">200.000 - 299.000</Checkbox>
-                                                                <Checkbox value="300000-399000">300.000 - 399.000</Checkbox>
-                                                                <Checkbox value="400000">400.000 +</Checkbox>
-                                                            </CheckboxGroup>
-                                                        </AccordionItem>
-                                                        <AccordionItem key="category" indicator={<ChevronLeftIcon />} aria-label="Category" title="Category">
-                                                            <CheckboxGroup value={cateFilter} onChange={handleCategoryFilterChange}>
-                                                                <Checkbox value="headphone">Headphone</Checkbox>
-                                                                <Checkbox value="tv">TV</Checkbox>
-                                                                <Checkbox value="laptop">Laptop</Checkbox>
-                                                                <Checkbox value="smartphone">Smart Phone</Checkbox>
-                                                            </CheckboxGroup>
-                                                        </AccordionItem>
-                                                    </Accordion>
+                                                <Accordion
+                        selectionMode="multiple"
+                        className="px-0 sticky top-[130px]"
+                        defaultExpandedKeys={["category", "price", "brand"]}
+                    >
+                        <AccordionItem
+                            key="category"
+                            indicator={<ChevronLeftIcon />}
+                            aria-label="category"
+                            title="Phân loại sản phẩm"
+                        >
+                            <CheckboxGroup value={cateFilter} onChange={handleCategoryFilterChange}>
+                                {categories.map((item, index) => (
+                                    <Checkbox className='font-medium' value={item.name} key={index}>{item.name}</Checkbox>
+                                ))}
+                            </CheckboxGroup>
+                        </AccordionItem>
+
+                        <AccordionItem
+                            key="brand"
+                            indicator={<ChevronLeftIcon />}
+                            aria-label="brand"
+                            title="Thương hiệu sản phẩm"
+                        >
+                            <CheckboxGroup value={brandFilter} onChange={handleBrandFilterChange}>
+                                {brands.map((item, index) => (
+                                    <Checkbox className='font-medium' value={item.name} key={index}>{item.name}</Checkbox>
+                                ))}
+                            </CheckboxGroup>
+                        </AccordionItem>
+
+                        <AccordionItem
+                            key="price"
+                            indicator={<ChevronLeftIcon />}
+                            aria-label="price"
+                            title="Lọc theo giá"
+                        >
+                            <div className="my-4">
+                                <div className="text-lg">Lọc theo giá:</div>
+                                <Slider
+                                    value={priceRange}
+                                    onChange={handlePriceRangeChange}
+                                    valueLabelDisplay="auto"
+                                    min={0}
+                                    max={500000}
+                                    step={10000}
+                                />
+                                <div className="flex justify-between mb-2">
+                                    <span>{priceRange[0].toLocaleString()}đ</span>
+                                    <span>{priceRange[1].toLocaleString()}đ</span>
+                                </div>
+                                <Button onClick={() => handlePriceFilterChange([`${priceRange[0]}-${priceRange[1]}`])} variant="bordered">
+                                    Áp dụng bộ lọc
+                                </Button>
+                            </div>
+                        </AccordionItem>
+                    </Accordion>
                                                 </ModalBody>
                                             </>
                                         )}
@@ -461,16 +397,25 @@ function BodyShop() {
                     {loading ? (
                         <div className='h-[380px] flex justify-center items-center'>
                             <Loading />
-                        </div> // Show loading indicator
-                    ) : variants.length === 0 ? ( // Check if there are no products
+                        </div>
+                    ) : variants.length === 0 ? (
                         <div className='h-[380px] flex justify-center items-center'>
-                            <p className='text-lg'>Không có sản phẩm</p> {/* Message for no products */}
+                            <p className='text-lg'>Không có sản phẩm</p>
                         </div>
                     ) : (
                         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-4 mt-4">
-                             {variants.map((product: Variant, index: number) => ( // Added index as a second parameter
-            <BoxProduct key={`${product.product_id}-${index}`} product={product} /> // Updated key to include index
-        ))}
+                            {variants.slice(0, displayCount).map((product: Variant, index: number) => (
+                                <BoxProduct key={`${product.product_id}-${index}`} product={product} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Load More Button */}
+                    {displayCount < variants.length && (
+                        <div className="flex justify-center mt-4">
+                            <Button onClick={handleLoadMore} variant="bordered">
+                                Xem thêm
+                            </Button>
                         </div>
                     )}
 

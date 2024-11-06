@@ -1,35 +1,54 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Chart, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, BarController } from 'chart.js';
+import axios from 'axios';
+import apiConfig from '@/configs/api';
 
 // Register the required Chart.js components
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
+interface StaticDataItem {
+  month_year: string;
+  revenue: string;
+}
+
 const Chart_Price = () => {
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const [staticData, setStaticData] = useState<StaticDataItem[]>([]);
+  const [monthsTK, setMonthsTK] = useState<string[]>([]);
+  const [revenueTK, setRevenueTK] = useState<number[]>([]);
+  const [chartInstance, setChartInstance] = useState<Chart | null>(null);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    const fetchStaticData = async () => {
+      const response = await axios.get(apiConfig.static.getAll);
+      const data = response.data.revenue;
+
+      setStaticData(data);
+      setMonthsTK(data.map((item: StaticDataItem) => item.month_year));
+      setRevenueTK(data.map((item: StaticDataItem) => parseFloat(item.revenue)));
+    };
+    fetchStaticData();
+  }, []);
+
+  useEffect(() => {
+    if (!chartRef.current || monthsTK.length === 0 || revenueTK.length === 0) return;
 
     const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
 
-    const myChart = new Chart(ctx, {
+    // Destroy the existing chart instance if it exists
+    if (chartInstance) chartInstance.destroy();
+
+    const newChartInstance = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'], // Example months
+        labels: monthsTK,
         datasets: [
           {
-            label: 'Revenue',
-            data: [12000, 15000, 18000, 20000, 17000, 220000], // Example revenue data
-            backgroundColor: 'rgba(75, 192, 192, 0.6)', // Bar color
+            label: 'Doanh thu',
+            data: revenueTK,
+            backgroundColor: '#696CFF',
             borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Beef',
-            data: [120000, 19000, 8000, 22000, 10000, 12000], // Example revenue data
-            backgroundColor: '#fef9ef', // Bar color
-            borderColor: 'rgba(75, 180, 180, 1)',
             borderWidth: 1,
           },
         ],
@@ -38,11 +57,11 @@ const Chart_Price = () => {
         responsive: true,
         plugins: {
           legend: {
-            display: true,
+            display: false,
             position: 'top',
           },
           title: {
-            display: true,
+            display: false,
             text: 'Monthly Revenue',
           },
         },
@@ -57,13 +76,17 @@ const Chart_Price = () => {
       },
     });
 
-    // Cleanup function to destroy the chart instance on component unmount
-    return () => {
-      myChart.destroy();
-    };
-  }, []);
+    setChartInstance(newChartInstance);
 
-  return <canvas ref={chartRef} />;
+    return () => {
+      newChartInstance.destroy();
+    };
+  }, [monthsTK, revenueTK]); // Depend on monthsTK and revenueTK to re-render when data is available
+
+  return <div className=''>
+<div className='text-[18px] font-bold text-[#333333] mb-2'>Doanh thu theo tháng</div>
+<canvas ref={chartRef} />
+  </div>;
 };
 
 export default Chart_Price;
