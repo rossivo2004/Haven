@@ -7,6 +7,11 @@ import { use, useEffect, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { Order } from "@/src/interface";
 import InfoIcon from '@mui/icons-material/Info';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+
 
 export const OrderSession: React.FC = () => {
     const userId = Cookies.get('user_id'); // Get user ID from cookies
@@ -60,6 +65,33 @@ export const OrderSession: React.FC = () => {
 
     }, [userId])
 
+    const cancelOrder = (idOrrder: number) => {
+        confirmAlert({
+            title: "Hủy đơn hàng",
+            message: "Bạn có chắc muốn hủy đơn hàng?",
+            buttons: [
+                {
+                    label: "Yes",
+                    onClick: async () => { // Thay đổi thành async để sử dụng await
+                        try {
+                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`); // Thêm await để chờ phản hồi
+                            if (response.status === 400) { // Kiểm tra nếu phản hồi trả về 400
+                                toast.error("Lỗi: Không thể hủy đơn hàng"); // Thông báo lỗi
+                                return; // Dừng thực hiện nếu có lỗi
+                            }
+                            toast.success("Hủy đơn thành công"); // Sửa thông báo thành công
+                        } catch (error) {
+                            toast.error("Lỗi khi hủy đơn hàng"); // Cập nhật thông báo lỗi
+                        }
+                    },
+                },
+                {
+                    label: "No",
+                },
+            ],
+        });
+    };
+
     console.log(order);
 
 
@@ -78,7 +110,10 @@ export const OrderSession: React.FC = () => {
                             <TableCell>{item.invoice_code}</TableCell>
                             <TableCell>{new Date(item.updated_at).toLocaleDateString('en-GB')}</TableCell>
                             <TableCell><div className='flex justify-center w-full'>{getStatusText(item.status)}</div></TableCell>
-                            <TableCell><a href={`/trackingorder/${item.invoice_code}`} target="_blank" rel="noopener noreferrer"><InfoIcon /></a></TableCell>
+                            <TableCell><div className="flex gap-2">
+                            <div className="cursor-pointer"><CancelIcon onClick={() => cancelOrder(Number(item.id))}/></div>
+                            <a href={`/trackingorder/${item.invoice_code}`} target="_blank" rel="noopener noreferrer"><InfoIcon /></a>
+                                </div></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

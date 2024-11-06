@@ -172,6 +172,10 @@ const apiConfig = {
 
     // Trừ điểm user
     deductPoints : `${baseUrl}/api/checkout/deduct-points`,
+
+        //Hủy đơn hàng dựa trên id
+    ///orders/cancelorder/{orderId}
+    cancelOrder: `${baseUrl}/api/checkout/orders/cancelorder/`,
   },
 
 

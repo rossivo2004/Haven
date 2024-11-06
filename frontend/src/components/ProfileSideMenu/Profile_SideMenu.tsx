@@ -63,10 +63,18 @@ function Profile_SideMenu() {
                             </Link>
                         </li>
                         <li className=" border-b border-black py-4">
-                            <Link href={`${hiddenMenuPaths[3]}`}>
-                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[3]}`  ? 'active_nav_profile' : ''}`}>
+                            <Link href={`${hiddenMenuPaths[1]}`}>
+                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[1]}`  ? 'active_nav_profile' : ''}`}>
                                     <div><DiscountOutlinedIcon /></div>
                                     <div>Quản lí đơn hàng</div>
+                                </div>
+                            </Link>
+                        </li>
+                        <li className=" border-black py-4">
+                            <Link href={`${hiddenMenuPaths[2]}`}>
+                                <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[2]}`  ? 'active_nav_profile' : ''}`}>
+                                    <div><DiscountOutlinedIcon /></div>
+                                    <div>Sản phẩm yêu thích</div>
                                 </div>
                             </Link>
                         </li>

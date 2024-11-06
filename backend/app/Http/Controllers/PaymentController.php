@@ -138,10 +138,10 @@ public function vnpayReturn(Request $request, $orderID)
 
     if ($request->vnp_ResponseCode == '00') { // Kiểm tra mã phản hồi từ VNPay
         // Nếu thành công
-        return redirect()->to('http://localhost:3000/thankorder');
+        return redirect()->to('/thankorder');
     } else {
         // Nếu thất bại, chuyển hướng đến trang thất bại (tuỳ chọn)
-        return redirect()->to('http://localhost:3000/failure');
+        return redirect()->to('/failure');
     }
 
     // return response()->json(['status' => true, 'message' => 'Payment successful', 'data' => $responseData]);

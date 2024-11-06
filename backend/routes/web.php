@@ -23,11 +23,11 @@ Route::resource('roles', RoleController::class);
 
 // Define API routes for posts
 Route::prefix('api/posts')->group(function () {
-    Route::get('/', [PostController::class, 'index']); 
-    Route::post('/store', [PostController::class, 'store']); 
-    Route::get('/show/{id}', [PostController::class, 'show']); 
-    Route::put('/update/{id}', [PostController::class, 'update']); 
-    Route::delete('/delete/{id}', [PostController::class, 'destroy']); 
+    Route::get('/', [PostController::class, 'index']);
+    Route::post('/store', [PostController::class, 'store']);
+    Route::get('/show/{id}', [PostController::class, 'show']);
+    Route::put('/update/{id}', [PostController::class, 'update']);
+    Route::delete('/delete/{id}', [PostController::class, 'destroy']);
 });
 
 // Quản lý users
