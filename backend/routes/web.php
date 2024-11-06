@@ -37,6 +37,15 @@ Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin
     // Các route chỉ dành cho admin
 
 });
+
+Route::middleware(['auth', 'check.status'])->group(function () {
+    // Đăng nhập - đăng xuất
+    Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
+    Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
+    Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
+    Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+});
+
 // Quản lý users
 Route::group(['prefix' => 'api/users'], function() {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
@@ -56,11 +65,7 @@ Route::group(['prefix' => 'api/roles'], function () {
     Route::delete('/delete/{role}', [RoleController::class, 'destroy'])->name('Role.destroy');
 });
 
-// Đăng nhập - đăng xuất
-Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
-Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
-Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
-Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+
 
 // Đăng ký
 Route::group(['prefix' => 'api/register'], function() {
