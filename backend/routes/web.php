@@ -38,13 +38,14 @@ Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin
 
 });
 
-Route::middleware(['auth', 'check.status'])->group(function () {
+Route::middleware(['check.status'])->group(function () {
     // Đăng nhập - đăng xuất
     Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
     Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
     Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
     Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
 });
+
 
 // Quản lý users
 Route::group(['prefix' => 'api/users'], function() {

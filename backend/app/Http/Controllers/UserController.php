@@ -114,28 +114,37 @@ class UserController extends Controller
     }
 
     // Đăng nhập qua API
-    public function login(LoginRequest $request)
+    public function login(Request $request)
     {
+        // Validate login credentials
         $credentials = $request->only('email', 'password');
 
+        // Attempt to authenticate the user
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            // Lấy thông tin user sau khi đăng nhập
             $user = Auth::user();
 
-            // Lưu ID của user vào session
-            session(['user_id' => $user->id]);
+            // Kiểm tra nếu user bị banned
+            if ($user->status === 'banned') {
+                // Đăng xuất user ngay lập tức nếu đã đăng nhập
+                Auth::logout();
 
-            // Trả về ID và thông tin của user
+                // Trả về thông báo lỗi cho người dùng
+                return response()->json([
+                    'message' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+                ], 403);
+            }
+
+            // Trả về thông báo đăng nhập thành công nếu user không bị banned
             return response()->json([
                 'message' => 'Đăng nhập thành công',
-                'user_id' => $user->id, // Trả về ID
-            ], 200);
+                'user' => $user
+            ]);
         }
 
-        return response()->json(['error' => 'Email hoặc mật khẩu không đúng'], 401);
+        // Trả về thông báo lỗi nếu thông tin đăng nhập không chính xác
+        return response()->json(['message' => 'Thông tin đăng nhập không chính xác.'], 401);
     }
+
 
     // Đăng xuất qua API
     public function logout(Request $request)
@@ -301,7 +310,14 @@ class UserController extends Controller
         $existingUser = User::where('email', $request->email)->first();
 
         if ($existingUser) {
-            // Email đã tồn tại, trả về ID của người dùng hiện có
+            // Kiểm tra nếu người dùng có trạng thái bị banned
+            if ($existingUser->status === 'banned') {
+                return response()->json([
+                    'message' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+                ], 403);
+            }
+
+            // Email đã tồn tại và không bị banned, trả về ID của người dùng hiện có
             return response()->json([
                 'user_id' => $existingUser->id,
             ], 200);
@@ -316,6 +332,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make('123456dummy'), // Mật khẩu ngẫu nhiên
                 'role_id' => $role->id,
+                'status' => 'active' // Set status mặc định là active khi tạo mới
             ]);
 
             // Đăng nhập người dùng mới
@@ -331,6 +348,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
         }
     }
+
 
 
 }
