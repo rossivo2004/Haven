@@ -118,6 +118,8 @@ route::group([
     Route::get('/edit/{productVariant}', [ProductVariantController::class, 'edit'])->name('ProductVariant.edit');
     Route::put('/update/{productVariant}', [ProductVariantController::class, 'update'])->name('ProductVariant.update');
     Route::delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
+
+    Route::get('/getRelatedVariants/{productVariant}', [ProductVariantController::class, 'getRelatedVariants'])->name('ProductVariant.getRelatedVariants');
 });
 
 route::group([
