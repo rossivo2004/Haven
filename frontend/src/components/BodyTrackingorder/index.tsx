@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import Loading from "../ui/Loading";
+import Link from "next/link";
+import Image from "next/image";
 
 function BodyTrackingorder() {
     const { id } = useParams();
@@ -37,20 +39,20 @@ function BodyTrackingorder() {
             <div className="flex justify-center items-center h-screen">
                 <Loading />
             </div>
-        ) : (
+        ) : order ? (
             <div className="flex lg:flex-row flex-col-reverse lg:mt-10 gap-5">
                 <div className="lg:w-3/5 w-full ">
-                <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm mb-2">
+                <div className="flex lg:flex-row flex-col lg:items-center justify-between p-4 bg-gray-50 dark:bg-transparent dark:text-white rounded-md shadow-sm mb-2">
                     <div className="flex items-center space-x-4">
                         <div>
                             <h3 className="font-medium lg:text-2xl text-lg">Thông Tin Nhận Hàng</h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-white">
                                 {order?.full_name} <span className="mx-2">|</span> {order?.phone}
                             </p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-4 text-right">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-white">
                             {order?.address}, {order?.ward}, {order?.district}, {order?.province}
                         </p>
                     </div>
@@ -79,7 +81,7 @@ function BodyTrackingorder() {
 
                 <div>
 
-                    <div className="py-4 px-4 space-y-6">
+                    <div className="py-4 px-4 space-y-6 dark:text-white">
                         {order?.order_details.map((item) => (
                             <div>
                                 <div className="mb-2 text-xl ">Bạn đang xem đơn hàng: <span className="font-semibold">{order.invoice_code}</span></div>
@@ -89,7 +91,7 @@ function BodyTrackingorder() {
                                         <img src={item.product_variant.image} alt="Product 1" className="w-24 h-24 object-cover mr-4" />
                                         <div>
                                             <div className="lg:text-xl text-base font-medium">{item.product_variant.name}</div>
-                                            <div className="text-gray-600 text-sm mt-2">Số lượng: {item?.quantity}</div>
+                                            <div className="text-gray-600 text-sm mt-2 dark:text-white">Số lượng: {item?.quantity}</div>
                                         </div>
                                     </div>
                                     {/* Product Price */}
@@ -106,12 +108,12 @@ function BodyTrackingorder() {
             </div>
 
             <div className="flex-1">
-                <div className="p-6 border bg-white rounded-lg">
+                <div className="p-6 border bg-white dark:bg-transparent dark:text-white rounded-lg">
                     {/* Title */}
                     <h2 className="text-center text-lg font-semibold mb-6">SHIPPING INFORMATION</h2>
                     {/* Order Status */}
                     <div className="mb-6">
-                        <div className="text-sm font-medium mb-2">Tình trạng đơn hàng</div>
+                        <div className="text-sm font-semibold mb-2">Tình trạng đơn hàng</div>
                         <ul className="steps steps-vertical lg:steps-horizontal">
                             <li className={`step ${order?.status === "pending" || order?.status === "preparing" || order?.status === "transport" || order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Đơn hàng đang chờ</li>
                             <li className={`step ${order?.status === "preparing" || order?.status === "transport" || order?.status === "complete" || order?.status === "canceled" ? 'step-primary' : ''}`}>Đã duyệt</li>
@@ -123,8 +125,8 @@ function BodyTrackingorder() {
                     </div>
                     {/* Shipping Method */}
                     <div className="mb-6">
-                        <div className="text-sm font-medium mb-2">Phương thức vận chuyển</div>
-                        <div className="text-gray-600">
+                        <div className="text-sm font-semibold mb-2">Phương thức vận chuyển</div>
+                        <div className="text-gray-600 dark:text-white">
                             {orderPayment_transpot == 1 && "Grab Food"}
                             {orderPayment_transpot == 2 && "Giao hàng nhanh"}
                             {orderPayment_transpot == 3 && "Shopee Express"}
@@ -134,8 +136,8 @@ function BodyTrackingorder() {
                     </div>
                     {/* Payment Method */}
                     <div className="mb-6">
-                        <div className="text-sm font-medium mb-2">Hình thức thanh toán</div>
-                        <div className="text-gray-600">
+                        <div className="text-sm font-semibold mb-2">Hình thức thanh toán</div>
+                        <div className="text-gray-600 dark:text-white">
                             {order?.payment_method === "1" ? "Thanh toán khi nhận hàng (COD)" :
                                 order?.payment_method === "2" ? "Thanh toán trực tuyến" :
                                     "Chưa xác định"}
@@ -144,8 +146,8 @@ function BodyTrackingorder() {
                     </div>
                     {/* Estimated Delivery Time */}
                     <div className="mb-6">
-                        <div className="text-sm font-medium mb-2">Thời gian giao hàng dự kiến</div>
-                        <div className="text-gray-600">5 ngày làm việc</div>
+                        <div className="text-sm font-semibold mb-2">Thời gian giao hàng dự kiến</div>
+                        <div className="text-gray-600 dark:text-white">5 ngày làm việc</div>
                         <hr className="border-gray-300 mt-2" />
                     </div>
                     {/* Order Summary */}
@@ -181,6 +183,12 @@ function BodyTrackingorder() {
 
 
             </div>
+        </div>
+    ) : (
+        <div className="flex flex-col justify-center items-center h-full pt-[100px] pb-[200px] dark:text-white">
+            <Image src='/images/order-not.png' alt="not found" width={300} height={300} />
+            <p className="text-lg">Không có dữ liệu đơn hàng.</p>
+            <Link href="/tracking" className="underline">Quay lại trang tra cứu</Link>
         </div>
     ));
 

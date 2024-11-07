@@ -229,7 +229,7 @@ function BodyShop() {
                             title="Lọc theo giá"
                         >
                             <div className="my-4">
-                                <div className="text-lg">Lọc theo giá:</div>
+                                {/* <div className="text-lg dark:text-white">Lọc theo giá:</div> */}
                                 <Slider
                                     value={priceRange}
                                     onChange={handlePriceRangeChange}
@@ -238,9 +238,9 @@ function BodyShop() {
                                     max={500000}
                                     step={10000}
                                 />
-                                <div className="flex justify-between mb-2">
-                                    <span>{priceRange[0].toLocaleString()}đ</span>
-                                    <span>{priceRange[1].toLocaleString()}đ</span>
+                                <div className="flex justify-between mb-2 dark:text-white">
+                                    <span className='dark:text-white'>{priceRange[0].toLocaleString()}đ</span>
+                                    <span className='dark:text-white'>{priceRange[1].toLocaleString()}đ</span>
                                 </div>
                                 <Button onClick={() => handlePriceFilterChange([`${priceRange[0]}-${priceRange[1]}`])} variant="bordered">
                                     Áp dụng bộ lọc

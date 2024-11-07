@@ -93,8 +93,22 @@ useEffect(() => {
     }
   }
 
+  const handleResendCode = async () => {
+    // Logic to resend the OTP code
+    try {
+      const response = await axios.post(apiConfig.user.sendResetPasswordCode, { email: userData.email });
+      if (response.status === 200) {
+        toast.success('Mã xác thực đã được gửi lại!');
+      } else {
+        toast.error('Không thể gửi mã xác thực!');
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi gửi mã xác thực!');
+    }
+  };
+
   return (
-    <div className="my-20 max-w-screen-xl mx-auto px-4 h-auto">
+    <div className="my-20 max-w-screen-xl mx-auto px-4 h-auto dark:text-white">
       <div className="flex lg:flex-row flex-col lg:h-[680px] gap-10">
         <div className="lg:w-1/2 w-full">
           <img
@@ -125,7 +139,7 @@ useEffect(() => {
                           key={index}
                           ref={(el) => { inputs.current[index] = el }}
                           maxLength={1}
-                          className="w-12 h-14 text-center text-lg border border-gray-300 rounded-md bg-gray-100 shadow-dark-200 inset-6 font-medium"
+                          className="w-12 h-14 text-center text-lg border border-gray-300 rounded-md bg-gray-100 shadow-dark-200 inset-6 font-medium dark:text-black"
                         />
                       ))}
                     </div>
@@ -137,7 +151,7 @@ useEffect(() => {
                   </div>
                 </div>
                 <div className="mb-6">
-                  Nếu không nhận được mã? <Link href={'#'} className="text-main font-bold">Gửi lại</Link>
+                  Nếu không nhận được mã? <div onClick={handleResendCode} className="text-main font-bold">Gửi lại</div>
                 </div>
                 <button
                   type="submit"

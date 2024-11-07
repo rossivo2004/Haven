@@ -164,7 +164,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-11.png`}
+                                src={`/images/bn-11.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority
@@ -173,7 +173,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-20.png`}
+                                src={`/images/bn-20.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority
@@ -182,7 +182,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-21.png`}
+                                src={`/images/bn-21.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority

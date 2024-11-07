@@ -365,3 +365,25 @@ export interface User {
       updated_at: string | null;
   };
 }
+
+export interface FavouriteItem {
+  id: number;
+  product_id: number;
+  image: string;
+  name: string;
+  DiscountedPrice: number;
+  Favored: boolean;
+  FlashSalePrice: number;
+  QuantityInCart: number;
+  StatusStock: string;
+  storedCart: boolean;
+  created_at: string;
+  discount: boolean;
+  // flash_sales: FlashSale[];
+  // product: Product;
+  price: number;
+  stock: number;
+  updated_at: string;
+  variant_value: string;
+  view: number;
+}

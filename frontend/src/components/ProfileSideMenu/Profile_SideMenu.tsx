@@ -42,19 +42,19 @@ function Profile_SideMenu() {
     return (
         <div>
           
-            <aside className="lg:w-[320px] w-full">
+            <aside className="lg:w-[320px] w-full dark:text-white">
                 <nav>
                     <ul>
                         <li className="mb-6">
                             <div className='flex items-center gap-4'>
-                                <div><Avatar src="https://i.pravatar.cc/150?u=a04258114e29026302d" size="lg" /></div>
+                                {/* <div><Avatar src="https://i.pravatar.cc/150?u=a04258114e29026302d" size="lg" /></div> */}
                                 <div className='flex flex-col'>
-                                    <div className='text-base font-normal'>Tài khoản của</div>
-                                    <div className='text-2xl font-medium'>{user?.name}</div>
+                                    <div className='text-base font-normal dark:text-white'>Tài khoản của</div>
+                                    <div className='text-2xl font-medium dark:text-white'>{user?.name}</div>
                                 </div>
                             </div>
                         </li>
-                        <li className=" border-b border-black py-4">
+                        <li className=" border-b border-black dark:border-white py-4 dark:text-white">
                             <Link href={`${hiddenMenuPaths[0]}`}>
                                 <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[0]}` ? 'active_nav_profile' : ''}`}>
                                     <div><PersonOutlineOutlinedIcon /></div>
@@ -62,7 +62,7 @@ function Profile_SideMenu() {
                                 </div>
                             </Link>
                         </li>
-                        <li className=" border-b border-black py-4">
+                        <li className=" border-b border-black dark:border-white py-4 dark:text-white">
                             <Link href={`${hiddenMenuPaths[1]}`}>
                                 <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[1]}`  ? 'active_nav_profile' : ''}`}>
                                     <div><DiscountOutlinedIcon /></div>
@@ -70,7 +70,7 @@ function Profile_SideMenu() {
                                 </div>
                             </Link>
                         </li>
-                        <li className=" border-black py-4">
+                        <li className=" border-black d py-4 dark:text-white">
                             <Link href={`${hiddenMenuPaths[2]}`}>
                                 <div className={`flex items-center gap-4 ${pathname === `${hiddenMenuPaths[2]}`  ? 'active_nav_profile' : ''}`}>
                                     <div><DiscountOutlinedIcon /></div>

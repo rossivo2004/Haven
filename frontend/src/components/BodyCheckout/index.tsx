@@ -326,12 +326,12 @@ function BodyCheckout() {
             <div>
                 {/* Main form without nesting another form */}
                 <form className="max-w-7xl mx-auto" onSubmit={handleSubmit}>
-                    <h1 className="text-4xl font-bold mb-6 text-center">Checkout</h1>
+                    <h1 className="text-4xl font-bold mb-6 text-center dark:text-white">Checkout</h1>
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                         <div className="lg:col-span-2">
-                            <h2 className="text-2xl font-semibold mb-4">Thanh Toán</h2>
+                            <h2 className="text-2xl font-semibold mb-4 dark:text-white">Thanh Toán</h2>
 
-                            <div className='flex flex-col gap-5'>
+                            <div className='flex flex-col gap-5 dark:text-white'>
                                 <div>
                                     <label htmlFor="full-name">Họ và tên người nhận</label>
                                     <Input required id='full-name' size='lg' value={user?.name} variant='bordered' placeholder='Họ và tên người nhận' />
@@ -472,7 +472,7 @@ function BodyCheckout() {
                         </div>
 
                         <div className="lg:col-span-2">
-                            <h2 className="text-2xl font-semibold mb-4">Tóm tắt đơn hàng</h2>
+                            <h2 className="text-2xl font-semibold mb-4 dark:text-white">Tóm tắt đơn hàng</h2>
                             {/* Cart items summary */}
                             <div className='shadow-md border rounded-md p-6'>
                                 <ul>
@@ -481,14 +481,14 @@ function BodyCheckout() {
                                             <div className='flex gap-4 justify-between items-center pb-2'>
                                                 <div className='flex gap-4 items-center'>
                                                     <img src={item.image} alt={item.name} className="w-24 h-24" />
-                                                    <p>{item.name}</p>
+                                                    <p className='dark:text-white'>{item.name}</p>
                                                 </div>
-                                                <p>Số lượng: {item.quantity}</p>
+                                                <p className='dark:text-white'>Số lượng: {item.quantity}</p>
                                             </div>
                                         </li>
                                     ))}
                                 </ul>
-                                <div className="py-4">
+                                <div className="py-4 dark:text-white">
                                     <div className="flex justify-between mb-2">
                                         <span>Tổng tiền</span>
                                         {/* Check if component has mounted to render the correct value */}

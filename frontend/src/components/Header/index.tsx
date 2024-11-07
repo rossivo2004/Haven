@@ -177,6 +177,7 @@ function Header({ params }: { params: { lang: string } }) {
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
         toast.success('Đăng xuất thành công');
+        Cookies.remove('checkout_data');
     };
 
 
@@ -458,15 +459,16 @@ function Header({ params }: { params: { lang: string } }) {
                                                 />
                                             </DropdownTrigger>
                                             <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                                <DropdownItem key="profile" className="h-14 gap-2">
+                                                <DropdownItem key="profile" className="h-14 gap-2 dark:text-white">
                                                     <p className="font-semibold">Signed in as</p>
                                                     <p className="font-semibold">{userData.email}</p> {/* Display user email */}
                                                 </DropdownItem>
                                                 <DropdownItem key="settings">
-                                                    <Link href={'/profile'}>
+                                                    <Link href={'/profile'} className='dark:text-white'>
                                                         Trang cá nhân
                                                     </Link>
                                                 </DropdownItem>
+                                              
                                                 {/* <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                                 <DropdownItem key="analytics">
                                                     <Link href={'/profile/notify'}>
@@ -474,8 +476,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                     </Link>
                                                 </DropdownItem> */}
                                                 <DropdownItem key="system">
-                                                    <Link href={'/profile/order'}>
+                                                    <Link href={'/profile/order'} className='dark:text-white'>
                                                         Quản lí đơn hàng
+                                                    </Link>
+                                                </DropdownItem>
+                                                <DropdownItem key="favourite">
+                                                    <Link href={'/profile/favourite'} className='dark:text-white'>
+                                                        Sản phẩm yêu thích
                                                     </Link>
                                                 </DropdownItem>
                                                 {/* <DropdownItem key="configurations">
@@ -484,7 +491,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                     </Link>
                                                 </DropdownItem> */}
                                                 <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
-                                                    Đăng xuất
+                                                    <div className='dark:text-white'>Đăng xuất</div>
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
@@ -797,13 +804,18 @@ function Header({ params }: { params: { lang: string } }) {
                                             <p className="font-semibold">zoey@example.com</p>
                                         </DropdownItem>
                                         <DropdownItem key="settings">
-                                            <Link href={`/profile`}>
+                                            <Link href={`/profile`} className='dark:text-white'>
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>
                                         <DropdownItem key="analytics">
                                             <Link href={'/profile/order'}>
                                                 Quản lý đơn hàng
+                                            </Link>
+                                        </DropdownItem>
+                                        <DropdownItem key="analytics">
+                                            <Link href={'/profile/favourite'}>
+                                                Sản phẩm yêu thích
                                             </Link>
                                         </DropdownItem>
                                         {/* <DropdownItem key="system">System</DropdownItem>

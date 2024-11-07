@@ -18,7 +18,7 @@ function BodyResetPassword() {
     });
 
     return (
-        <div className="my-20 max-w-screen-xl mx-auto px-4 h-auto">
+        <div className="my-20 max-w-screen-xl mx-auto px-4 h-auto dark:text-white">
             <div className="flex lg:flex-row flex-col lg:h-[680px] gap-10">
                 <div className="lg:w-1/2 w-full">
                     <img
@@ -76,7 +76,7 @@ function BodyResetPassword() {
                                             type="password"
                                             name="password"
                                             placeholder="Mật khẩu"
-                                            className="border-b border-black py-2 text-base font-normal focus:outline-none w-full"
+                                                       className="border-b border-black py-2 rounded-lg px-2 text-base font-normal focus:outline-none w-full"
                                         />
                                         <ErrorMessage
                                             name="password"
@@ -89,7 +89,7 @@ function BodyResetPassword() {
                                             type="password"
                                             name="repassword"
                                             placeholder="Xác nhận lại mật khẩu"
-                                            className="border-b border-black py-2 text-base font-normal focus:outline-none w-full"
+                                                           className="border-b border-black px-2 rounded-lg py-2 text-base font-normal focus:outline-none w-full"
                                         />
                                         <ErrorMessage
                                             name="repassword"

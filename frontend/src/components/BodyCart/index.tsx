@@ -194,7 +194,7 @@ const Body_Cart = () => {
                     />
                 </div>
             </div>
-            <h1 className="text-4xl font-bold mb-6 text-center">Giỏ Hàng</h1>
+            <h1 className="text-4xl font-bold mb-6 text-center dark:text-white">Giỏ Hàng</h1>
 
             <Checkbox
     isSelected={cart.length > 0 && cart.length === selectedItems.size} // Check if all items are selected
@@ -210,7 +210,7 @@ const Body_Cart = () => {
                 {loading ? <div className='w-full h-[400px] flex items-center justify-center relative'><Loading /></div> : (
                         cart.length > 0 ? (
                             cart.map((item: any) => (
-                                <div className="bg-white" key={item.product_variant.id} >
+                                <div className="bg-white dark:bg-transparent" key={item.product_variant.id} >
                                 <div className="flex justify-between items-center border-b pb-4 mb-4">
                                     <div className="flex items-center">
                                         <Checkbox
@@ -220,9 +220,9 @@ const Body_Cart = () => {
                                         />
                                         <img src={item.product_variant.image} alt={'âffff'} className="w-24 h-24 mr-4 rounded" />
                                         <div>
-                                            <p className="text-xl font-semibold">{item.product_variant.name}</p>
+                                            <p className="text-xl font-semibold dark:text-white">{item.product_variant.name}</p>
                                             {/* <p className="text-sm text-gray-600">fssdf</p> */}
-                                            <div className="flex items-center mt-2">
+                                            <div className="flex items-center mt-2 dark:text-white">
                                                 <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded">-</button>
                                                 <span className="px-4">{item.quantity}</span>
                                                 <button onClick={() => updateQuantity(item, item.quantity + 1)} className="px-3 py-1 border rounded">+</button>
@@ -239,7 +239,7 @@ const Body_Cart = () => {
                                             </div>
                                         </div>
                                         <div className='flex items-center justify-end' >
-                                            <CloseIcon onClick={() => deleteItem(item)} className='hover:text-red-600 cursor-pointer' />
+                                            <CloseIcon onClick={() => deleteItem(item)} className='hover:text-red-600 dark:text-white cursor-pointer' />
                                         </div>
                                     </div>
                                 </div>
@@ -250,7 +250,7 @@ const Body_Cart = () => {
                             <div className='mb-4'>
                                 <img src="/images/cartnot.png" alt="" className='w-[220px] object-cover' />
                             </div>
-                            <div className='text-4xl font-medium mb-4'>Chưa có sản phẩm nào trong giỏ hàng</div>
+                            <div className='text-4xl font-medium mb-4 dark:text-white'>Chưa có sản phẩm nào trong giỏ hàng</div>
                             <div>
                                 <Link href={'/shop'}>
                                     <button className='bg-main p-2 rounded-lg text-white'>Quay trở lại cửa hàng</button>
@@ -281,8 +281,8 @@ const Body_Cart = () => {
                 </div>
 
                 <div className='relative top-0'>
-                    <div className="bg-white p-6 rounded shadow-sm sticky top-[100px]">
-                        <h2 className="text-2xl font-semibold mb-4">Cộng Giỏ Hàng</h2>
+                    <div className="bg-white dark:bg-transparent p-6 rounded shadow-sm sticky top-[100px]">
+                        <h2 className="text-2xl dark:text-white font-semibold mb-4">Cộng Giỏ Hàng</h2>
 
 
                         {/* <div className="mb-4">
@@ -293,27 +293,27 @@ const Body_Cart = () => {
                     </div> */}
 
                         <div className="mb-4">
-                            <p className="block text-lg font-medium">Thời gian giao hàng dự kiến</p>
-                            <p>1 - 2 ngày sau khi đặt hàng</p>
-                            <hr className="border-t-1 border-black mt-2" />
+                            <p className="block text-lg font-medium dark:text-white">Thời gian giao hàng dự kiến</p>
+                            <p className='dark:text-white'>1 - 2 ngày sau khi đặt hàng</p>
+                            <hr className="border-t-1 border-black dark:border-white mt-2" />
                         </div>
 
                         <div className="py-4">
                             <div className="flex justify-between mb-2">
-                                <span>Tổng tiền</span>
-                                <span>{totalAmount.toLocaleString()} đ</span>
+                                <span className='dark:text-white'>Tổng tiền</span>
+                                <span className='dark:text-white'>{totalAmount.toLocaleString()} đ</span>
                             </div>
                             {/* <div className="flex justify-between mb-2">
                             <span>Khuyến mãi</span>
                             <span>{disscount.toLocaleString()} đ</span>
                         </div> */}
                             <div className="flex justify-between mb-2">
-                                <span>Số điểm tích lũy</span>
-                                <span>{loyaltyPoints.toLocaleString()} điểm</span>
+                                <span className='dark:text-white'>Số điểm tích lũy</span>
+                                <span className='dark:text-white'>{loyaltyPoints.toLocaleString()} điểm</span>
                             </div>
                             <div className="flex justify-between font-bold text-lg">
-                                <span>Tổng thanh toán</span>
-                                <span className='text-2xl text-price'>{(totalAmount).toLocaleString()} đ</span>
+                                <span className='dark:text-white'>Tổng thanh toán</span>
+                                <span className='dark:text-white text-2xl text-price'>{(totalAmount).toLocaleString()} đ</span>
                             </div>
                         </div>
 

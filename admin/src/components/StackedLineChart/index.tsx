@@ -22,30 +22,39 @@ ChartJS.register(
   Legend
 );
 
-const StackedLineChart: React.FC = () => {
-  const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    datasets: [
+// Define a type for the data items
+type DataItem = {
+  month: string;
+  successful: number;
+  cancelled: number;
+  total: number;
+};
 
+const StackedLineChart: React.FC<{ dataO: DataItem[] }> = ({ dataO }) => {
+
+  console.log(dataO);
+  const data = {
+    labels: dataO.map((item: DataItem) => item.month),
+    datasets: [
       {
-        label: 'My Second dataset',
-        data: [28, 48, 40, 19, 86, 27, 90],
+        label: 'Thành công',
+        data: dataO.map(item => item.successful),
         backgroundColor: 'rgba(54, 162, 235, 0.5)',
         borderColor: 'rgba(54, 162, 235, 1)',
         fill: true,
       },
       {
-        label: 'My Third dataset',
-        data: [18, 48, 77, 9, 100, 27, 40],
-        backgroundColor: '#7B61FF',
+        label: 'Đã hủy',
+        data: dataO.map(item => item.cancelled),
+        backgroundColor: 'rgba(123, 97, 255, 0.5)',
         borderColor: '#7B61FF',
         fill: true,
       },
       {
-        label: 'My Fourth dataset',
-        data: [40, 20, 30, 40, 30, 90, 100],
-        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-        borderColor: 'rgba(255, 206, 86, 1)',
+        label: 'Tổng',
+        data: dataO.map(item => item.total),
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgba(255, 99, 132, 1)',
         fill: true,
       },
     ],
@@ -59,7 +68,7 @@ const StackedLineChart: React.FC = () => {
       },
       title: {
         display: false,
-        text: 'Chart.js Line Chart - stacked=true',
+        text: 'Biểu đồ đường - stacked=true',
       },
     },
     scales: {

@@ -46,8 +46,8 @@ const [loading, setLoading] = useState(false);
 
             toast.success(response.data.message); // Show success message
 
-            Cookies.set('user_id', String(response.data.user_id), { expires: 7 }); // Set user_id in cookie for 7 days
-            dispatch(setUserId(response.data.user_id)); // Dispatch action to set user ID in Redux
+            Cookies.set('user_id', String(response.data.user.id), { expires: 7 }); // Set user_id in cookie for 7 days
+            dispatch(setUserId(response.data.user.id)); // Dispatch action to set user ID in Redux
             window.location.href = '/';
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại! Vui lòng thử lại.'; // Get error message from response
@@ -105,7 +105,7 @@ const [loading, setLoading] = useState(false);
                                             name="email" // Change name to email
                                             placeholder="Email" // Change placeholder to Email
 
-                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full px-2 rounded-lg"
 
                                         />
 
@@ -129,7 +129,7 @@ const [loading, setLoading] = useState(false);
                                             name="password"
 
                                             placeholder="Mật khẩu"
-                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full px-2 rounded-lg"
                                         />
 
                                         <ErrorMessage

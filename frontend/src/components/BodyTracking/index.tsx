@@ -48,11 +48,11 @@ function BodyTracking() {
 
             <div className='w-full h-[400px] flex lg:flex-row flex-col gap-10 lg:mt-10'>
                 <div className='lg:w-1/3 w-full flex flex-col justify-center'>
-                    <div className='text-4xl font-semibold mb-4'>Tra cứu đơn hàng</div>
+                    <div className='text-4xl font-semibold mb-4 dark:text-white'>Tra cứu đơn hàng</div>
                     <div>
                         <form onSubmit={handleTracking}>
                             <div className='mb-2'>
-                                <label htmlFor="trackingCode" className='text-xl mb-2'>Mã đơn hàng</label>
+                                <label htmlFor="trackingCode" className='text-xl mb-2 dark:text-white'>Mã đơn hàng</label>
                                 <Input 
                                     id="trackingCode" 
                                     placeholder='Nhập mã đơn hàng' 

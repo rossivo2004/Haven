@@ -49,17 +49,17 @@ export const OrderSession: React.FC = () => {
         }
     };
 
+    const fetchOrder = async () => {
+
+        const response = await axios.get(`${apiConfig.order.showOrderUser}${userId}`);
+
+        setOrder(response.data); // Update order state with fetched data
+
+    };
     useEffect(() => {
 
         // Fetch order data for the user
 
-        const fetchOrder = async () => {
-
-            const response = await axios.get(`${apiConfig.order.showOrderUser}${userId}`);
-
-            setOrder(response.data); // Update order state with fetched data
-
-        };
 
         fetchOrder(); // Call the fetch function
 
@@ -80,6 +80,7 @@ export const OrderSession: React.FC = () => {
                                 return; // Dừng thực hiện nếu có lỗi
                             }
                             toast.success("Hủy đơn thành công"); // Sửa thông báo thành công
+                            fetchOrder()
                         } catch (error) {
                             toast.error("Lỗi khi hủy đơn hàng"); // Cập nhật thông báo lỗi
                         }
@@ -107,11 +108,11 @@ export const OrderSession: React.FC = () => {
                 <TableBody>
                     {order.map((item, index) => (
                         <TableRow key={index}>
-                            <TableCell>{item.invoice_code}</TableCell>
-                            <TableCell>{new Date(item.updated_at).toLocaleDateString('en-GB')}</TableCell>
-                            <TableCell><div className='flex justify-center w-full'>{getStatusText(item.status)}</div></TableCell>
+                            <TableCell><div className='dark:text-white'>{item.invoice_code}</div></TableCell>
+                            <TableCell><div className='dark:text-white'>{new Date(item.updated_at).toLocaleDateString('en-GB')}</div></TableCell>
+                            <TableCell><div className='flex justify-center w-full'><div className=''>{getStatusText(item.status)}</div></div></TableCell>
                             <TableCell><div className="flex gap-2">
-                            <div className="cursor-pointer"><CancelIcon onClick={() => cancelOrder(Number(item.id))}/></div>
+                            <div className="cursor-pointer text-red-600"><CancelIcon onClick={() => cancelOrder(Number(item.id))}/></div>
                             <a href={`/trackingorder/${item.invoice_code}`} target="_blank" rel="noopener noreferrer"><InfoIcon /></a>
                                 </div></TableCell>
                         </TableRow>

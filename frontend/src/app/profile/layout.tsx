@@ -27,7 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (isMobile === null) {
-    return <div className='w-full h-screen flex items-center justify-center'><Spinner /></div>; 
+    // return <div className='w-full h-screen flex items-center justify-center'><Spinner /></div>; 
   }
 
   if (isMobile) {

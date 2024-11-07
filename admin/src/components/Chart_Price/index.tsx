@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Chart, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend, BarController } from 'chart.js';
 import axios from 'axios';
 import apiConfig from '@/configs/api';
+import { Spinner } from '@nextui-org/react';
 
 // Register the required Chart.js components
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
@@ -17,9 +18,11 @@ const Chart_Price = () => {
   const [monthsTK, setMonthsTK] = useState<string[]>([]);
   const [revenueTK, setRevenueTK] = useState<number[]>([]);
   const [chartInstance, setChartInstance] = useState<Chart | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchStaticData = async () => {
+      setLoading(true)
       const response = await axios.get(apiConfig.static.getAll);
       const data = response.data.revenue;
 
@@ -28,6 +31,7 @@ const Chart_Price = () => {
       setRevenueTK(data.map((item: StaticDataItem) => parseFloat(item.revenue)));
     };
     fetchStaticData();
+    setLoading(false)
   }, []);
 
   useEffect(() => {
@@ -84,8 +88,12 @@ const Chart_Price = () => {
   }, [monthsTK, revenueTK]); // Depend on monthsTK and revenueTK to re-render when data is available
 
   return <div className=''>
-<div className='text-[18px] font-bold text-[#333333] mb-2'>Doanh thu theo tháng</div>
-<canvas ref={chartRef} />
+    {loading ? <Spinner className="w-full h-full" /> : (
+      <>
+        <div className='text-[18px] font-bold text-[#333333] mb-2'>Doanh thu theo tháng</div>
+        <canvas ref={chartRef} />
+      </>
+    )}
   </div>;
 };
 

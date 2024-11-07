@@ -230,7 +230,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
     return (
         <AppContainer>
-            <div className="flex flex-row text-black sm:text-base text-sm gap-10">
+            <div className="flex flex-row text-black dark:text-white sm:text-base text-sm gap-10">
                 <div className="flex flex-col w-full gap-7">
                     <div className="flex flex-row items-center w-full relative">
                         <div className="absolute top-0 left-0 flex sm:hidden">

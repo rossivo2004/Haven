@@ -24,41 +24,60 @@ class StatisticsController extends Controller
 
     $totalRevenue = $monthlyRevenue->sum('revenue');
 
-    // 2. Sản phẩm bán chạy nhất theo tháng và năm
+
+    return response()->json([
+        'revenue' => $monthlyRevenue,
+        'revenue_total' => $totalRevenue,
+
+    ]);
+}
+
+public function getProductMostLeastStatistics()
+{
+    $currentMonthYear = now()->format('m/Y');
+
     $productsByMonth = OrderDetail::join('orders', 'orders.id', '=', 'order_details.order_id')
-        ->selectRaw('DATE_FORMAT(orders.created_at, "%m/%Y") as month_year, product_variant_id, SUM(order_details.quantity) as total_sold')
+        ->join('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
+        ->selectRaw('DATE_FORMAT(orders.created_at, "%m/%Y") as month_year, product_variants.id as product_variant_id, product_variants.name as product_name, SUM(order_details.quantity) as total_sold')
         ->where('orders.status', 'complete')
-        ->groupBy('month_year', 'product_variant_id')
+        ->whereRaw('DATE_FORMAT(orders.created_at, "%m/%Y") = ?', [$currentMonthYear])
+        ->groupBy('month_year', 'product_variants.id', 'product_variants.name')
         ->orderByRaw('YEAR(orders.created_at), MONTH(orders.created_at)')
         ->get()
         ->groupBy('month_year')
-        ->map(function ($monthData, $monthYear) {
-            // Lấy sản phẩm bán chạy nhất
-            $mostSold = $monthData->sortByDesc('total_sold')->take(10); // Lấy 2 sản phẩm bán chạy nhất
-
-            // Lấy danh sách sản phẩm có lượt bán bằng 0
-            $soldProducts = $monthData->pluck('product_variant_id')->toArray();
-            $allProducts = ProductVariant::all()->pluck('id')->toArray(); // Giả sử bạn có model ProductVariant để lấy tất cả sản phẩm
-            $leastSoldIds = array_diff($allProducts, $soldProducts); // Tìm sản phẩm không bán
-
-            // Lấy sản phẩm không bán
-            $leastSold = collect($leastSoldIds)->map(function ($id) use ($monthYear) {
+        ->map(function ($monthData) {
+            $mostSold = $monthData->sortByDesc('total_sold')->take(10)->map(function ($item) {
                 return [
-                    'month_year' => $monthYear,
-                    'product_variant_id' => $id,
-                    'total_sold' => 0
+                    'month_year' => $item->month_year,
+                    'product_variant_id' => $item->product_variant_id,
+                    'product_name' => $item->product_name,
+                    'total_sold' => $item->total_sold,
                 ];
-            })->take(10)->values(); // Lấy tối đa 10 sản phẩm không bán
+            })->values();
+
+            $soldProducts = $monthData->pluck('product_variant_id')->toArray();
+            $leastSoldIds = array_diff(ProductVariant::all()->pluck('id')->toArray(), $soldProducts);
+
+            $leastSold = ProductVariant::whereIn('id', $leastSoldIds)
+                ->select('id as product_variant_id', 'name as product_name')
+                ->get()
+                ->map(function ($product) use ($monthData) {
+                    return [
+                        'month_year' => $monthData->first()->month_year,
+                        'product_variant_id' => $product->product_variant_id,
+                        'product_name' => $product->product_name,
+                        'total_sold' => 0,
+                    ];
+                })->take(10);
 
             return [
                 'most_sold' => $mostSold,
                 'least_sold' => $leastSold,
             ];
-        });
+        })
+        ->first(); // Get only the current month’s data
 
     return response()->json([
-        'revenue' => $monthlyRevenue,
-        'revenue_total' => $totalRevenue,
         'products_by_month' => $productsByMonth,
     ]);
 }
@@ -200,17 +219,17 @@ public function getRevenueComparison()
     $previousMonth = date('m', strtotime('-1 month'));
     $previousYear = $currentMonth == '01' ? $currentYear - 1 : $currentYear;
 
-// Tính doanh thu cho tháng này
-$currentMonthRevenue = Order::whereYear('created_at', $currentYear)
-->whereMonth('created_at', $currentMonth)
-->where('status', 'complete')
-->sum('total'); // Giả sử bạn có cột 'total' trong bảng 'orders'
+    // Tính doanh thu cho tháng này
+    $currentMonthRevenue = Order::whereYear('created_at', $currentYear)
+        ->whereMonth('created_at', $currentMonth)
+        ->where('status', 'complete')
+        ->sum('total'); // Giả sử bạn có cột 'total' trong bảng 'orders'
 
-// Tính doanh thu cho tháng trước
-$previousMonthRevenue = Order::whereYear('created_at', $previousYear)
-->whereMonth('created_at', $previousMonth)
-->where('status', 'complete')
-->sum('total');
+    // Tính doanh thu cho tháng trước
+    $previousMonthRevenue = Order::whereYear('created_at', $previousYear)
+        ->whereMonth('created_at', $previousMonth)
+        ->where('status', 'complete')
+        ->sum('total');
 
     // Tính phần trăm thay đổi
     $percentageChange = 0;
@@ -228,16 +247,16 @@ $previousMonthRevenue = Order::whereYear('created_at', $previousYear)
         'current_month_revenue' => [
             [
                 'month' => $currentMonthYear,
-                'revenue' => round($currentMonthRevenue, 2)
+                'revenue' => number_format($currentMonthRevenue, 0, '.', '')
             ]
         ],
         'previous_month_revenue' => [
             [
                 'month' => $previousMonthYear,
-                'revenue' => round($previousMonthRevenue, 2)
+                'revenue' => number_format($previousMonthRevenue, 0, '.', '')
             ]
         ],
-        'percentage_change' => round($percentageChange, 2),
+        'percentage_change' => number_format($percentageChange, 2),
     ]);
 }
 

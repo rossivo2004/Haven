@@ -422,9 +422,8 @@ const fetchUpdatedCart = async (userId: string) => {
 
             <div className='flex gap-10 lg:flex-row flex-col-reverse mb-20'>
                 <div className='lg:w-1/2 w-full'>
-                    <div className='lg:text-3xl text-2xl font-bold mb-4'>{product?.name}</div>
-                    <div className="flex items-center mb-4">
-                        {/* Ratings section */}
+                    <div className='lg:text-3xl text-2xl font-bold mb-4 dark:text-white'>{product?.name}</div>
+                    {/* <div className="flex items-center mb-4">
                         {[...Array(4)].map((_, i) => (
                             <svg key={i} className="w-4 h-4 text-yellow-300 me-1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                                 <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
@@ -436,9 +435,9 @@ const fetchUpdatedCart = async (userId: string) => {
                         <p className="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">4.95</p>
                         <p className="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">out of</p>
                         <p className="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400">5</p>
-                    </div>
+                    </div> */}
 
-                    <div className='lg:text-base text-[13px] font-normal mb-4'>Tình trạng: <span className='text-red-600 font-bold'>{product && product.stock !== undefined && product.stock > 0 ? 'còn hàng' : 'hết hàng'}
+                    <div className='lg:text-base text-[13px] font-normal mb-4 dark:text-white'>Tình trạng: <span className='text-red-600 font-bold'>{product && product.stock !== undefined && product.stock > 0 ? 'còn hàng' : 'hết hàng'}
                     </span></div>
 
                     <div className='flex gap-5 items-center mb-4'>
@@ -448,7 +447,7 @@ const fetchUpdatedCart = async (userId: string) => {
                         <div className='flex flex-col font-normal text-base'>
                             {product?.discount !== undefined && product.discount > 0 ? (
                                 <div>
-                                    <div className='line-through'>{product?.price.toLocaleString('vi-VN')} đ</div>
+                                    <div className='line-through dark:text-white'>{product?.price.toLocaleString('vi-VN')} đ</div>
                                     <div className='text-price'>
                                         Khuyến mãi <span>{product.discount}%</span>
                                     </div>
@@ -481,14 +480,14 @@ const fetchUpdatedCart = async (userId: string) => {
                     <div className='flex gap-2 mb-4'>
                         {variantsPr?.map((item) => (
                             <a href={`/product/${item.id}`} key={item.id}>
-                                <div className={`p-1 border font-medium border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main text-white border-main' : ''}`}>
+                                <div className={`p-1 border font-medium dark:text-white border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main dark:text-white text-white border-main' : ''}`}>
                                     {item.name}
                                 </div>
                             </a>
                         ))}
                     </div>
 
-                    <div className='font-normal text-sm mb-5'>
+                    <div className='font-normal text-sm mb-5 dark:text-white'>
                         {product?.product?.description}
                     </div>
 
@@ -497,16 +496,16 @@ const fetchUpdatedCart = async (userId: string) => {
 
                         <div className="flex gap-2">
                             <Link href={`/shop?category%5B%5D=${product?.product?.category?.name}`}>
-                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.category?.name}</span>
+                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400 dark:text-white">{product?.product?.category?.name}</span>
                             </Link>
                             <Link href={`/  shop?category%5B%5D=${product?.product?.brand?.name}`}>
-                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400">{product?.product?.brand?.name}</span>
+                                <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400 dark:text-white">{product?.product?.brand?.name}</span>
                             </Link>
                         </div>
 
                         <div className="flex items-center gap-7 text-black py-5">
-                            <span className="text-base sm:text-xl font-semibold">Số lượng</span>
-                            <div className="flex items-center border border-gray-300">
+                            <span className="text-base sm:text-xl font-semibold dark:text-white">Số lượng</span>
+                            <div className="flex items-center border border-gray-300 dark:text-white !bg-transparent">
                                 <button className="p-2" onClick={() => handleQuantityChange(quantity - 1)}>-</button>
                                 <Divider orientation="vertical" />
                                 <input
@@ -551,65 +550,10 @@ const fetchUpdatedCart = async (userId: string) => {
             </div>
 
             <div className='mb-10'>
-                <div className="w-full">
-                    {/* Tab Links */}
-                    <div className="flex border-b border-gray-300 mb-4 lg:border-b-0 lg:text-xl text-lg">
-                        {['Mô Tả', 'Giới Thiệu', 'Nhận Xét Sản Phẩm'].map((tab, index) => (
-                            <button
-                                key={index}
-                                className={`flex-1 py-2 text-center lg:border-b-2 lg:border-transparent ${activeTab === index && isMobile ? 'border-b-2 border-black' : ''
-                                    }`}
-                                onClick={() => handleTabClick(index)}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Tab Content Sections */}
-                    <div className="block lg:hidden">
-                        {/* Show only active tab content on mobile */}
-                        {activeTab === 0 && <div className="content-section font-bold text-3xl">
-                            <div className='text-center font-boldtext-4xl mb-4'>
-                                Content of Giới Thiệu
+                            <div className='font-bold text-2xl dark:text-white'>Mô tả sản phẩm</div>
+                            <div className='dark:text-white'>
+                                {product?.product?.description}
                             </div>
-                            <div>
-                                <div className='font-bold text-2xl'>Thông tin sản phẩm</div>
-                                <div className='font-normal text-base'>
-                                    <div>Thương hiệu: TRUST FARM, GREEN CATTLE, SEAFOOD KINGDOM, YUMPO, JINSHIM ABALONE KOREA </div>
-                                </div>
-                            </div>
-                        </div>}
-                        {activeTab === 1 && <div className="content-section text-center font-bold text-3xl">Content of Giới Thiệu</div>}
-                        {activeTab === 2 && <div className="content-section text-center font-bold text-3xl">Content of Nhận Xét Sản Phẩm</div>}
-                    </div>
-
-                    {/* Content Sections - Always visible on Desktop */}
-                    <div className="hidden lg:block">
-                        <div id="section-0" className="content-section py-5 mb-10">
-                            <div className='text-center font-bold lg:text-4xl mb-4'>
-                                Content of Mô Tả
-                            </div>
-                        </div>
-                        <div id="section-1" className="content-section py-5 mb-10">
-
-                            <div className='text-center font-bold lg:text-4xl mb-4'>
-                                Content of Giới Thiệu
-                            </div>
-                            <div>
-                                <div className='font-bold text-2xl'>Thông tin sản phẩm</div>
-                                <div className='font-normal text-base'>
-                                    <div>Thương hiệu: TRUST FARM, GREEN CATTLE, SEAFOOD KINGDOM, YUMPO, JINSHIM ABALONE KOREA </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="section-2" className="content-section py-5">
-                            <div className='text-center font-bold lg:text-4xl mb-4'>
-                                Content of Nhận Xét Sản Phẩm
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* <div className='mb-10'>
@@ -628,7 +572,7 @@ const fetchUpdatedCart = async (userId: string) => {
 
             <div>
                 <div className="flex items-center mb-4">
-                    <span className="font-bold text-2xl">Đã Xem Gần Đây</span>
+                    <span className="font-bold text-2xl dark:text-white">Đã Xem Gần Đây</span>
                     <div className="flex-grow border-t border-black ml-4" />
                 </div>
                 <div>

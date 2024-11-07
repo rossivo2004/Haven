@@ -129,6 +129,7 @@ const apiConfig = {
     getOrder: `${baseUrl}/api/statics/order`,
     getUser: `${baseUrl}/api/statics/user`,
     getComparison: `${baseUrl}/api/statics/comparison`,
+    getMostLeast: `${baseUrl}/api/statics/mostleast`,
   }
 };
 
