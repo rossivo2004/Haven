@@ -19,6 +19,9 @@ const apiConfig = {
     // Show sản phẩm biến thể theo id
     getproductvariantsbyid: `${baseUrl}/api/productvariant/show/`,
 
+    //Shaw sản phẩm tương tự
+    // /getRelatedVariants/{productVariant
+    getRelatedVariants: `${baseUrl}/api/productvariant/getRelatedVariants/`,
   },
   categories: {
     getAll: `${baseUrl}/api/category/`,

@@ -11,7 +11,7 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import { siteConfig } from "@/src/config/site";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay } from 'swiper/modules';
-import { Tabs, Tab, Button } from "@nextui-org/react";
+import { Tabs, Tab, Button, Spinner } from "@nextui-org/react";
 
 import { title, subtitle } from "@/src/components/primitives";
 import { GithubIcon } from "@/src/components/icons";
@@ -43,6 +43,7 @@ import apiConfig from '@/src/config/api';
 
 import { Category, Variant } from "@/src/interface";
 import axios from "axios";
+import Loading from "../ui/Loading";
 
 
 
@@ -80,11 +81,14 @@ function BodyHome() {
 
     const fetchFlashSaleProducts = async (flashSaleId: number) => {
         try {
+            setLoading(true);
             const response = await axios.get(`${apiConfig.flashsale.getShowProductFlashsale}${flashSaleId}`);
             return response.data.FlashsaleProducts.data; // Adjust based on the actual response structure
         } catch (error) {
             console.error("Error fetching flash sale products:", error);
             return [];
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -253,56 +257,59 @@ function BodyHome() {
                     >
                         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
                             <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
-                            <div className="flex items-center">
-                                <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
-                                <div>
-                                    <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 15 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                                Day
+                            {productDataSale.length > 0 && (
+                                <div className="flex items-center">
+                                    <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
+                                    <div>
+                                        <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 15 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Day
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 10 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                                Hour
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 10 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Hour
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 24 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                                Minute
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 24 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Minute
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={customStyle}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                                Minute
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={customStyle}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Minute
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </motion.div>
-                    <div className="max-w-screen-xl mx-auto px-4 mb-14">
-                        <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                            {productDataSale.slice(0, 8).map((product) => (
-                                <BoxProductFlashSale key={product.id} product={product} />
-                            ))}
-                            {/* {flatProducts.slice(0, 8).map((product) => (
-                                <BoxProductFlashSale key={product.id} product={product} />
-                            ))} */}
-                        </div>
+                    <div className="max-w-screen-xl mx-auto px-20 mb-14 relative h-auto">
+                        {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : productDataSale.length > 0 ? (
+                            <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
+                                {productDataSale.slice(0, 8).map((product) => (
+                                    <BoxProductFlashSale key={product.id} product={product} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center py-4">Hiện tại không có sản phẩm khuyến mãi</div> // Display message when there are no flash sale products
+                        )}
                     </div>
                 </motion.div>
 
@@ -332,7 +339,7 @@ function BodyHome() {
                                 },
                             }}
                         >
-                            {category.map((item, index) => (
+                            {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : category.map((item, index) => (
                                 <SwiperSlide key={index}>
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.8 }} // Bắt đầu nhỏ hơn
@@ -385,13 +392,13 @@ function BodyHome() {
                                 <div className="flex w-full flex-col items-center lg:items-end">
                                     <div className="font-bold lg:text-4xl text-2xl lg:hidden">Sản Phẩm Nổi Bật</div>
                                     <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full pt-[64px]">
-                                            {productData
-              .sort((a, b) => (b.views || 0) - (a.views || 0)) // Sort by views in descending order, using 0 as fallback
-              .slice(0, 6) 
-                .map((product) => (
-                    <BoxProduct key={product.id} product={product} />
-                ))}
-                                            </div>
+                                        {loading ? <div className="w-full h-[800px] flex items-center justify-center col-span-3"><Spinner /></div> : productData
+                                            .sort((a, b) => (b.views || 0) - (a.views || 0)) // Sort by views in descending order, using 0 as fallback
+                                            .slice(0, 6)
+                                            .map((product) => (
+                                                <BoxProduct key={product.id} product={product} />
+                                            ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -466,11 +473,11 @@ function BodyHome() {
                                 <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                             </div>
                             {productData
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by created_at
-    .slice(0, 6) // Get the first 6 products
-    .map((product) => (
-        <BoxProduct key={product.id} product={product} />
-    ))}
+                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by created_at
+                                .slice(0, 6) // Get the first 6 products
+                                .map((product) => (
+                                    <BoxProduct key={product.id} product={product} />
+                                ))}
                         </div>
 
 
@@ -517,7 +524,7 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between mb-6 items-center">
-                            <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hàng Đầu Thế Giới</div>
+                            <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hng Đầu Thế Giới</div>
                             <div className="font-medium text-sm text-main">Xem thêm</div>
                         </div>
                         <div>

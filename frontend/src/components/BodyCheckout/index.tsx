@@ -210,6 +210,20 @@ function BodyCheckout() {
     }, [userId]);
 
 
+    const [userName, setUserName] = useState<string | undefined>(user?.name);
+    const [userPhone, setUserPhone] = useState<string | undefined>(user?.phone);
+    const [userEmail, setUserEmail] = useState<string | undefined>(user?.email);
+    const [userAddress, setUserAddress] = useState<string | undefined>(user?.address);
+
+    useEffect(() => {
+        if (user) {
+            setUserName(user.name);
+            setUserPhone(user.phone);
+            setUserEmail(user.email);
+            setUserAddress(user.address);
+        }
+    }, [user]);
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission behavior
 
@@ -229,14 +243,14 @@ function BodyCheckout() {
             user_id: userId, // User ID from cookies
             product_variant_id: checkoutItemsId, // Assuming this is an array of IDs
             invoice_code: `HAVEN-${Date.now()}`, // Generate a unique invoice code
-            full_name: (document.getElementById('full-name') as HTMLInputElement).value,
-            phone: (document.getElementById('phone-user') as HTMLInputElement).value,
-            email: (document.getElementById('email-user') as HTMLInputElement).value,
+            full_name: userName, // Use state instead of directly from user
+            phone: userPhone, // Use state instead of directly from user
+            email: userEmail, // Use state instead of directly from user
             total: totalAmount, // Total amount
             province: provinceName,
             district: districtName,
             ward: wardName,
-            address: (document.getElementById('address') as HTMLTextAreaElement).value,
+            address: userAddress, // Use state instead of directly from user
             payment_transpot: shipMethod,
             payment_method: payMethod,
         };
@@ -334,16 +348,16 @@ function BodyCheckout() {
                             <div className='flex flex-col gap-5 dark:text-white'>
                                 <div>
                                     <label htmlFor="full-name">Họ và tên người nhận</label>
-                                    <Input required id='full-name' size='lg' value={user?.name} variant='bordered' placeholder='Họ và tên người nhận' />
+                                    <Input required id='full-name' size='lg' value={userName} variant='bordered' placeholder='Họ và tên người nhận' onChange={(e) => setUserName(e.target.value)} />
                                 </div>
                                 <div className='flex gap-5'>
                                     <div className='w-1/2'>
                                         <label htmlFor="phone-user">Số điện thoại</label>
-                                        <Input required id='phone-user' size='lg' variant='bordered' placeholder='Số điện thoại' value={user?.phone} />
+                                        <Input required id='phone-user' size='lg' variant='bordered' placeholder='Số điện thoại' value={userPhone} onChange={(e) => setUserPhone(e.target.value)} />
                                     </div>
                                     <div className='flex-1'>
                                         <label htmlFor="email-user">Email</label>
-                                        <Input required id='email-user' size='lg' variant='bordered' placeholder='Email' value={user?.email} />
+                                        <Input required id='email-user' size='lg' variant='bordered' placeholder='Email' value={userEmail} onChange={(e) => setUserEmail(e.target.value)} />
                                     </div>
                                 </div>
 
@@ -421,10 +435,10 @@ function BodyCheckout() {
 
                                 <div>
                                     <label htmlFor="addresss">Địa chỉ nhận hàng</label>
-                                    <Textarea value={user?.address} required id='address' disableAutosize disableAnimation classNames={{
+                                    <Textarea value={userAddress} required id='address' disableAutosize disableAnimation classNames={{
                                         base: "",
                                         input: "resize-y min-h-[40px]",
-                                    }} placeholder='Địa chỉ chi tiết' variant='bordered' />
+                                    }} placeholder='Địa chỉ chi tiết' variant='bordered' onChange={(e) => setUserAddress(e.target.value)} />
                                 </div>
 
                                 {/* Shipping method */}

@@ -27,27 +27,7 @@ function BoxProduct({ product }: { product: Variant }) {
         return Math.min(discounted, flashSale).toLocaleString('vi-VN');
     };
 
-
-    // console.log(product.product?.category.tag);
-    const handleLanguageChange = (e: any) => {
-        const selectedLang = e.target.value;
-
-        // Lấy phần còn lại của URL
-        const currentPath = window.location.pathname.replace(/^\/vi|\/en/, '');
-
-        // Điều hướng đến URL tương ứng
-        if (selectedLang === 'vi') {
-            router.push(`/vi${currentPath}`);
-        } else {
-            router.push(`/en${currentPath}`);
-        }
-    };
-
-    // useEffect(() => {
-    //     const currentLang = window.location.pathname.startsWith('/vi') ? 'vi' : 'en';
-    //     setLanguage(currentLang);
-    // }, []);
-
+    console.log(product);
 
     return (
         <Link href={`   /product/${id}`} >

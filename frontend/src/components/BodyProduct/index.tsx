@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from "next/navigation";
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -77,9 +77,11 @@ function BodyProduct() {
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [priceDiscount, setPriceDiscount] = useState(0);
     const [variantsPr, setVariantsPr] = useState<Variant[]>([]);
+    const [variantsRelated, setVariantsRelated] = useState<Variant[]>([]);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
     const [isFavorited, setIsFavorited] = useState<boolean>(false);
+    const [mainPrice, setMainPrice] = useState<number | null>(null);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
@@ -91,7 +93,14 @@ function BodyProduct() {
         }
     };
 
-    // ... existing code ...
+    useEffect(() => {
+        const fetchRelatedVariants = async () => {
+            const response = await axios.get(`${apiConfig.products.getRelatedVariants}${id}`);
+            setVariantsRelated(response.data.relatedVariants);
+        };
+        fetchRelatedVariants();
+    }, [id]);
+
 
     useEffect(() => {
         const fetchProductFavourite = async () => {
@@ -190,6 +199,16 @@ function BodyProduct() {
         return Math.min(discounted, flashSale).toLocaleString('vi-VN');
     };
 
+    useEffect(() => {
+        if (product) {
+            const flashSaleStock = product.flash_sales[0].pivot.stock; // Assuming flash_sales is an array
+            if (flashSaleStock === 0) {
+                setMainPrice(product.DiscountedPrice ?? null); // Set to DiscountedPrice or null if undefined
+            } else {
+                setMainPrice(product.FlashSalePrice ?? null); // Set to the regular price or null if undefined
+            }
+        }
+    }, [product]);
 
 
 
@@ -284,6 +303,7 @@ const handleAddToCart = async () => {
                     Discount: product?.discount,
                     FlashSalePrice: product?.FlashSalePrice,
                     DiscountedPrice: product?.DiscountedPrice,
+                    priceMain: mainPrice
                 }
             });
 
@@ -442,7 +462,7 @@ const fetchUpdatedCart = async (userId: string) => {
 
                     <div className='flex gap-5 items-center mb-4'>
                         <div className='font-bold text-3xl text-price'>
-                            {getLowerPrice(product?.DiscountedPrice?.toString(), product?.FlashSalePrice?.toString())} đ
+                            {mainPrice?.toLocaleString('vi-VN')} đ
                         </div>
                         <div className='flex flex-col font-normal text-base'>
                             {product?.discount !== undefined && product.discount > 0 ? (
@@ -572,14 +592,14 @@ const fetchUpdatedCart = async (userId: string) => {
 
             <div>
                 <div className="flex items-center mb-4">
-                    <span className="font-bold text-2xl dark:text-white">Đã Xem Gần Đây</span>
+                    <span className="font-bold text-2xl dark:text-white">Sản phẩm tương tự</span>
                     <div className="flex-grow border-t border-black ml-4" />
                 </div>
                 <div>
-                    <div>
-                        {/* <  {DUMP_PRODUCTS.slice(0, 4).map((product) => (
+                    <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
+                        {variantsRelated.map((product) => (
                             <BoxProduct key={product.id} product={product} />
-                        ))}> */}
+                        ))}
                         {/* <RecentlyViewed /> */}
 
                     </div>

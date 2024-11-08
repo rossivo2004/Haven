@@ -143,21 +143,45 @@ const Body_Cart = () => {
         setLoading(false);
     }
 
-    useEffect(() => {
-        // Calculate total amount and loyalty points whenever cart changes
-        const calculateTotals = () => {
-            const total = cart.reduce((acc, item) => {
-                if (item.product_variant.id !== undefined && selectedItems.has(item.product_variant.id)) { // Ensure item.id is defined
-                    return acc + (Math.min(item.product_variant.DiscountedPrice ?? 0, item.product_variant.FlashSalePrice ?? 0) * (item.quantity || 0)); // Ensure quantity is a number
-                }
-                return acc; // Ensure to return acc when item is not selected
-            }, 0);
-            setTotalAmount(total);
-            setLoyaltyPoints(total * 0.01); // 1% of total amount as loyalty points
-        };
 
-        calculateTotals();
-    }, [cart, selectedItems]); 
+
+    if (userId) {
+        useEffect(() => {
+            // Calculate total amount and loyalty points whenever cart changes
+            const calculateTotals = () => {
+                const total = cart.reduce((acc, item) => {
+                    const isFlashSale = Array.isArray(item.product_variant.flash_sales) && item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0; // Check if flash sale is active and stock is available
+                    const price = isFlashSale
+                        ? Math.min(item.product_variant.DiscountedPrice ?? 0, item.product_variant.FlashSalePrice ?? 0)
+                        : item.product_variant.DiscountedPrice ?? item.product_variant.priceMain ?? 0; // Fallback to 0 if price is undefined
+
+                    if (item.product_variant.id !== undefined && selectedItems.has(item.product_variant.id)) {
+                        return acc + (price * (item.quantity || 0)); // Ensure quantity is a number
+                    }
+                    return acc; // Ensure to return acc when item is not selected
+                }, 0);
+                setTotalAmount(total);
+                setLoyaltyPoints(total * 0.01); // 1% of total amount as loyalty points
+            };
+
+            calculateTotals();
+        }, [cart, selectedItems]);
+    } else {
+        useEffect(() => {
+            // Calculate total amount and loyalty points whenever cart changes
+            const calculateTotals = () => {
+                const total = cart.reduce((acc, item) => {
+                    if (item.product_variant.id !== undefined && selectedItems.has(item.product_variant.id) && item.product_variant.priceMain !== undefined) { // Ensure item.id and priceMain are defined
+                        return acc + (item.product_variant.priceMain * (item.quantity || 0)); // Ensure quantity is a number
+                    }
+                    return acc; // Ensure to return acc when item is not selected
+                }, 0);
+                setTotalAmount(total);
+                setLoyaltyPoints(total * 0.01); // 1% of total amount as loyalty points
+            };
+            calculateTotals();
+        }, [cart, selectedItems]);
+    }
 
     console.log(totalAmount, loyaltyPoints);
 
@@ -197,72 +221,80 @@ const Body_Cart = () => {
             <h1 className="text-4xl font-bold mb-6 text-center dark:text-white">Giỏ Hàng</h1>
 
             <Checkbox
-    isSelected={cart.length > 0 && cart.length === selectedItems.size} // Check if all items are selected
-    onChange={handleSelectAllChange} // Handle select all change
-    className='pl-42 mb-4'
->
-    Chọn tất cả
-</Checkbox>
+                isSelected={cart.length > 0 && cart.length === selectedItems.size} // Check if all items are selected
+                onChange={handleSelectAllChange} // Handle select all change
+                className='pl-42 mb-4'
+            >
+                Chọn tất cả
+            </Checkbox>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 <div className="lg:col-span-2">
-                {loading ? <div className='w-full h-[400px] flex items-center justify-center relative'><Loading /></div> : (
+                    {loading ? <div className='w-full h-[400px] flex items-center justify-center relative'><Loading /></div> : (
                         cart.length > 0 ? (
                             cart.map((item: any) => (
                                 <div className="bg-white dark:bg-transparent" key={item.product_variant.id} >
-                                <div className="flex justify-between items-center border-b pb-4 mb-4">
-                                    <div className="flex items-center">
-                                        <Checkbox
-                                            isSelected={selectedItems.has(item.product_variant.id)} // Check if item is selected
-                                            onChange={() => handleSelectItem(item.product_variant.id)} // Handle selection change
-                                            className="mr-4"
-                                        />
-                                        <img src={item.product_variant.image} alt={'âffff'} className="w-24 h-24 mr-4 rounded" />
-                                        <div>
-                                            <p className="text-xl font-semibold dark:text-white">{item.product_variant.name}</p>
-                                            {/* <p className="text-sm text-gray-600">fssdf</p> */}
-                                            <div className="flex items-center mt-2 dark:text-white">
-                                                <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded">-</button>
-                                                <span className="px-4">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item, item.quantity + 1)} className="px-3 py-1 border rounded">+</button>
+                                    <div className="flex justify-between items-center border-b pb-4 mb-4">
+                                        <div className="flex items-center">
+                                            <Checkbox
+                                                isSelected={selectedItems.has(item.product_variant.id)} // Check if item is selected
+                                                onChange={() => handleSelectItem(item.product_variant.id)} // Handle selection change
+                                                className="mr-4"
+                                            />
+                                            <img src={item.product_variant.image} alt={'âffff'} className="w-24 h-24 mr-4 rounded" />
+                                            <div>
+                                                <p className="text-xl font-semibold dark:text-white">{item.product_variant.name}</p>
+                                                {/* <p className="text-sm text-gray-600">fssdf</p> */}
+                                                <div className="flex items-center mt-2 dark:text-white">
+                                                    <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded">-</button>
+                                                    <span className="px-4">{item.quantity}</span>
+                                                    <button onClick={() => updateQuantity(item, item.quantity + 1)} className="px-3 py-1 border rounded">+</button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="text-right flex gap-2">
-                                        <div>
-                                            <span className="text-gray-500 text-sm">
-                                                {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} đ
-                                            </span>
-                                            <div className='text-2xl text-price font-bold'>
-                                                {((Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice)) * item.quantity).toLocaleString('vi-VN')} đ
+                                        <div className="text-right flex gap-2">
+                                            <div>
+                                                <span className="text-gray-500 text-sm">
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales[0].pivot.stock > 0
+                                                            ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')
+                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : item.product_variant.priceMain.toLocaleString('vi-VN')} đ
+                                                </span>
+                                                <div className='text-2xl text-price font-bold'>
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales[0].pivot.stock > 0
+                                                            ? (Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice) * item.quantity).toLocaleString('vi-VN')
+                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : (item.product_variant.priceMain * item.quantity).toLocaleString('vi-VN')} đ
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className='flex items-center justify-end' >
-                                            <CloseIcon onClick={() => deleteItem(item)} className='hover:text-red-600 dark:text-white cursor-pointer' />
+                                            <div className='flex items-center justify-end' >
+                                                <CloseIcon onClick={() => deleteItem(item)} className='hover:text-red-600 dark:text-white cursor-pointer' />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             )) // Ensure this closing parenthesis is correctly placed
                         ) : (
-                        <div className='w-full h-[400px] flex flex-col items-center justify-center text-xl'>
-                            <div className='mb-4'>
-                                <img src="/images/cartnot.png" alt="" className='w-[220px] object-cover' />
+                            <div className='w-full h-[400px] flex flex-col items-center justify-center text-xl'>
+                                <div className='mb-4'>
+                                    <img src="/images/cartnot.png" alt="" className='w-[220px] object-cover' />
+                                </div>
+                                <div className='text-4xl font-medium mb-4 dark:text-white'>Chưa có sản phẩm nào trong giỏ hàng</div>
+                                <div>
+                                    <Link href={'/shop'}>
+                                        <button className='bg-main p-2 rounded-lg text-white'>Quay trở lại cửa hàng</button>
+                                    </Link>
+                                </div>
                             </div>
-                            <div className='text-4xl font-medium mb-4 dark:text-white'>Chưa có sản phẩm nào trong giỏ hàng</div>
-                            <div>
-                                <Link href={'/shop'}>
-                                    <button className='bg-main p-2 rounded-lg text-white'>Quay trở lại cửa hàng</button>
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
 
 
 
-<div className='flex justify-between items-center'>
-    {/* <div>
+                    <div className='flex justify-between items-center'>
+                        {/* <div>
         <div className="flex justify-end">
             {selectedItems.size > 0 && ( // Only show if there are selected items
                 <div className="text-red-600 cursor-pointer">
@@ -272,12 +304,12 @@ const Body_Cart = () => {
             )}
         </div>
     </div> */}
-    {/* {cart.length > 0 ? (
+                        {/* {cart.length > 0 ? (
         <div className="text-right font-semibold">
             Tổng Khối Lượng Giỏ Hàng: <span className="text-black">0.5Kg</span>
         </div>
     ) : null} */}
-</div>
+                    </div>
                 </div>
 
                 <div className='relative top-0'>
@@ -318,9 +350,9 @@ const Body_Cart = () => {
                         </div>
 
                         {selectedItems.size > 0 ? (
-                           <Link href={'/checkout'} onClick={handleCheckout}> 
-                           <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
-                       </Link>
+                            <Link href={'/checkout'} onClick={handleCheckout}>
+                                <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
+                            </Link>
                         ) : (
                             <div className="w-full text-center">
                                 <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm <br /> để thanh toán</p>

@@ -235,7 +235,7 @@ function BodyShop() {
                                     onChange={handlePriceRangeChange}
                                     valueLabelDisplay="auto"
                                     min={0}
-                                    max={500000}
+                                    max={1000000}
                                     step={10000}
                                 />
                                 <div className="flex justify-between mb-2 dark:text-white">
@@ -268,7 +268,10 @@ function BodyShop() {
                                                 <DropdownMenu variant="faded" aria-label="More Filters" className='dark:text-white'>
                                                     {[...Array.from(new Set([...priceFilter, ...filter]))].map((filterItem) => (
                                                         <DropdownItem key={filterItem} onClick={() => handleChipClose(filterItem)}>
-                                                            {filterItem} <CloseIcon fontSize="small" />
+                                                          <div className="flex justify-between">
+                                                          <div>{filterItem}</div>
+                                                          <div> <CloseIcon fontSize="small" /></div>
+                                                          </div>
                                                         </DropdownItem>
                                                     ))}
                                                 </DropdownMenu>

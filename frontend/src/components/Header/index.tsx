@@ -52,6 +52,7 @@ const menuItems = [
 ];
 
 function Header({ params }: { params: { lang: string } }) {
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
     const dispatch = useDispatch();
     const router = useRouter();
     const [userData, setUserData] = useState<any>(null);
@@ -314,7 +315,6 @@ function Header({ params }: { params: { lang: string } }) {
 
 
 
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
     useEffect(() => {
         if (userId) { // {{ edit_1 }}
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
@@ -552,7 +552,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                            {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} VND
+                                                                            {userId ? (
+                                                                                item.product_variant.flash_sales.length > 0
+                                                                                    ? item.product_variant.flash_sales[0].pivot.stock > 0 
+                                                                                        ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
+                                                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
+                                                                                    : item.product_variant.priceMain?.toLocaleString('vi-VN')
+                                                                            ) : item.product_variant.priceMain?.toLocaleString('vi-VN')} VND
                                                                         </div>
 
                                                                     </div>

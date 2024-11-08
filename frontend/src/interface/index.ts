@@ -244,6 +244,22 @@ export interface CartItem {
     FlashSalePrice?: number; // Optional flash sale price
     DiscountedPrice?: number; // Optional discounted price
     id?: number; // Optional ID of the product
+    priceMain?: number; // Optional price of the product
+    flash_sales: {
+      ProductFlashSaleCount: number;
+      StatusFlashSaleStock: string;
+      created_at: string;
+      end_time: string;
+      id: number;
+      pivot: {
+        discount_percent: number;
+        flash_sale_id: number;
+        id: number;
+        product_variant_id: number;
+        sold: number;
+        stock: number;
+      };
+    }[];
   }
 }
 
@@ -344,19 +360,19 @@ export interface OrderTracking {
 // }
 
 export interface User {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  google_id: string | null;
-  facebook_id: string | null;
-  image: string | null;
-  phone: string ;
-  address: string;
-  status: string;
+  id?: number;
+  name?: string;
+  email?: string;
+  password?: string;
+  google_id?: string | null;
+  facebook_id?: string | null;
+  image?: string | null;
+  phone?: string ;
+  address?: string;
+  status?: string;
   point: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   role_id: number;
   role: {
       id: number;
