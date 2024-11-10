@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     // Các trường được phép mass assignment
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id', 'point',
+        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id', 'point', 'province', 'district', 'ward',
     ];
 
     // Các trường sẽ bị ẩn khi trả về model

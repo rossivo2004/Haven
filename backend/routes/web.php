@@ -18,8 +18,6 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\StatisticsController;
 use App\Models\ProductImage;
 
-// Quản lý roles
-Route::resource('roles', RoleController::class);
 
 // Define API routes for posts
 Route::prefix('api/posts')->group(function () {
@@ -30,8 +28,6 @@ Route::prefix('api/posts')->group(function () {
     Route::delete('/delete/{id}', [PostController::class, 'destroy']);
 });
 
-// Quản lý users
-Route::resource('api/roles', RoleController::class);
 
 Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin']], function() {
     // Các route chỉ dành cho admin

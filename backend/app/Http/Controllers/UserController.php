@@ -46,7 +46,10 @@ class UserController extends Controller
             'phone' => 'nullable|string',
             'address' => 'nullable|string',
             'status' => 'nullable',
-            'image' => 'nullable'
+            'image' => 'nullable',
+            'province' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'ward' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('image')) {
@@ -75,8 +78,11 @@ class UserController extends Controller
             'role_id' => 'required|integer',
             'phone' => 'nullable|string',
             'address' => 'nullable|string',
-         'status' => 'required|in:active,banned',
-            'image' => 'nullable'
+            'status' => 'required|in:active,banned',
+            'image' => 'nullable',
+            'province' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'ward' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('image')) {
