@@ -120,50 +120,47 @@ class UserController extends Controller
     }
 
     // Đăng nhập qua API
-    public function login(Request $request)
-    {
-        // Validate login credentials
-        $credentials = $request->only('email', 'password');
+    // public function login(Request $request)
+    // {
+    //     // Validate login credentials
+    //     $credentials = $request->only('email', 'password');
 
-        // Attempt to authenticate the user
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+    //     // Attempt to authenticate the user
+    //     if (Auth::attempt($credentials)) {
+    //         $user = Auth::user();
 
-            // Kiểm tra nếu user bị banned
-            if ($user->status === 'banned') {
-                // Đăng xuất user ngay lập tức nếu đã đăng nhập
-                Auth::logout();
+    //         // Kiểm tra nếu user bị banned
+    //         if ($user->status === 'banned') {
+    //             // Đăng xuất user ngay lập tức nếu đã đăng nhập
+    //             Auth::logout();
 
-                // Trả về thông báo lỗi cho người dùng
-                return response()->json([
-                    'message' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
-                ], 403);
-            }
+    //             // Trả về thông báo lỗi cho người dùng
+    //             return response()->json([
+    //                 'message' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+    //             ], 403);
+    //         }
 
-            // Trả về thông báo đăng nhập thành công nếu user không bị banned
-            return response()->json([
-                'message' => 'Đăng nhập thành công',
-                'user' => $user
-            ]);
-        }
+    //         // Trả về thông báo đăng nhập thành công nếu user không bị banned
+    //         return response()->json([
+    //             'message' => 'Đăng nhập thành công',
+    //             'user' => $user
+    //         ]);
+    //     }
 
-        // Trả về thông báo lỗi nếu thông tin đăng nhập không chính xác
-        return response()->json(['message' => 'Thông tin đăng nhập không chính xác.'], 401);
-    }
+    //     // Trả về thông báo lỗi nếu thông tin đăng nhập không chính xác
+    //     return response()->json(['message' => 'Thông tin đăng nhập không chính xác.'], 401);
+    // }
 
 
-    // Đăng xuất qua API
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    // // Đăng xuất qua API
+    // public function logout(Request $request)
+    // {
+    //     Auth::logout();
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Đăng xuất thành công'], 200);
-    }
-
-    // Đăng nhập Google API
-    
+    //     return response()->json(['message' => 'Đăng xuất thành công'], 200);
+    // }
 
 
     // Reset Password API
@@ -225,8 +222,7 @@ class UserController extends Controller
     }
 
 
-    // Đăng ký API
-
+    
     // Hiển thị form đăng ký
     public function showRegisterForm()
     {
