@@ -9,7 +9,6 @@ import { Textarea } from "@nextui-org/input";
 import apiConfig from "@/configs/api";
 import { Spinner } from "@nextui-org/react"; // Optional: if you want a spinner
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from "@nextui-org/table";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import Image from 'next/image';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
@@ -30,7 +29,7 @@ interface Variant {
     product_id: string | number;
 }
 
-const CreateProduct = () => {
+const BodyProductVa = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -572,14 +571,14 @@ const CreateProduct = () => {
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
-                            { name: 'Sản phẩm chính', link: '#' },
+                            { name: 'Sản phẩm biến thể', link: '#' },
                         ]}
                     />
                 </div>
             {/* {loading && <Spinner />} */}
             <div className='flex justify-between mb-4'>
                 <div className='font-semibold text-xl'>
-                    Quản lý sản phẩm
+                    Quản lý sản phẩm biến thể
                 </div>
                 <div className='flex items-center gap-2'>
                     <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
@@ -1448,4 +1447,4 @@ const CreateProduct = () => {
     );
 };
 
-export default CreateProduct;
+export default BodyProductVa;

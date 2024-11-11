@@ -380,6 +380,9 @@ export interface User {
       created_at: string | null;
       updated_at: string | null;
   };
+  province: string;
+  district: string;
+  ward: string;
 }
 
 export interface FavouriteItem {

@@ -22,6 +22,10 @@ const apiConfig = {
     addproductimage : `${baseUrl}/api/productimage/store`,
   },
 
+  productsva: {
+    getAll: `${baseUrl}/api/productvariant`,
+  },
+
   categories: {
     getAll: `${baseUrl}/api/category/`,
     createCt: `${baseUrl}/api/category/store/`,

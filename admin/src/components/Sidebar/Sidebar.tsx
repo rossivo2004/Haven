@@ -13,6 +13,7 @@ import DiscountIcon from '@mui/icons-material/Discount';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import AppsIcon from '@mui/icons-material/Apps';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,6 +64,13 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/productsva">
+                  <div className={`py-2 px-4 hover:bg-gray-100 rounded-lg mb-1 flex items-center ${pathname === '/productsva' ? 'sidebar_active' : ''}`}>
+                    <AppsIcon className="mr-2" /> Sản phẩm biến thể
+                  </div>
+                </Link>
+              </li>
+              <li>
                 <Link href="/categories">
                   <div className={`py-2 px-4 hover:bg-gray-100 rounded-lg mb-1 flex items-center ${pathname === '/categories' ? 'sidebar_active' : ''}`}>
                     <CategoryIcon className="mr-2" /> Phân loại
@@ -97,14 +105,14 @@ const Sidebar: React.FC = () => {
                   </div>
                 </Link>
               </li>
-             
+{/*              
               <li>
                 <Link href="/banner">
                   <div className={`py-2 px-4 hover:bg-gray-100 rounded-lg mb-1 flex items-center ${pathname === '/banner' ? 'sidebar_active' : ''}`}>
                     <ViewCarouselIcon className="mr-2" /> Banner
                   </div>
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>

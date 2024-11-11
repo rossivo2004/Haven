@@ -49,9 +49,10 @@ import Loading from "../ui/Loading";
 
 function BodyHome() {
     const [productData, setProductData] = useState<Variant[]>([])
+    const [productDataHot, setProductDataHot] = useState<Variant[]>([])
+    const [productDataNew, setProductDataNew] = useState<Variant[]>([])
     const [productDataSale, setProductDataSale] = useState<Variant[]>([]); // Change initial state to an empty array
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
-
 
 
     // const [language, setLanguage] = useState('vi'); // Default to 'en'
@@ -115,6 +116,17 @@ function BodyHome() {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const response = await axios.get(`${apiConfig.products.getAllProduct}`);
+            console.log(response.data);
+            
+            setProductDataHot(response.data.Featured);
+            setProductDataNew(response.data.newProducts);
+        }
+        fetchProducts();
+    }, [])
 
     const fetchProducts = async () => {
         try {
@@ -214,28 +226,28 @@ function BodyHome() {
                             <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50 transition-all">
                                 <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                    Free shipping
+                                    Miễn phí giao hàng
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">For orders from 500k or more</div>
+                                <div className="text-sm text-[#c6c6c6]">Cho đơn từ 500k</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                    24/7 Support
+                                    Hỗ trợ 24/7
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">24/7 online / offline support</div>
+                                <div className="text-sm text-[#c6c6c6]">Hỗ trợ trực tuyến/ngoại tuyến 24/7</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                    Free returns
+                                    Miễn phí đổi trả
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">Within 7 days</div>
+                                <div className="text-sm text-[#c6c6c6]">Trong vòng 3 ngày</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                    Order online
+                                    Đặt hàng online
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">Hotline: 0357 420 420</div>
                             </div>
@@ -259,7 +271,7 @@ function BodyHome() {
                             <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
                             {productDataSale.length > 0 && (
                                 <div className="flex items-center">
-                                    <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
+                                    <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">Kết thúc sau:</div>
                                     <div>
                                         <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -267,7 +279,7 @@ function BodyHome() {
                                                     <span style={{ "--value": 15 } as CSSProperties}></span>
                                                 </span>
                                                 <div className="text-[10px]">
-                                                    Day
+                                                    Ngày
                                                 </div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -275,7 +287,7 @@ function BodyHome() {
                                                     <span style={{ "--value": 10 } as CSSProperties}></span>
                                                 </span>
                                                 <div className="text-[10px]">
-                                                    Hour
+                                                    Giờ
                                                 </div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -283,7 +295,7 @@ function BodyHome() {
                                                     <span style={{ "--value": 24 } as CSSProperties}></span>
                                                 </span>
                                                 <div className="text-[10px]">
-                                                    Minute
+                                                    Phút
                                                 </div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
@@ -291,7 +303,7 @@ function BodyHome() {
                                                     <span style={customStyle}></span>
                                                 </span>
                                                 <div className="text-[10px]">
-                                                    Minute
+                                                    Giây
                                                 </div>
                                             </div>
                                         </div>
@@ -300,7 +312,7 @@ function BodyHome() {
                             )}
                         </div>
                     </motion.div>
-                    <div className="max-w-screen-xl mx-auto px-20 mb-14 relative h-auto">
+                    <div className="max-w-screen-xl mx-auto mb-14 relative h-auto">
                         {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : productDataSale.length > 0 ? (
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
                                 {productDataSale.slice(0, 8).map((product) => (
@@ -392,8 +404,7 @@ function BodyHome() {
                                 <div className="flex w-full flex-col items-center lg:items-end">
                                     <div className="font-bold lg:text-4xl text-2xl lg:hidden">Sản Phẩm Nổi Bật</div>
                                     <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full pt-[64px]">
-                                        {loading ? <div className="w-full h-[800px] flex items-center justify-center col-span-3"><Spinner /></div> : productData
-                                            .sort((a, b) => (b.views || 0) - (a.views || 0)) // Sort by views in descending order, using 0 as fallback
+                                        {loading ? <div className="w-full h-[800px] flex items-center justify-center col-span-3"><Spinner /></div> : productDataHot
                                             .slice(0, 6)
                                             .map((product) => (
                                                 <BoxProduct key={product.id} product={product} />
@@ -472,8 +483,7 @@ function BodyHome() {
                             <div className="lg:col-span-2 md:col-span-3 col-span-2">
                                 <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                             </div>
-                            {productData
-                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by created_at
+                            {productDataNew
                                 .slice(0, 6) // Get the first 6 products
                                 .map((product) => (
                                     <BoxProduct key={product.id} product={product} />
@@ -537,7 +547,7 @@ function BodyHome() {
                     </div>
                 </motion.div> */}
 
-                <div className="max-w-screen-xl mx-auto px-4 mb-16">
+                {/* <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex items-center justify-between mb-6">
                         <div className="font-bold text-4xl text-black dark:text-white">Tin tức mới</div>
                         <div className="font-medium text-sm text-main">Xem thêm</div>
@@ -555,16 +565,16 @@ function BodyHome() {
                             },
                         }}
                     >
-                        {/* {BLOG.slice(0, 4).map((blog, index) => (
+                        {BLOG.slice(0, 4).map((blog, index) => (
                             <SwiperSlide key={index} className="lg:hidden">
                                 <BoxBlog blog={blog} />
                             </SwiperSlide>
-                        ))} */}
+                        ))}
 
                     </Swiper>
 
 
-                </div>
+                </div> */}
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="relative w-full lg:h-[500px] h-auto">

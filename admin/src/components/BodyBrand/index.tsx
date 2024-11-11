@@ -304,11 +304,11 @@ function BodyBrand() {
                 </div>
             )}
             <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+                <div className="h-[62px]">
                     <BreadcrumbNav
                         items={[
-                            { name: 'Home', link: '/' },
-                            { name: 'Brands', link: '#' },
+                            { name: 'Trang chủ', link: '/' },
+                            { name: 'Thương hiệu', link: '#' },
                         ]}
                     />
                 </div>
@@ -393,20 +393,21 @@ function BodyBrand() {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-                <div className="text-xl font-bold">Brand Table</div>
+                <div className="text-xl font-bold">Bảng thương hiệu</div>
                 <div>
                     <div className="flex gap-2">
                         <Input
                             isClearable
                             type="text"
-                            placeholder="Tìm kiếm sản phẩm"
+                            placeholder="Tìm kiếm thương hiệu"
                             labelPlacement="outside"
                             size="md"
                             endContent={<SearchIcon />}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            className="border-none bg-[#f5f8ff]"
                         />
-                        <Button onPress={handleOpenAddBrandModal} size="md" className="font-medium !px-6" color="primary">Thêm phân loại</Button>
+                        <Button onPress={handleOpenAddBrandModal} size="md" className="font-medium !px-6 bg-[#696bff] text-white">Thêm phân loại</Button>
                     </div>
                 </div>
             </div>

@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   const [isInvisible, setIsInvisible] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-10 bg-[#fafafa] dark:bg-[#0F172A] p-2 flex items-center justify-between h-16 pr-14 lg:pr-4 md:pr-4">
+    <header className="fixed top-0 left-0 w-full z-10 bg-[#f5f8ff] dark:bg-[#0F172A] p-2 flex items-center justify-between h-[90px] pr-14 lg:pr-4 md:pr-4">
       <div className="flex items-center">
         <div className="text-xl font-bold dark:text-white">NERVE</div>
       </div>
@@ -53,9 +53,9 @@ const Header: React.FC = () => {
             </Dropdown>
           </div>
         </div>
-        <div className="hidden md:flex items-center text-sm md:text-md text-black dark:text-white">
-          John Doe
-        </div>
+        {/* <div className="hidden md:flex items-center text-sm md:text-md text-black dark:text-white">
+          Admin
+        </div> */}
       </div>
     </header>
   );

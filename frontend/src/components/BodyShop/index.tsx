@@ -57,13 +57,26 @@ function BodyShop() {
 
             const response = await axios.get(`${apiConfig.products.getallproductvariants}?${params.toString()}`, { withCredentials: true });
 
-            setVariants(response.data.productvariants.data);
+            let fetchedVariants = response.data.productvariants.data;
+
+            // Apply sorting based on sortOrder
+            if (sortOrder === 'low-to-high') {
+                fetchedVariants.sort((a: Variant, b: Variant) => 
+                    Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0) - Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0)
+                );
+            } else if (sortOrder === 'high-to-low') {
+                fetchedVariants.sort((a: Variant, b: Variant) => 
+                    Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0) - Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0)
+                );
+            }
+
+            setVariants(fetchedVariants);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
             setLoading(false); // End loading
         }
-    }, [cateFilter, brandFilter, priceRange]);
+    }, [cateFilter, brandFilter, priceRange, sortOrder]);
 
     const fetchCategory = async () => {
         try {
@@ -164,6 +177,12 @@ function BodyShop() {
         } else if (order === 'high-to-low') {
             setVariants(prev => [...prev].sort((a, b) => Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0) - Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0)));
         }
+        fetchProduct(); // Fetch products again to ensure sorting is applied
+
+        const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter, order]; // Include sort order in filters
+        setFilter(combinedFilter); // Update filter state
+        console.log(combinedFilter);
+        
     }
 
     const handlePriceRangeChange = (event: Event, value: number | number[], activeThumb: number) => {
@@ -310,8 +329,7 @@ function BodyShop() {
                                     <DropdownMenu variant="faded" aria-label="Static Actions" className='dark:text-white'>
                                         <DropdownItem key="low-to-high" onClick={() => handleSort('low-to-high')}>Giá thấp đến cao</DropdownItem>
                                         <DropdownItem key="high-to-low" onClick={() => handleSort('high-to-low')}>Giá cao đến thấp</DropdownItem>
-                                        <DropdownItem key="promotion">Khuyến mãi nhiều</DropdownItem>
-                                        <DropdownItem key="best-seller">Sản phẩm bán chạy</DropdownItem>
+                                      
                                     </DropdownMenu>
                                 </Dropdown>
                             </div>

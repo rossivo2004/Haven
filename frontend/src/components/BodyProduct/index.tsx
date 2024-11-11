@@ -201,11 +201,15 @@ function BodyProduct() {
 
     useEffect(() => {
         if (product) {
-            const flashSaleStock = product.flash_sales[0].pivot.stock; // Assuming flash_sales is an array
-            if (flashSaleStock === 0) {
-                setMainPrice(product.DiscountedPrice ?? null); // Set to DiscountedPrice or null if undefined
+            if (product && product.flash_sales.length > 0) { // Check if flash_sales has elements
+                const flashSaleStock = product.flash_sales[0].pivot.stock; // Assuming flash_sales is an array
+                if (flashSaleStock === 0) {
+                    setMainPrice(product.DiscountedPrice ?? null); // Set to DiscountedPrice or null if undefined
+                } else {
+                    setMainPrice(product.FlashSalePrice ?? null); // Set to the regular price or null if undefined
+                }
             } else {
-                setMainPrice(product.FlashSalePrice ?? null); // Set to the regular price or null if undefined
+                setMainPrice(product.DiscountedPrice ?? null);
             }
         }
     }, [product]);
@@ -375,6 +379,29 @@ const handleAddToCart = async () => {
     }
 };
 
+const handleBuyNow = async () => {
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    if (!userId) {
+        toast.error('Bạn cần đăng nhập để mua hàng.'); // Notify user to log in
+        return;
+    }
+
+    const checkoutData = {
+        productId: product?.id, // Use the current product ID
+        selectedItems: [{
+            id: product?.id,
+            quantity: quantity, // Use the quantity state
+            name: product?.name || '', // Get name for the selected item
+            image: product?.image || '' // Get image for the selected item
+        }],
+        totalAmount: mainPrice, // Save total amount
+        pointCart: 0, // Assuming no loyalty points for now
+    };
+
+    Cookies.set('checkout_data', JSON.stringify(checkoutData)); // Save selected items and total amount to cookies
+    router.push('/checkout'); // Redirect to checkout page
+};
+
 const fetchUpdatedCart = async (userId: string) => {
     try {
         const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
@@ -442,7 +469,23 @@ const fetchUpdatedCart = async (userId: string) => {
 
             <div className='flex gap-10 lg:flex-row flex-col-reverse mb-20'>
                 <div className='lg:w-1/2 w-full'>
-                    <div className='lg:text-3xl text-2xl font-bold mb-4 dark:text-white'>{product?.name}</div>
+                   <div className='flex items-center justify-between'>
+                   <div className='lg:text-3xl text-2xl font-bold mb-4 dark:text-white'>{product?.name}</div>
+                    <div className='cursor-pointer'>
+                    {isFavorited ? ( // Conditional rendering based on isFavorited state
+                                <div  className=" text-red-600">
+                                    <FavoriteIcon onClick={() => handleAddToFavorites(product?.id as number)}/>
+                                </div>
+                            ) : (
+                                <div
+                                    // Ensure product ID is treated as a number
+                                    className=" text-red-600"
+                                >
+                                    <FavoriteBorderIcon  onClick={() => handleAddToFavorites(product?.id as number)}/>
+                                </div>
+                            )}
+                    </div>
+                   </div>
                     {/* <div className="flex items-center mb-4">
                         {[...Array(4)].map((_, i) => (
                             <svg key={i} className="w-4 h-4 text-yellow-300 me-1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -500,8 +543,8 @@ const fetchUpdatedCart = async (userId: string) => {
                     <div className='flex gap-2 mb-4'>
                         {variantsPr?.map((item) => (
                             <a href={`/product/${item.id}`} key={item.id}>
-                                <div className={`p-1 border font-medium dark:text-white border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main dark:text-white text-white border-main' : ''}`}>
-                                    {item.name}
+                                <div className={`py-1 px-2 border font-medium dark:text-white border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main dark:text-white text-white border-main' : ''}`}>
+                                    {item.variant_value}
                                 </div>
                             </a>
                         ))}
@@ -544,18 +587,11 @@ const fetchUpdatedCart = async (userId: string) => {
                             <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
                                 <AddShoppingCartIcon /> Thêm vào giỏ hàng
                             </Button>
-                            {isFavorited ? ( // Conditional rendering based on isFavorited state
-                                <Button onClick={() => handleAddToFavorites(product?.id as number)} className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                                    <FavoriteIcon /> Đã thích
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={() => handleAddToFavorites(product?.id as number)} // Ensure product ID is treated as a number
-                                    className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7"
-                                >
-                                    <FavoriteBorderIcon /> Yêu thích
-                                </Button>
-                            )}
+                           
+                            <Button onClick={handleBuyNow} className="flex flex-1 text-[#FFC535] border border-[#FFC535] text-base bg-transparent font-semibold rounded py-7">
+                                <AddShoppingCartIcon /> Mua ngay
+                            </Button>
+                           
                         </div>
                     </div>
 

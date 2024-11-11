@@ -85,7 +85,7 @@ function BodyContact() {
 
         {/* bên phải */}
         <div className="w-full lg:w-2/5 h-1/2  bg-gray p-8 shadow-md rounded mb-8 lg:mb-0">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 uppercase">Công Ty TNHH Phát Triển Việt Quốc Tế</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4 uppercase">Cửa hàng thực phẩm FoodHaven</h3>
           <div className="flex items-center">
             <LocationOnIcon className="xl:h-[30px] xl:w-[30px] lg:w-6 lg:h-6 mr-2" />
             <div className="font-semibold">Địa chỉ:</div>

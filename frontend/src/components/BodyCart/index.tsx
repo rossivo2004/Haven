@@ -16,8 +16,10 @@ import apiConfig from '@/src/config/api';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { addToCart, updateCart } from '@/src/store/cartSlice';
+import { addToCart, deleteCart, updateCart } from '@/src/store/cartSlice';
 import Loading from '../ui/Loading';
+import { confirmAlert } from 'react-confirm-alert'; // Import react-confirm-alert
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for styling
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -87,8 +89,21 @@ const Body_Cart = () => {
     const updateQuantity = async (item: CartItem, newQuantity: number) => {
         // Ensure quantity does not go below 1
         if (newQuantity < 1) {
-            toast.warning('Số lượng tối thiểu là 1');
-            return; // Dừng hàm nếu số lượng không hợp lệ
+            confirmAlert({
+                title: 'Xác nhận',
+                message: 'Bạn có muốn xóa sản phẩm này không?',
+                buttons: [
+                    {
+                        label: 'Có',
+                        onClick: async () => await deleteItem(item) // Call deleteItem if confirmed
+                    },
+                    {
+                        label: 'Không',
+                        onClick: () => {} // Do nothing if canceled
+                    }
+                ]
+            });
+            return; // Stop the function if quantity is invalid
         }
 
         if (userId) {
@@ -141,6 +156,8 @@ const Body_Cart = () => {
             toast.success('Xóa sản phẩm thành công');
         }
         setLoading(false);
+
+        dispatch(deleteCart(cart)); // Pass the current cart as an argument
     }
 
 

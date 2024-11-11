@@ -306,11 +306,11 @@ const handleDelete = async (categoryId: string) => {
                 </div>
             )}
             <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+                <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
-                            { name: 'Home', link: '/' },
-                            { name: 'Categories', link: '#' },
+                            { name: 'Trang chủ', link: '/' },
+                            { name: 'Phân loại', link: '#' },
                         ]}
                     />
                 </div>
@@ -395,7 +395,7 @@ const handleDelete = async (categoryId: string) => {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-                <div className="text-xl font-bold">Category Table</div>
+                <div className="text-xl font-bold">Bảng phân loại</div>
                 <div>
                     <div className="flex gap-2">
                         <Input

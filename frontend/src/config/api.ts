@@ -3,6 +3,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 const apiConfig = {
   products: {
     getAll: `${baseUrl}/api/product/`,
+    getAllProduct: `${baseUrl}/api/product/home`,
     getDetailByTag: `${baseUrl}/api/product/getProductByTag/`,
     deletePr: `${baseUrl}/api/product/delete/`,
     updatepr: `${baseUrl}/api/product/update/`,

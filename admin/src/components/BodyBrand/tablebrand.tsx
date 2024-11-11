@@ -38,6 +38,13 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 10; // Number of items per page
+
+    // Calculate the current items to display based on the current page
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = brands.slice(indexOfFirstItem, indexOfLastItem);
 
     // Cập nhật giá trị categoryName và categoryTag khi editingCategory thay đổi
     useEffect(() => {
@@ -181,17 +188,23 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
         }
     };
 
+    const totalPages = Math.ceil(brands.length / itemsPerPage); // Calculate total pages
+
+    // Add this line to calculate the current range of items being displayed
+    const indexOfFirstProduct = indexOfFirstItem + 1; // Adjust for 1-based index
+    const indexOfLastProduct = Math.min(indexOfLastItem, brands.length); // Adjust for total items
+
     return (
         <>
-            <Table aria-label="Brnad table">
-                <TableHeader columns={[{ uid: 'name', name: 'Brand Name' }, { uid: 'tag', name: 'Brnad Tag' }, { uid: 'actions', name: 'Actions' }]}>
+            <Table aria-label="Brand table">
+                <TableHeader columns={[{ uid: 'name', name: 'Brand Name' }, { uid: 'tag', name: 'Brand Tag' }, { uid: 'actions', name: 'Actions' }]}>
                     {(column) => (
                         <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={brands}>
+                <TableBody items={currentItems}>
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -199,6 +212,30 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
                     )}
                 </TableBody>
             </Table>
+
+            {/* Manual Pagination Controls */}
+            <div className="flex justify-between items-center mt-4">
+                <div className="text-sm">
+                    {`${indexOfFirstProduct} - ${indexOfLastProduct} của ${brands.length} thương hiệu`} {/* Updated to show current range */}
+                </div>
+                <div className="flex gap-2">
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <div
+                            className={`cursor-pointer w-10 h-10 flex items-center justify-center rounded-md border-2 
+                                ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600'}`}
+                            key={index + 1}
+                            onClick={() => setCurrentPage(index + 1)}
+                            style={{ 
+                                backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent', 
+                                border: '2px solid #696bff',
+                                color: currentPage === index + 1 ? 'white' : '#696bff'
+                            }}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             {/* Modal for editing category */}
             {editingBrand && (

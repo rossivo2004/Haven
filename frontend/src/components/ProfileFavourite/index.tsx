@@ -76,16 +76,16 @@ function ProfileFavourite() {
                     </div>
                 )}
                 {!loading && favourite.map((item) => (
-                    <div className="w-full h-auto lg:h-[360px] flex flex-col group mb-2 pb-3 rounded-lg re z-0" key={item.id}>
+                    <div className="w-full h-auto px-2 lg:h-[360px] flex flex-col group mb-2 pb-3 rounded-lg re z-0" key={item.id}>
                         <Link href={`/product/${item.id}`}>
-                            <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
+                            <div className="w-full h-[140px] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                                 <Image
                                     loading="lazy"
                                     src={item.image}
                                     alt={item.name}
                                     width={500}
                                     height={500}
-                                    className="w-full lg:h-[260px] h-full object-cover group-hover:scale-110 transition-all"
+                                    className="w-full lg:h-[260px] h-full object-contain group-hover:scale-110 transition-all"
                                 />
                             </div>
                         </Link>

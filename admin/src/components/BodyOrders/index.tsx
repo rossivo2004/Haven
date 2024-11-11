@@ -3,8 +3,6 @@ import './style.css';
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, Tooltip, Radio, cn, RadioGroup } from "@nextui-org/react";
 import TableOrder from "../TableOrder";
-import CustomPagination from "@/components/Pagination";
-import { Pagination } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/input";
@@ -12,7 +10,7 @@ import { EyeIcon } from "./EyeIcon";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { confirmAlert } from "react-confirm-alert";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Order } from '@/interface';
 import axios from 'axios';
 import apiConfig from '@/configs/api';
@@ -71,7 +69,7 @@ const getStatusTextModal = (status: string) => {
 };
 
 
-const orderStatuses = ['pending', 'preparing', 'transport', 'complete']; 
+const orderStatuses = ['pending', 'preparing', 'transport', 'complete'];
 
 function BodyOrders() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -81,16 +79,25 @@ function BodyOrders() {
 
     const [selectedStatus, setSelectedStatus] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
     const [idOrrder, setIdOrrder] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
-    
+    const [currentPage, setCurrentPage] = useState<number>(1); // State to track the current page
+    const [totalPages, setTotalPages] = useState<number>(1); // State to track total pages
 
-// ... existing code ...
-const handleEditStatus = (status: string, idOrder: number) => {
-    setSelectedStatus(status); // Cập nhật trạng thái đã chọn
-    console.log("Selected Status:", status); // Kiểm tra giá trị
-    setIdOrrder(String(idOrder)); // Set the idOrrder state correctly
-    onOpen(); // Mở modal
-};
-// ... existing code ...
+    const productsPerPage = 10; // Define the number of products per page
+
+    // Calculate the orders to display based on the current page
+    const ordersToDisplay = useMemo(() => {
+        const startIndex = (currentPage - 1) * 10; // Calculate start index
+        return order.slice(startIndex, startIndex + 10); // Slice the orders array
+    }, [order, currentPage]);
+
+    // ... existing code ...
+    const handleEditStatus = (status: string, idOrder: number) => {
+        setSelectedStatus(status); // Cập nhật trạng thái đã chọn
+        console.log("Selected Status:", status); // Kiểm tra giá trị
+        setIdOrrder(String(idOrder)); // Set the idOrrder state correctly
+        onOpen(); // Mở modal
+    };
+    // ... existing code ...
 
     const fecthOrder = async () => {
         setLoading(true);
@@ -98,6 +105,7 @@ const handleEditStatus = (status: string, idOrder: number) => {
             const response = await axios.get(apiConfig.order.getAll);
             const data = response.data; // Changed from response.json() to response.data
             setOrder(data);
+            setTotalPages(Math.ceil(data.length / 10)); // Calculate total pages based on orders
         } catch (error) {
             console.log("Lỗi");
         } finally {
@@ -194,10 +202,15 @@ const handleEditStatus = (status: string, idOrder: number) => {
         }
     };
 
+    // Function to handle page change
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page); // Update current page
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+            <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
@@ -206,6 +219,12 @@ const handleEditStatus = (status: string, idOrder: number) => {
                     />
                 </div>
             </div>
+                <div className='flex justify-between mb-4'>
+                    <div className='font-semibold text-xl'>
+                        Quản lý đơn hàng
+                    </div>
+
+                </div>
 
             <div>
                 <div className="mb-4">
@@ -217,7 +236,7 @@ const handleEditStatus = (status: string, idOrder: number) => {
                             <TableColumn><div className='flex justify-center w-full'>Thao tác</div></TableColumn>
                         </TableHeader>
                         <TableBody>
-                            {order.map((item, ind) => (
+                            {ordersToDisplay.map((item, ind) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.invoice_code}</TableCell>
                                     <TableCell><div className='flex justify-center w-full'>{new Date(item.created_at).toLocaleDateString('en-GB')}</div></TableCell>
@@ -230,10 +249,10 @@ const handleEditStatus = (status: string, idOrder: number) => {
                                                 </span>
                                             </Tooltip>
                                             <Tooltip content="Edit status">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditStatus(item.status, item.id)}>
-                            <EditIcon />
-                        </span>
-                    </Tooltip>
+                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditStatus(item.status, item.id)}>
+                                                    <EditIcon />
+                                                </span>
+                                            </Tooltip>
                                             <Tooltip color="danger" content="Delete order">
                                                 <span
                                                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -249,9 +268,26 @@ const handleEditStatus = (status: string, idOrder: number) => {
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex justify-end w-full">
-
-                    <Pagination showControls total={10} initialPage={1} />
+                <div className="flex justify-between items-center mt-4">
+                    <div className="text-sm">
+                        {`${(currentPage - 1) * productsPerPage + 1} - ${Math.min(currentPage * productsPerPage, order.length)} của ${order.length} đơn hàng`}
+                    </div>
+                    <div className="flex gap-2">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <div
+                                className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md text-white'
+                                key={index + 1}
+                                onClick={() => handlePageChange(index + 1)}
+                                style={{
+                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent',
+                                    border: currentPage === index + 1 ? '2px solid #696bff' : '2px solid #696bff',
+                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                }}
+                            >
+                                {index + 1}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -262,25 +298,25 @@ const handleEditStatus = (status: string, idOrder: number) => {
                             <ModalHeader className="flex gap-1">Đơn hàng</ModalHeader>
                             <ModalBody>
                                 <div>
-                                <RadioGroup className="w-full !justify-between mb-2" orientation="horizontal" value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
-    {orderStatuses.map((status) => (
-        <CustomRadio key={status} value={status}>
-            {getStatusTextModal(status)} {/* Use the getStatusText function to display the correct text */}
-        </CustomRadio>
-    ))}
-</RadioGroup>   
+                                    <RadioGroup className="w-full !justify-between mb-2" orientation="horizontal" value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
+                                        {orderStatuses.map((status) => (
+                                            <CustomRadio key={status} value={status}>
+                                                {getStatusTextModal(status)} {/* Use the getStatusText function to display the correct text */}
+                                            </CustomRadio>
+                                        ))}
+                                    </RadioGroup>
                                     <div>
                                         <Button color='danger' onClick={() => cancelOrder(Number(idOrrder))}>Hủy đơn hàng</Button>
                                     </div>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
-        Đóng
-    </Button>
-    <Button color="primary" onPress={() => { handleConfirmUpdate(); onClose(); }}>
-        Xác nhận
-    </Button>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Đóng
+                                </Button>
+                                <Button color="primary" onPress={() => { handleConfirmUpdate(); onClose(); }}>
+                                    Xác nhận
+                                </Button>
                             </ModalFooter>
                         </>
                     )}

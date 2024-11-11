@@ -627,9 +627,9 @@ function Header({ params }: { params: { lang: string } }) {
                                 <li className='flex items-center'>
                                     <Link href={'/'}>TRANG CHỦ</Link>
                                 </li>
-                                <li className='flex items-center'>
+                                {/* <li className='flex items-center'>
                                     <Link href={`/blog`}>TIN TỨC</Link>
-                                </li>
+                                </li> */}
                                 <li>
 
 
