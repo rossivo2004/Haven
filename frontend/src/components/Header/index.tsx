@@ -42,6 +42,7 @@ import { logout } from '@/src/store/userSlice';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
+import { fetchUserProfile } from '@/src/config/token'; // Import the fetchUserProfile function
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -52,11 +53,10 @@ const menuItems = [
 ];
 
 function Header({ params }: { params: { lang: string } }) {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userData, setUserData] = useState<any>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const dispatch = useDispatch();
     const router = useRouter();
-    const [userData, setUserData] = useState<any>(null);
-    // const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Variant[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Variant[]>([]);
@@ -66,7 +66,6 @@ function Header({ params }: { params: { lang: string } }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    // const totalItems = useSelector(selectTotalItems);
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -90,91 +89,51 @@ function Header({ params }: { params: { lang: string } }) {
     const cartItems = useSelector((state: RootState) => state.cart.items); // Get cart items from Redux
     const cartCounts = cartItems.length; // Get the count of items in the cart
 
+    const [userProducts, setUserProducts] = useState<Variant[]>([]); // State to hold user-specific products
 
     useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
-        if (userId) {
-            // Fetch user's cart from the API
-            const fetchUserCart = async () => {
-                try {
-                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
-                    if (response.data && response.data) { // Check if cart_items exists
-                        setCart(response.data); // Adjust according to your API response structure
-                        setCartCount(response.data.length);
-                    } else {
-                        console.warn('No cart items found in response');
-                    }
-                } catch (error) {
-                    console.error('Error fetching user cart:', error);
-                }
-            };
-            fetchUserCart();
+        const token = Cookies.get('access_token'); // Get token from cookies
+        if (token) {
+            fetchUserProfile() // Fetch user data using the token
+                .then(data => {
+                    setUserData(data); // Set user data in state
+                    fetchUserProducts(data.id); // Fetch products for the logged-in user
+                    setUserId(data.id);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
         } else {
-            // If no user ID, show cart from cookies
+            // If not logged in, check for cart items in cookies
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
-                setCartCount(existingCartItems.cart_items.length);
+                setCartCount(existingCartItems.cart_items.length); // Update cart count
             } else {
                 console.warn('No cart items found in cookies');
             }
         }
     }, []); // Add cartCount to the dependency array
 
-    useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
-        if (userId) {
-            // Fetch user's cart from the API
-            const fetchUserCart = async () => {
-                try {
-                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
-                    if (response.data && response.data) { // Check if cart_items exists
-                        setCart(response.data); // Adjust according to your API response structure
-                        setCartCount(response.data.length);
-                    } else {
-                        console.warn('No cart items found in response');
-                    }
-                } catch (error) {
-                    console.error('Error fetching user cart:', error);
-                }
-            };
-            fetchUserCart();
-        } else {
-            // If no user ID, show cart from cookies
-            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
-            console.log(existingCartItems);
-
-            if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
-                setCart(existingCartItems.cart_items); // Set cart state from cookies
-                setCartCount(existingCartItems.cart_items.length);
-            } else {
-                console.warn('No cart items found in cookies');
-            }
-        }
-    }, [cartItems]); // Add cartCount to the dependency array
-
-
-    useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user_id from cookies
-        if (userId) {
-            fetchUserData(userId); // Fetch user data if user_id exists
-        }
-    }, []);
-
-    const fetchUserData = async (id: string) => {
+    const fetchUserProducts = async (userId: string) => { // New function to fetch user-specific products
         try {
-            const response = await axios.get(`${apiConfig.user.getUserById}${id}`); // Adjust the API endpoint as needed
-            setUserData(response.data); // Store the user data in state
+            const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
+            // setUserProducts(response.data.products); // Assuming the API returns products in this structure
+            if (response.data && response.data) { // Check if cart_items exists
+                setCart(response.data); // Adjust according to your API response structure
+                setCartCount(response.data.length);
+            } else {
+                console.warn('No cart items found in response');
+            }
         } catch (error) {
-            console.error('Error fetching user data:', error);
+            console.error('Error fetching user products:', error);
         }
     };
 
     const handleLogout = () => {
         signOut();
-        axios.post(apiConfig.user.logout, { withCredentials: true });
+        Cookies.remove('access_token'); // Remove token on logout
+        Cookies.remove('refresh_token'); // Remove token on logout
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
         toast.success('Đăng xuất thành công');
@@ -219,7 +178,6 @@ function Header({ params }: { params: { lang: string } }) {
     // }, [cartItems]);
 
     // console.log(products);
-    console.log(cartItems);
 
 
     useEffect(() => {
@@ -316,12 +274,12 @@ function Header({ params }: { params: { lang: string } }) {
 
 
     useEffect(() => {
-        if (userId) { // {{ edit_1 }}
+        if (userData) { // {{ edit_1 }}
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items.length > 0) {
                 // Prepare items for moving to database
                 const itemsToMove = existingCartItems.cart_items.map((item: CartItem) => ({
-                    user_id: parseInt(userId), // Set user_id to null for each item
+                    user_id: userData.id, // Use userData.id instead of userId
                     product_variant_id: item.product_variant_id,
                     quantity: item.quantity,
                 }));
@@ -330,7 +288,7 @@ function Header({ params }: { params: { lang: string } }) {
                 const moveCartToDatabase = async () => {
                     try {
                         await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
-                            user_id: parseInt(userId), // Handle undefined case
+                            user_id: userData.id, // Use userData.id instead of userId
                             cart_items: itemsToMove,
                         }, {
                             headers: {
@@ -350,10 +308,10 @@ function Header({ params }: { params: { lang: string } }) {
                 moveCartToDatabase(); // Call the async function
             }
         }
-    }, [userId]);
+    }, [userData]); // Update dependency to userData
 
 
-
+    console.log(cart);
 
 
     return (
@@ -552,13 +510,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                            {userId ? (
+                                                                        {
                                                                                 item.product_variant.flash_sales.length > 0
                                                                                     ? item.product_variant.flash_sales[0].pivot.stock > 0 
                                                                                         ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
                                                                                         : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
-                                                                                    : item.product_variant.priceMain?.toLocaleString('vi-VN')
-                                                                            ) : item.product_variant.priceMain?.toLocaleString('vi-VN')} VND
+                                                                                    : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')
+                                                                            } VND
                                                                         </div>
 
                                                                     </div>

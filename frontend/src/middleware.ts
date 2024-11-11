@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'; // Import NextRequest
 
 export default function middleware(request: NextRequest) {
-  const userId = request.cookies.get('user_id'); // Get user_id cookie
+  const userId = request.cookies.get('access_token'); // Get user_id cookie
   const checkoutData = request.cookies.get('checkout_data'); // Get checkout_data cookie
   const userFor = request.cookies.get('user'); // Get checkout_data cookie
   const otp_code = request.cookies.get('otp_code'); // Get checkout_data cookie

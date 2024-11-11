@@ -10,26 +10,46 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { toast } from "react-toastify";
 import { Spinner } from "@nextui-org/react";
 import Loading from "../ui/Loading";
+import { fetchUserProfile } from '@/src/config/token';
 
 function ProfileFavourite() {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null); 
     const [favourite, setFavourite] = useState<FavouriteItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []);
+
     const getFavourite = async () => {
-        setLoading(true)
-        const res = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`)
-        setFavourite(res.data)
-        setLoading(false)
+        if (!userId) return; // Ensure userId is not null before making the API call
+        setLoading(true);
+        try {
+            const res = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+            setFavourite(res.data);
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+            toast.error('Có lỗi xảy ra khi lấy danh sách yêu thích.'); // Notify error
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        getFavourite()
-    }, [userId])
+        getFavourite();
+    }, [userId]);
 
     const handleAddToFavorites = async (productVariantId: number) => {
         
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
         if (!userId) {
             toast.error('Bạn cần đăng nhập để thêm sản phẩm vào yêu thích.');
             return;

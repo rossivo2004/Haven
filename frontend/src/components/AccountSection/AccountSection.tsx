@@ -42,7 +42,7 @@ import apiConfig from "@/src/config/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
+import { fetchUserProfile } from '@/src/config/token';
 interface Province {
     id: string;
     full_name: string;
@@ -153,7 +153,7 @@ const Security = () => {
 };
 
 const AccountSection = () => {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null); 
     const [isVisible, setIsVisible] = React.useState(false);
     const toggleVisibility = () => setIsVisible(!isVisible);
     //   const [user, setUser] = useState<IUser>();
@@ -181,6 +181,19 @@ const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     }
 };
 // ... existing code ...
+
+useEffect(() => {
+    const getUserId = async () => {
+        try {
+            const userProfile = await fetchUserProfile(); // Fetch user profile using token
+            setUserId(userProfile.id); // Set user ID from the fetched profile
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
+    };
+
+    getUserId(); // Call the function to get user ID
+}, []);
 
 useEffect(() => {
     // Fetch provinces

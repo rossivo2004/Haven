@@ -30,6 +30,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { addToCart, updateCart } from '@/src/store/cartSlice';
+import { fetchUserProfile } from '@/src/config/token';
 
 interface CustomRadioProps extends RadioProps {
     isSelected: boolean;
@@ -68,6 +69,7 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
 function BodyProduct() {
     const { id } = useParams(); // get id product
     const [product, setProduct] = useState<Variant | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const [productFavourite, setProductFavourite] = useState<Variant | null>(null);
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
     const router = useRouter();
@@ -82,6 +84,46 @@ function BodyProduct() {
     const [loading, setLoading] = useState(true);
     const [isFavorited, setIsFavorited] = useState<boolean>(false);
     const [mainPrice, setMainPrice] = useState<number | null>(null);
+
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []); 
+
+    useEffect(() => {
+        const fetchProductFavourite = async () => {
+            if (userId) {
+                try {
+                    const response = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+
+                    // Check if the response data is empty
+                    if (response.data && response.data.length > 0) {
+                        console.log(response.data);
+                        const favorites = response.data; // Assuming this returns an array of favorite products
+                        const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
+                        setIsFavorited(isProductFavorited); // Update state
+                    } else {
+                        // If no favorites found, set isFavorited to false
+                        setIsFavorited(false);
+                    }
+                } catch (error: any) { // Specify the type of error as 'any'
+                    console.error('Error fetching favorites:', error); // Handle errors
+                    setIsFavorited(false); // Ensure isFavorited is false on error
+                }
+            } else {
+                setIsFavorited(false); // Ensure isFavorited is false if no user ID
+            }
+        };
+        fetchProductFavourite();
+    }, [userId, product]);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
@@ -102,32 +144,8 @@ function BodyProduct() {
     }, [id]);
 
 
-    useEffect(() => {
-        const fetchProductFavourite = async () => {
-            const userId = Cookies.get('user_id');
-            if (userId) {
-                try {
-                    const response = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+   
 
-                    // Check if the response data is empty
-                    if (response.data && response.data.length > 0) {
-                        const favorites = response.data; // Assuming this returns an array of favorite products
-                        const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
-                        setIsFavorited(isProductFavorited); // Update state
-                    } else {
-                        // If no favorites found, set isFavorited to false
-                        setIsFavorited(false);
-                    }
-                } catch (error: any) { // Specify the type of error as 'any'
-                    console.error('Error fetching favorites:', error); // Handle errors
-                    setIsFavorited(false); // Ensure isFavorited is false on error
-                }
-            } else {
-                setIsFavorited(false); // Ensure isFavorited is false if no user ID
-            }
-        };
-        fetchProductFavourite();
-    }, [product]);
 
     // ... existing code ...
 
@@ -147,7 +165,7 @@ function BodyProduct() {
         fetchData();
     }, [id]);
 
-    console.log(product);
+    // console.log(product);
 
     useEffect(() => {
         const fetchProductPromotion = async () => {
@@ -227,7 +245,6 @@ function BodyProduct() {
 
 
     const handleAddToFavorites = async (productVariantId: number) => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
         if (!userId) {
             toast.error('Bạn cần đăng nhập để thêm sản phẩm vào yêu thích.');
             return;
@@ -276,7 +293,6 @@ function BodyProduct() {
 // ... existing code ...
 
 const handleAddToCart = async () => {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
     const body = {
         user_id: userId ? parseInt(userId) : null, // Parse user ID if it exists
         product_variant_id: product?.id, // Ensure product ID is used
@@ -380,7 +396,6 @@ const handleAddToCart = async () => {
 };
 
 const handleBuyNow = async () => {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
     if (!userId) {
         toast.error('Bạn cần đăng nhập để mua hàng.'); // Notify user to log in
         return;

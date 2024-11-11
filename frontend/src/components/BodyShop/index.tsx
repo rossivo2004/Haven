@@ -440,15 +440,6 @@ function BodyShop() {
                         </div>
                     )}
 
-                    {/* Pagination */}
-                    <div className="flex justify-end mt-8">
-                        {/* <CustomPagination
-                            currentPage={currentPage}
-                            totalItems={flatProducts.length} // Update this to total items
-                            itemsPerPage={itemsPerPage}
-                            onPageChange={setCurrentPage}
-                        /> */}
-                    </div>
                 </div>
             </div>
         </div>

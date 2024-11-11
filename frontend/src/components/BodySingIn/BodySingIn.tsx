@@ -42,12 +42,15 @@ const [loading, setLoading] = useState(false);
     const handleCheckSignin = async (values: SignInValues) => {
         setLoading(true);
         try {
-            const response = await axios.post(apiConfig.user.login, values); // Use axios to post data
+            const response = await axios.post(apiConfig.user.loginToken, values); // Use axios to post data
 
-            toast.success(response.data.message); // Show success message
+            toast.success('Đăng nhập thành công!'); // Show success message
 
-            Cookies.set('user_id', String(response.data.user.id), { expires: 7 }); // Set user_id in cookie for 7 days
-            dispatch(setUserId(response.data.user.id)); // Dispatch action to set user ID in Redux
+            console.log(response.data);
+
+            Cookies.set('access_token', response.data.access_token, { expires: 7 }); // Set access_token in cookie for 7 days
+            Cookies.set('refresh_token', response.data.refresh_token, { expires: 7 }); // Set refresh_token in cookie for 7 days
+            
             window.location.href = '/';
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại! Vui lòng thử lại.'; // Get error message from response
