@@ -11,11 +11,24 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from "react-toastify";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-
+import { fetchUserProfile } from '@/src/config/token';  
 
 export const OrderSession: React.FC = () => {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null);
     const [order, setOrder] = useState<Order[]>([]);
+
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []);
 
     const getStatusColor = (status: string) => {
         switch (status) {

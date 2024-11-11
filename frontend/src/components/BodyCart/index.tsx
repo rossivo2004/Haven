@@ -20,10 +20,11 @@ import { addToCart, deleteCart, updateCart } from '@/src/store/cartSlice';
 import Loading from '../ui/Loading';
 import { confirmAlert } from 'react-confirm-alert'; // Import react-confirm-alert
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for styling
+import { fetchUserProfile } from '@/src/config/token'; // Import the fetchUserProfile function
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null); // State to hold user ID
     const [cart, setCart] = useState<CartItem[]>([]);
 
     const [totalAmount, setTotalAmount] = useState<number>(0); // State to hold total amount
@@ -31,6 +32,21 @@ const Body_Cart = () => {
 
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []); // Ensure this useEffect runs only once
+
+    console.log(userId);
 
     useEffect(() => {
         if (userId) {
@@ -64,7 +80,7 @@ const Body_Cart = () => {
                 console.warn('No cart items found in cookies');
             }
         }
-    }, []); // Ensure this useEffect runs only once
+    }, [userId]); // Depend on userId to fetch cart when it changes
     console.log(cart);
 
     const handleCheckout = () => {
@@ -273,18 +289,18 @@ const Body_Cart = () => {
                                         <div className="text-right flex gap-2">
                                             <div>
                                                 <span className="text-gray-500 text-sm">
-                                                    {userId
-                                                        ? (item.product_variant.flash_sales[0].pivot.stock > 0
+                                                    {
+                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')
-                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
-                                                        : item.product_variant.priceMain.toLocaleString('vi-VN')} đ
+                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
+                                                } đ
                                                 </span>
                                                 <div className='text-2xl text-price font-bold'>
-                                                    {userId
-                                                        ? (item.product_variant.flash_sales[0].pivot.stock > 0
+                                                    {
+                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? (Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice) * item.quantity).toLocaleString('vi-VN')
-                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
-                                                        : (item.product_variant.priceMain * item.quantity).toLocaleString('vi-VN')} đ
+                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
+                                                } đ
                                                 </div>
                                             </div>
                                             <div className='flex items-center justify-end' >

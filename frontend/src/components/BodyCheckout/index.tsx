@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { IUser } from '@/src/interface';
 import Cookies from 'js-cookie';
 import apiConfig from '@/src/config/api';
-
+import { fetchUserProfile } from '@/src/config/token';
 
 interface Province {
     id: string;
@@ -59,7 +59,7 @@ const CustomRadio = (props: any) => {
 };
 
 function BodyCheckout() {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null);
     const cartData = Cookies.get('checkout_data'); // Get user ID from cookies
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -97,6 +97,20 @@ function BodyCheckout() {
     // const priceDisscount = useSelector((state: { cart: { priceDisscount: number } }) => state.cart.priceDisscount);
     // const totalSum = useSelector((state: { cart: { sum: number } }) => state.cart.sum);
 
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []);
+
+    console.log(userId);
 
     useEffect(() => {
         if (cartData) {

@@ -80,6 +80,14 @@ const apiConfig = {
     register: `${baseUrl}/api/register/send-code`,
     verify: `${baseUrl}/api/register/verify-code`,
 
+    loginToken: `${baseUrl}/api/auth/login`,
+
+    //Lấy data user từ token
+    getUserFromToken: `${baseUrl}/api/auth/profile`,
+
+    // Refresh token
+    refreshToken: `${baseUrl}/api/auth/refresh`,
+
     // Lấy thông tin user theo id
     ///users/show/{id}
     getUserById: `${baseUrl}/api/users/show/`,
