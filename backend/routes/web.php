@@ -14,18 +14,33 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\StatisticsController;
 use App\Models\ProductImage;
 
-// Quản lý roles
-Route::resource('roles', RoleController::class);
-// Quản lý users
-Route::resource('api/roles', RoleController::class);
+
+// Define API routes for posts
+Route::prefix('api/posts')->group(function () {
+    Route::get('/', [PostController::class, 'index']);
+    Route::post('/store', [PostController::class, 'store']);
+    Route::get('/show/{id}', [PostController::class, 'show']);
+    Route::put('/update/{id}', [PostController::class, 'update']);
+    Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+});
+
 
 Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin']], function() {
     // Các route chỉ dành cho admin
 
 });
+
+// Route::middleware(['check.status'])->group(function () {
+//     // Đăng nhập - đăng xuất
+//     Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
+//     Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
+// });
+
+
 // Quản lý users
 Route::group(['prefix' => 'api/users'], function() {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
@@ -45,11 +60,7 @@ Route::group(['prefix' => 'api/roles'], function () {
     Route::delete('/delete/{role}', [RoleController::class, 'destroy'])->name('Role.destroy');
 });
 
-// Đăng nhập - đăng xuất
-Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
-Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
-Route::get('/api/auth/google', [UserController::class, 'googlelogin'])->name('api.logingoogle');
-Route::get('/api/auth/google/callback', [UserController::class, 'googlecallback'])->name('api.googlecallback');
+
 
 // Đăng ký
 Route::group(['prefix' => 'api/register'], function() {
@@ -101,6 +112,8 @@ route::group([
     Route::get('/edit/{productVariant}', [ProductVariantController::class, 'edit'])->name('ProductVariant.edit');
     Route::put('/update/{productVariant}', [ProductVariantController::class, 'update'])->name('ProductVariant.update');
     Route::delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
+
+    Route::get('/getRelatedVariants/{productVariant}', [ProductVariantController::class, 'getRelatedVariants'])->name('ProductVariant.getRelatedVariants');
 });
 
 route::group([
@@ -224,20 +237,11 @@ route::group([
 });
 
 
-// route::group([
-//     'prefix' => 'api/notify'
-// ],function(){
-//     Route::get('/view', [NotificationController::class, 'watchnotify']); // Xem thông báo    
-//     Route::get('/unread', [NotificationController::class, 'countUnread']); // Số lượng thông báo chưa đọc      
-//     Route::post('/mark-as-read/{order}', [NotificationController::class, 'markAsRead']); // Admin kích vào thì đã đọc
-//     Route::delete('/delete/{order}', [NotificationController::class, 'deletenotify']); // Xóa thông báo
-// });
-
 route::group([
     'prefix' => 'api/ordernotify'
 ],function(){
     Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo    
     Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc      
     Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
-    // Route::delete('/delete/{order}', [OrderController::class, 'deletenotify']); // Xóa thông báo
 });
+

@@ -11,13 +11,14 @@ import { Spinner } from "@nextui-org/react"; // Optional: if you want a spinner
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from "@nextui-org/table";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import Image from 'next/image';
-import { Pagination } from "@nextui-org/react";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { EyeIcon } from "./EyeIcon";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import BreadcrumbNav from '../Breadcrumb/Breadcrumb';
 
 interface Variant {
     name: string;
@@ -46,10 +47,7 @@ const CreateProduct = () => {
         brand_id: '',
     });
 
-    const [pagination, setPagination] = useState({
-        last_page: 1,  // Default value for total pages
-        current_page: 1 // Default value for current page
-    });
+
     const [products, setProducts] = useState<Product[]>([]);
     const [productsVa, setProductsVa] = useState<ProductVa[]>([]);
     // ... existing code ...
@@ -77,6 +75,13 @@ const CreateProduct = () => {
 
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [selectedVariantImages, setSelectedVariantImages] = useState<{ [key: number]: File[] }>({}); // Add this line
+
+    const [currentPage, setCurrentPage] = useState(1); // Add state for current page
+    const productsPerPage = 10; // Define how many products per page
+
+    const indexOfLastProduct = currentPage * productsPerPage; // Calculate index of last product
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage; // Calculate index of first product
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct); // Get current products
 
     const handleAddVariant = () => {
         setVariants([...variants, {
@@ -398,12 +403,11 @@ const CreateProduct = () => {
         }
     };
 
-    const fetchProducts = async (page = 1) => {
+    const fetchProducts = async () => {
         setLoadingProducts(true); // Start loading
         try {
-            const response = await axios.get(`${apiConfig.products.getAll}?page=${page}`, { withCredentials: true });
+            const response = await axios.get(`${apiConfig.products.getAll}`, { withCredentials: true });
             setProducts(response.data.products.data);
-            setPagination(response.data.products); // Update pagination data
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -426,7 +430,6 @@ const CreateProduct = () => {
     const fetchPagination = async () => {
         try {
             const response = await axios.get(apiConfig.products.getAll, { withCredentials: true });
-            setPagination(response.data.products);
         } catch (error) {
             console.error('Error fetching brands:', error);
         }
@@ -564,14 +567,22 @@ const CreateProduct = () => {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 !pt-0">
+             <div className="pb-5 h-[62px]">
+                    <BreadcrumbNav
+                        items={[
+                            { name: 'Trang chủ', link: '/' },
+                            { name: 'Sản phẩm chính', link: '#' },
+                        ]}
+                    />
+                </div>
             {/* {loading && <Spinner />} */}
             <div className='flex justify-between mb-4'>
                 <div className='font-semibold text-xl'>
                     Quản lý sản phẩm
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button color="primary" onPress={onOpen}>
+                    <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
                         Thêm sản phẩm
                     </Button>
                     {/* <div>
@@ -589,7 +600,7 @@ const CreateProduct = () => {
                             <div>
                                 <h1 className="text-xl font-semibold mb-4">Sản phẩm chính</h1>
                                 <div className="mb-4">
-                                    <label htmlFor="name_product" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="name_product" className="block text-sm font-medium text-gray-700 mb-1">
                                         Tên sản phẩm
                                     </label>
                                     <Input
@@ -606,7 +617,7 @@ const CreateProduct = () => {
                                 <div className='flex gap-5'>
                                     {/* Categories */}
                                     <div className="mb-4 flex-1">
-                                        <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">
                                             Phân loại
                                         </label>
                                         <Select
@@ -629,7 +640,7 @@ const CreateProduct = () => {
 
                                     {/* Brands */}
                                     <div className="mb-4 flex-1">
-                                        <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700 mb-1">
                                             Thương hiệu
                                         </label>
                                         <Select
@@ -651,7 +662,7 @@ const CreateProduct = () => {
                                     </div>
                                 </div>
                                 <div className="mb-4">
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                                         Mô tả sản phẩm
                                     </label>
                                     <Textarea
@@ -669,7 +680,7 @@ const CreateProduct = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                                    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
                                         Hình ảnh
                                     </label>
                                     <Input
@@ -709,7 +720,7 @@ const CreateProduct = () => {
                                                             input.files = dataTransfer.files; // Update the input files
                                                         }
                                                     }}
-                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-lg w-6 h-6"
                                                 >
                                                     X
                                                 </button>
@@ -736,7 +747,7 @@ const CreateProduct = () => {
                                 {showVariantForm && variants.map((variant, index) => (
                                     <div className="mb-4 border-b pb-4" key={index}>
                                         <div className="mb-4">
-                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Tên sản phẩm biến thể
                                             </label>
                                             <Input
@@ -752,7 +763,7 @@ const CreateProduct = () => {
                                             {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giá sản phẩm biến thể
                                             </label>
                                             <Input
@@ -769,7 +780,7 @@ const CreateProduct = () => {
                                             {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Số lượng sản phẩm biến thể
                                             </label>
                                             <Input
@@ -786,7 +797,7 @@ const CreateProduct = () => {
                                             {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giá trị biến thể
                                             </label>
                                             <Input
@@ -802,7 +813,7 @@ const CreateProduct = () => {
                                             {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Giảm giá (%)
                                             </label>
                                             <Input
@@ -819,7 +830,7 @@ const CreateProduct = () => {
                                             {errors[`discount_${index}`] && <p className="text-red-500 text-sm">{errors[`discount_${index}`]}</p>}
                                         </div>
                                         <div className="mb-4">
-                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
+                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                 Hình ảnh biến thể
                                             </label>
                                             <Input
@@ -880,9 +891,9 @@ const CreateProduct = () => {
                             </div>
                             <div className='flex gap-2 justify-end'>
                                 <Button color="danger" onClick={clo}>
-                                    Close
+                                    Đóng
                                 </Button>
-                                <Button color="primary" type='submit'>Lưu</Button>
+                                <Button className='bg-[#4f46b5] text-white' type='submit'>Lưu</Button>
                             </div>
                         </form>
                     </ModalBody>
@@ -896,10 +907,7 @@ const CreateProduct = () => {
             )}
 
             <div>
-                <Tabs aria-label="Options">
-                    <Tab key="SanphamChinh" title="Sản phẩm chính">
-                        <Card>
-                            {loadingProducts ? ( // Conditional rendering of the spinner
+            {loadingProducts ? ( // Conditional rendering of the spinner
                                 <div className="flex justify-center items-center h-32">
                                     <Spinner size="lg" color="primary" />
                                     <p className="ml-2 text-lg">Loading products...</p>
@@ -908,14 +916,14 @@ const CreateProduct = () => {
                                 <div>
                                     <Table aria-label="Example static collection table">
                                         <TableHeader>
-                                            <TableColumn>Tên</TableColumn>
-                                            <TableColumn>Danh mục</TableColumn>
-                                            <TableColumn>Thương hiệu</TableColumn>
-                                            <TableColumn>Số lượng biến thể</TableColumn>
-                                            <TableColumn>STATUS</TableColumn>
+                                            <TableColumn><div className=''>Tên</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Danh mục</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Thương hiệu</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Số lượng biến thể</div></TableColumn>
+                                            <TableColumn><div className='flex items-center justify-center'>Thao tác</div></TableColumn>
                                         </TableHeader>
                                         <TableBody>
-                                            {products.map((product, index) => {
+                                            {currentProducts.map((product, index) => {
                                                 return (
                                                     <TableRow key={index}>
                                                         <TableCell>
@@ -937,11 +945,11 @@ const CreateProduct = () => {
                                                                 <div>{product?.name || "Unnamed product"}</div>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell>{product.brand?.name}</TableCell>
-                                                        <TableCell>{product.category?.name}</TableCell>
-                                                        <TableCell>{product.ProductVariantCount}</TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.brand?.name}</div></TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.category?.name}</div></TableCell>
+                                                        <TableCell><div className='flex items-center justify-center'>{product.ProductVariantCount}</div></TableCell>
                                                         <TableCell>
-                                                            <div className='flex items-center gap-2'>
+                                                            <div className='flex items-center justify-center gap-2'>
                                                                 <span
                                                                     className="text-lg text-default-400 cursor-pointer active:opacity-50"
                                                                     onClick={() => handleOpenEditProductModal(product)} // Pass the entire product object
@@ -957,13 +965,34 @@ const CreateProduct = () => {
                                         </TableBody>
                                     </Table>
 
+                                    <div className="flex justify-between items-center mt-4">
+                                    <div className="text-sm">
+                        {`${indexOfFirstProduct + 1} - ${Math.min(indexOfLastProduct, products.length)} của ${products.length} sản phẩm`}
+                    </div>
+                                    <div className="flex gap-2">
+
+                                        {Array.from({ length: Math.ceil(products.length / productsPerPage) }, (_, index) => (
+                                            <div
+                                                className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md'
+                                                key={index + 1}
+                                                onClick={() => setCurrentPage(index + 1)}
+                                                style={{ 
+                                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent', 
+                                                    border: '2px solid #696bff',
+                                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                        ))}
+
+                                    </div>
+                                     
+                                    </div>
+
                                 </div>
 
                             )}
-                        </Card>
-                    </Tab>
-                    {/* Other tabs here... */}
-                </Tabs>
 
                 <Modal
                     size="5xl"
@@ -984,7 +1013,7 @@ const CreateProduct = () => {
                                             <form onSubmit={handleUpdate} encType="multipart/form-data">
                                                 <div>
                                                     <div className="mb-4">
-                                                        <label htmlFor="name_product" className="block text-sm font-medium text-gray-700">
+                                                        <label htmlFor="name_product" className="block text-sm font-medium text-gray-700 mb-1">
                                                             Tên sản phẩm
                                                         </label>
                                                         <Input
@@ -1003,7 +1032,7 @@ const CreateProduct = () => {
                                                     <div className='flex gap-5'>
                                                         {/* Categories */}
                                                         <div className="mb-4 flex-1">
-                                                            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Phân loại
                                                             </label>
                                                             <Select
@@ -1028,7 +1057,7 @@ const CreateProduct = () => {
 
                                                         {/* Brands */}
                                                         <div className="mb-4 flex-1">
-                                                            <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor="brand_id" className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Thương hiệu
                                                             </label>
                                                             <Select
@@ -1053,7 +1082,7 @@ const CreateProduct = () => {
                                                         </div>
                                                     </div>
                                                     <div className="mb-4">
-                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                                                             Mô tả
                                                         </label>
                                                         <Textarea
@@ -1094,9 +1123,9 @@ const CreateProduct = () => {
                                                                 <img src={img.image} alt="" className='w-[200px] h-[200px] object-cover' />
                                                                 <button
                                                                     onClick={() => handleDeleteProductImage(img.id)}
-                                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6"
+                                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-lg w-6 h-6 flex items-center justify-center"
                                                                 >
-                                                                    X
+                                                                    <DeleteOutlineIcon />
                                                                 </button>
                                                             </div>
                                                         ))}
@@ -1104,7 +1133,7 @@ const CreateProduct = () => {
                                                 </div>
 
                                                 <div className="mb-2">
-                                                    <label htmlFor="new_images" className="block text-sm font-medium text-gray-700">
+                                                    <label htmlFor="new_images" className="block text-sm font-medium text-gray-700 mb-1">
                                                         Thêm ảnh mới
                                                     </label>
                                                     <Input
@@ -1187,7 +1216,7 @@ const CreateProduct = () => {
                                                                 />
                                                                 <div className='flex gap-2'>
                                                                     <Button type="submit" color="primary">Lưu thay đổi</Button>
-                                                                    <Button onClick={() => setEditingVariant(null)}>Hủy</Button>
+                                                                    <Button onClick={() => setEditingVariant(null)} color='danger'>Hủy</Button>
                                                                 </div>
                                                             </form>
                                                         ) : (
@@ -1227,7 +1256,7 @@ const CreateProduct = () => {
                                                 {showVariantForm && variants.map((variant, index) => (
                                                     <div className="mb-4 border-b pb-4" key={index}>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`name_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Name Product Variant
                                                             </label>
                                                             <Input
@@ -1243,7 +1272,7 @@ const CreateProduct = () => {
                                                             {errors[`name_${index}`] && <p className="text-red-500 text-sm">{errors[`name_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`price_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Price
                                                             </label>
                                                             <Input
@@ -1259,7 +1288,7 @@ const CreateProduct = () => {
                                                             {errors[`price_${index}`] && <p className="text-red-500 text-sm">{errors[`price_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`stock_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Stock
                                                             </label>
                                                             <Input
@@ -1275,7 +1304,7 @@ const CreateProduct = () => {
                                                             {errors[`stock_${index}`] && <p className="text-red-500 text-sm">{errors[`stock_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`variantValue_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Variant Value
                                                             </label>
                                                             <Input
@@ -1291,7 +1320,7 @@ const CreateProduct = () => {
                                                             {errors[`variantValue_${index}`] && <p className="text-red-500 text-sm">{errors[`variantValue_${index}`]}</p>}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`discount_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Discount
                                                             </label>
                                                             <Input
@@ -1309,7 +1338,7 @@ const CreateProduct = () => {
 
 
                                                         <div className="mb-4">
-                                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700">
+                                                            <label htmlFor={`image_${index}`} className="block text-sm font-medium text-gray-700 mb-1">
                                                                 Upload Variant Image
                                                             </label>
                                                             <Input
@@ -1394,7 +1423,7 @@ const CreateProduct = () => {
                                                                 <Button color="primary" onPress={() => handleAddNewVariant(selectedProduct.id)}>
                                                                     Thêm biến thể
                                                                 </Button>
-                                                                <Button color="secondary" onPress={() => setShowNewVariantForm(false)}>
+                                                                <Button color="danger" onPress={() => setShowNewVariantForm(false)}>
                                                                     Hủy
                                                                 </Button>
                                                             </div>
@@ -1414,12 +1443,7 @@ const CreateProduct = () => {
                 </Modal>
 
             </div>
-            <Pagination
-                total={pagination.last_page}  // total number of pages
-                initialPage={pagination.current_page}  // current page
-                onChange={(page) => fetchProducts(page)} // fetch products when page changes
-                showControls
-            />
+          
         </div>
     );
 };

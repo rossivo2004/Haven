@@ -41,6 +41,62 @@ class ProductVariantController extends Controller
     //         'product' => $request->all(),
     //     ], 200);
     // }
+
+
+
+    function getRelatedVariants(ProductVariant $productVariant)
+{
+    // Lấy sản phẩm biến thể cụ thể
+   
+    try {
+        $product = $productVariant->product;
+
+    // Lấy sản phẩm biến thể cùng danh mục, loại trừ bản thân
+    $categoryVariants = ProductVariant::whereHas('product', function ($query) use ($product) {
+            $query->where('category_id', $product->category_id);
+        })
+        ->where('id', '!=', $productVariant->id)
+        ->inRandomOrder()
+        ->take(2)
+        ->get();
+
+    // Lấy sản phẩm biến thể cùng thương hiệu, loại trừ bản thân
+    $brandVariants = ProductVariant::whereHas('product', function ($query) use ($product) {
+            $query->where('brand_id', $product->brand_id);
+        })
+        ->where('id', '!=', $productVariant->id)
+        ->inRandomOrder()
+        ->take(1) 
+        ->get();
+
+    
+    $sameProductVariants = ProductVariant::where('product_id', $product->id)
+        ->where('id', '!=', $productVariant->id)
+        ->inRandomOrder()
+        ->take(1) 
+        ->get();
+
+   
+    $relatedVariants = $categoryVariants->merge($brandVariants)->merge($sameProductVariants);
+        return response()->json([
+            'success' => true,
+            'relatedVariants' => $relatedVariants,
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Xảy ra lỗi trong quá trình lấy',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+    // Lấy sản phẩm chính của biến thể
+    
+
+    
+}
+
+
+
     public function store(StoreProduct_variantRequest $request)
     {
         
@@ -73,6 +129,7 @@ class ProductVariantController extends Controller
      */
     public function show(ProductVariant $productVariant)
     {
+        $productVariant->increment('view');
         return response()->json([
             'success' => true,
             'product' => $productVariant

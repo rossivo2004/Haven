@@ -5,9 +5,12 @@ import {Spinner} from "@nextui-org/react";
 import Profile_SideMenu from '@/src/components/ProfileSideMenu/Profile_SideMenu';
 import { hiddenMenuPaths } from '@/src/utils';
 
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname(); 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+
 
 
   useEffect(() => {
@@ -24,7 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (isMobile === null) {
-    return <div className='w-full h-screen flex items-center justify-center'><Spinner /></div>; 
+    // return <div className='w-full h-screen flex items-center justify-center'><Spinner /></div>; 
   }
 
   if (isMobile) {

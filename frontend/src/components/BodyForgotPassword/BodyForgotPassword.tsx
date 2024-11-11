@@ -108,8 +108,8 @@ function BodyForgotPassword() {
           />
         </div>
         <div className="flex-1 flex flex-col justify-center">
-          <div className="text-4xl font-medium mb-5">Quên mật khẩu</div>
-          <div className="text-base font-normal mb-6">
+          <div className="text-4xl font-medium mb-5 dark:text-white">Quên mật khẩu</div>
+          <div className="text-base font-normal mb-6 dark:text-white">
             Vui lòng nhập thông tin bên dưới!
           </div>
           <form onSubmit={handleEmailSubmit}>

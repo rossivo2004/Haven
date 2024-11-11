@@ -22,6 +22,10 @@ const apiConfig = {
     addproductimage : `${baseUrl}/api/productimage/store`,
   },
 
+  productsva: {
+    getAll: `${baseUrl}/api/productvariant`,
+  },
+
   categories: {
     getAll: `${baseUrl}/api/category/`,
     createCt: `${baseUrl}/api/category/store/`,
@@ -89,6 +93,47 @@ const apiConfig = {
 
   roles: {
     getAll: `${baseUrl}/api/roles/`,
+  },
+
+  order: {
+    //Show order
+    getAll: `${baseUrl}/api/checkout/showorder`,
+
+    //Tạo đơn hàng
+    createOrder: `${baseUrl}/api/checkout/orders`,
+
+    //Trừ điểm khi dùng
+    subtractionPoint: `${baseUrl}/api/checkout/deduct-points`,
+
+    //Show order user
+    ///showorder/{userId}
+    showOrderUser: `${baseUrl}/api/checkout/showorder/`,
+
+    //Show order theo id
+    ///showorderdetail/{order}
+    showOrderDetail: `${baseUrl}/api/checkout/showorderdetail/`,
+
+    //Show order theo mã đơn hàg
+    ///showorderdetailcode/{code}
+    showOrderDetailCode: `${baseUrl}/api/checkout/showorderdetailcode/`,
+
+    //Hủy đơn hàng dựa trên id
+    ///orders/cancelorder/{orderId}
+    cancelOrder: `${baseUrl}/api/checkout/orders/cancelorder/`,
+
+    //Cập nhật đơn hàng
+    ///orders/updatestatus/{orderId}
+    updateOrderStatus: `${baseUrl}/api/checkout/orders/updatestatus/`,
+  },
+
+  static: {
+    //Show static
+    getAll: `${baseUrl}/api/statics`,
+    getProduct: `${baseUrl}/api/statics/product`,
+    getOrder: `${baseUrl}/api/statics/order`,
+    getUser: `${baseUrl}/api/statics/user`,
+    getComparison: `${baseUrl}/api/statics/comparison`,
+    getMostLeast: `${baseUrl}/api/statics/mostleast`,
   }
 };
 

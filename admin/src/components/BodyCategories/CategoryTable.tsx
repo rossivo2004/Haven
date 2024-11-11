@@ -38,6 +38,16 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const itemsPerPage = 10; // Number of items per page
+
+    // Calculate the current items to display
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = categories.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(categories.length / itemsPerPage);
 
     // Cập nhật giá trị categoryName và categoryTag khi editingCategory thay đổi
     useEffect(() => {
@@ -191,7 +201,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody items={categories}>
+                <TableBody items={currentItems}>
                     {(item) => (
                         <TableRow key={item.id}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -199,6 +209,30 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                     )}
                 </TableBody>
             </Table>
+
+            {/* Custom Pagination Controls */}
+            <div className="flex justify-between items-center mt-4">
+                <div className="text-sm">
+                    {/* Hiển thị số sản phẩm đang hiển thị */}
+                    {`${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, categories.length)} của ${categories.length} phân loại`}
+                </div>
+                <div className="flex gap-2">
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <div
+                            className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md'
+                            key={index + 1}
+                            onClick={() => setCurrentPage(index + 1)}
+                            style={{ 
+                                backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent', 
+                                border: '2px solid #696bff',
+                                color: currentPage === index + 1 ? 'white' : '#696bff'
+                            }}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             {/* Modal for editing category */}
             {editingCategory && (

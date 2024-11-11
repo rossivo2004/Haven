@@ -11,7 +11,7 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import { siteConfig } from "@/src/config/site";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay } from 'swiper/modules';
-import { Tabs, Tab, Button } from "@nextui-org/react";
+import { Tabs, Tab, Button, Spinner } from "@nextui-org/react";
 
 import { title, subtitle } from "@/src/components/primitives";
 import { GithubIcon } from "@/src/components/icons";
@@ -35,7 +35,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import './style.scss'
 
-import { fetchProducts } from "@/src/api/productApi";
+// import { fetchProducts } from "@/src/api/productApi";
 
 // import {useTranslations} from 'next-intl';
 
@@ -43,28 +43,25 @@ import apiConfig from '@/src/config/api';
 
 import { Category, Variant } from "@/src/interface";
 import axios from "axios";
+import Loading from "../ui/Loading";
 
-interface ProductIn {
-    id: number;
-    name: string;
-    price: string;
-    images: string[];
-}
+
 
 function BodyHome() {
-    const [productData, setProductData] = useState<ProductIn | null>(null);
+    const [productData, setProductData] = useState<Variant[]>([])
+    const [productDataHot, setProductDataHot] = useState<Variant[]>([])
+    const [productDataNew, setProductDataNew] = useState<Variant[]>([])
     const [productDataSale, setProductDataSale] = useState<Variant[]>([]); // Change initial state to an empty array
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
 
-
-    const [language, setLanguage] = useState('vi'); // Default to 'en'
-    const params = useParams(); 
+    // const [language, setLanguage] = useState('vi'); // Default to 'en'
+    // const params = useParams(); 
     // const { lang = 'vi' } = params;
     // const t = useTranslations('HomePage');
     const [loading, setLoading] = useState(false);
 
-    const [category, setCategory] =  useState<Category[]>([]);
+    const [category, setCategory] = useState<Category[]>([]);
 
     const fetchCategory = async () => {
         setLoading(true); // Start loading
@@ -85,24 +82,27 @@ function BodyHome() {
 
     const fetchFlashSaleProducts = async (flashSaleId: number) => {
         try {
+            setLoading(true);
             const response = await axios.get(`${apiConfig.flashsale.getShowProductFlashsale}${flashSaleId}`);
             return response.data.FlashsaleProducts.data; // Adjust based on the actual response structure
         } catch (error) {
             console.error("Error fetching flash sale products:", error);
             return [];
+        } finally {
+            setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
                 const response = await axios.get(`${apiConfig.flashsale.getAllFlashsale}`);
                 const flashSales = response.data.flashSales.data;
-    
+
                 // Filter flash sales with status 1
                 const activeFlashSales = flashSales.filter((sale: any) => sale.status === 1);
-    
+
                 // Fetch products for each active flash sale
                 const productsPromises = activeFlashSales.map((sale: any) => fetchFlashSaleProducts(sale.id));
                 const products = await Promise.all(productsPromises);
@@ -113,16 +113,38 @@ function BodyHome() {
                 setLoading(false);
             }
         };
-    
+
         fetchData();
     }, []);
 
     useEffect(() => {
-        console.log(productDataSale); // Log chỉ khi productDataSale thay đổi
-    }, [productDataSale]); 
-    
-    // console.log(productData);
-    
+        const fetchProducts = async () => {
+            const response = await axios.get(`${apiConfig.products.getAllProduct}`);
+            console.log(response.data);
+            
+            setProductDataHot(response.data.Featured);
+            setProductDataNew(response.data.newProducts);
+        }
+        fetchProducts();
+    }, [])
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`${apiConfig.products.getallproductvariants}`);
+            setProductData(response.data.productvariants.data);
+        } catch (error) {
+            console.error("Error fetching product data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    useEffect(() => {
+        fetchProducts();
+    }, [])
+
+    console.log(productData);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -137,15 +159,15 @@ function BodyHome() {
         "--value": counter,
     };
 
-    useEffect(() => {
-        const getProducts = async () => {
-            const data = await fetchProducts();
-            const dataNew = data.slice(0, 60);
-            setProductData(dataNew);
-        };
+    // useEffect(() => {
+    //     const getProducts = async () => {
+    //         const data = await fetchProducts();
+    //         const dataNew = data.slice(0, 60);
+    //         setProductData(dataNew);
+    //     };
 
-        getProducts();
-    }, []);
+    //     getProducts();
+    // }, []);
 
     //   console.log(productData);
 
@@ -158,7 +180,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-11.png`}
+                                src={`/images/bn-11.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority
@@ -167,7 +189,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-20.png`}
+                                src={`/images/bn-20.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority
@@ -176,7 +198,7 @@ function BodyHome() {
                         <SwiperSlide>
                             <Image
                                 className="banner-image absolute top-0 left-0 w-full max-w-screen-2xl mx-auto h-full object-cover"
-                                src={`/images/bn-21.png`}
+                                src={`/images/bn-21.jpg`}
                                 alt="Banner"
                                 layout="fill"
                                 priority
@@ -204,28 +226,28 @@ function BodyHome() {
                             <div className="border border-gray-200 w-full h-full flex items-center group justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50 transition-all">
                                 <RocketLaunchOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Free shipping
+                                    Miễn phí giao hàng
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">For orders from 500k or more</div>
+                                <div className="text-sm text-[#c6c6c6]">Cho đơn từ 500k</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <WhatsAppIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                24/7 Support
+                                    Hỗ trợ 24/7
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">24/7 online / offline support</div>
+                                <div className="text-sm text-[#c6c6c6]">Hỗ trợ trực tuyến/ngoại tuyến 24/7</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <Inventory2OutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Free returns
+                                    Miễn phí đổi trả
                                 </div>
-                                <div className="text-sm text-[#c6c6c6]">Within 7 days</div>
+                                <div className="text-sm text-[#c6c6c6]">Trong vòng 3 ngày</div>
                             </div>
                             <div className="border border-gray-200 w-full h-full group flex items-center justify-center flex-col lg:gap-2 gap-1 p-2 dark:hover:bg-gray-600 hover:bg-gray-50  transition-all">
                                 <PaymentOutlinedIcon className="mb-2 lg:!w-10 lg:!h-10 !h-8 !w-8 text-black dark:text-white" />
                                 <div className="text-lg text-[#666666] group-hover:text-black dark:group-hover:text-white font-medium group-hover:tracking-wider transition-all">
-                                Order online
+                                    Đặt hàng online
                                 </div>
                                 <div className="text-sm text-[#c6c6c6]">Hotline: 0357 420 420</div>
                             </div>
@@ -246,64 +268,67 @@ function BodyHome() {
                         }}
                     >
                         <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
-                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Flash Sale</div>
-                            <div className="flex items-center">
-                                <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">End after:</div>
-                                <div>
-                                    <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 15 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                            Day
+                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
+                            {productDataSale.length > 0 && (
+                                <div className="flex items-center">
+                                    <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">Kết thúc sau:</div>
+                                    <div>
+                                        <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 15 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Ngày
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 10 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                            Hour
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 10 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Giờ
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={{ "--value": 24 } as CSSProperties}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                            Minute
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={{ "--value": 24 } as CSSProperties}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Phút
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
-                                            <span className="countdown font-mono text-sm">
-                                                <span style={customStyle}></span>
-                                            </span>
-                                            <div className="text-[10px]">
-                                            Minute
+                                            <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
+                                                <span className="countdown font-mono text-sm">
+                                                    <span style={customStyle}></span>
+                                                </span>
+                                                <div className="text-[10px]">
+                                                    Giây
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </motion.div>
-                    <div className="max-w-screen-xl mx-auto px-4 mb-14">
-                        <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                            {productDataSale.slice(0, 8).map((product) => (
-                                <BoxProductFlashSale key={product.id} product={product} />
-                            ))}
-                            {/* {flatProducts.slice(0, 8).map((product) => (
-                                <BoxProductFlashSale key={product.id} product={product} />
-                            ))} */}
-                        </div>
+                    <div className="max-w-screen-xl mx-auto mb-14 relative h-auto">
+                        {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : productDataSale.length > 0 ? (
+                            <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
+                                {productDataSale.slice(0, 8).map((product) => (
+                                    <BoxProductFlashSale key={product.id} product={product} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center py-4">Hiện tại không có sản phẩm khuyến mãi</div> // Display message when there are no flash sale products
+                        )}
                     </div>
                 </motion.div>
 
 
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
-                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Category</div>
+                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Phân loại sản phẩm</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
@@ -326,7 +351,7 @@ function BodyHome() {
                                 },
                             }}
                         >
-                            {category.map((item, index) => (
+                            {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : category.map((item, index) => (
                                 <SwiperSlide key={index}>
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.8 }} // Bắt đầu nhỏ hơn
@@ -372,31 +397,19 @@ function BodyHome() {
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex gap-4">
                             <div className="lg:w-1/4 lg:block hidden">
-                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">Featured Products</div>
+                                <div className="text-black dark:text-white font-bold lg:text-4xl w-max text-2xl mb-6">Sản phẩm nổi bật</div>
                                 <img src={`/images/bn-5.png`} alt="A cat sitting on a chair" className="lg:block hidden w-full h-[800px] object-cover rounded-lg" />
                             </div>
                             <div className="flex-1">
                                 <div className="flex w-full flex-col items-center lg:items-end">
                                     <div className="font-bold lg:text-4xl text-2xl lg:hidden">Sản Phẩm Nổi Bật</div>
-                                    <Tabs aria-label="Disabled Options" className="mb-6" variant="bordered" color="warning"
-                                        classNames={{
-                                            tabContent: "group-data-[selected=true]:text-white"
-                                        }}
-                                    >
-                                        <Tab key="photos" title="Photos" className="py-0">
-                                            <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full">
-                                                {/* {flatProducts.slice(0, 6).map((product) => (
-                                                    <BoxProduct key={product.id} product={product} />
-                                                ))} */}
-                                            </div>
-                                        </Tab>
-                                        <Tab key="music" title="Music">
-                                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                        </Tab>
-                                        <Tab key="videos" title="Videos">
-                                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                        </Tab>
-                                    </Tabs>
+                                    <div className="lg:grid md:grid grid lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-4 w-full pt-[64px]">
+                                        {loading ? <div className="w-full h-[800px] flex items-center justify-center col-span-3"><Spinner /></div> : productDataHot
+                                            .slice(0, 6)
+                                            .map((product) => (
+                                                <BoxProduct key={product.id} product={product} />
+                                            ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -425,7 +438,7 @@ function BodyHome() {
                         <div>
                             <Link href="/shop">
                                 <Button variant="bordered" className="border-main text-main">
-                                   Xem thêm
+                                    Xem thêm
                                 </Button>
                             </Link>
                         </div>
@@ -470,9 +483,11 @@ function BodyHome() {
                             <div className="lg:col-span-2 md:col-span-3 col-span-2">
                                 <img src={`/images/bn-7.jpeg`} alt="A cat sitting on a chair" className="w-full h-full object-cover rounded-lg" />
                             </div>
-                            {/* {flatProducts.slice(0, 6).map((product) => (
-                                <BoxProduct key={product.id} product={product} />
-                            ))} */}
+                            {productDataNew
+                                .slice(0, 6) // Get the first 6 products
+                                .map((product) => (
+                                    <BoxProduct key={product.id} product={product} />
+                                ))}
                         </div>
 
 
@@ -507,7 +522,7 @@ function BodyHome() {
                     </div>
                 </motion.div>
 
-                <motion.div
+                {/* <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
@@ -519,20 +534,20 @@ function BodyHome() {
                 >
                     <div className="max-w-screen-xl mx-auto px-4 mb-16">
                         <div className="flex justify-between mb-6 items-center">
-                            <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hàng Đầu Thế Giới</div>
+                            <div className="font-bold lg:text-4xl text-2xl text-black dark:text-white">Thịt Đông Lạnh Nhập Khẩu Hng Đầu Thế Giới</div>
                             <div className="font-medium text-sm text-main">Xem thêm</div>
                         </div>
                         <div>
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
-                                {/* {flatProducts.slice(0, 8).map((product) => (
+                                {flatProducts.slice(0, 8).map((product) => (
                                     <BoxProduct key={product.id} product={product} />
-                                ))} */}
+                                ))}
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </motion.div> */}
 
-                <div className="max-w-screen-xl mx-auto px-4 mb-16">
+                {/* <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="flex items-center justify-between mb-6">
                         <div className="font-bold text-4xl text-black dark:text-white">Tin tức mới</div>
                         <div className="font-medium text-sm text-main">Xem thêm</div>
@@ -550,16 +565,16 @@ function BodyHome() {
                             },
                         }}
                     >
-                        {/* {BLOG.slice(0, 4).map((blog, index) => (
+                        {BLOG.slice(0, 4).map((blog, index) => (
                             <SwiperSlide key={index} className="lg:hidden">
                                 <BoxBlog blog={blog} />
                             </SwiperSlide>
-                        ))} */}
+                        ))}
 
                     </Swiper>
 
 
-                </div>
+                </div> */}
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="relative w-full lg:h-[500px] h-auto">

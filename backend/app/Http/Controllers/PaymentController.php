@@ -24,16 +24,16 @@ class PaymentController extends Controller
 
         $vnp_Url = env('VNP_URL');
         $vnp_Returnurl = env('VNP_RETURN_URL') . '/' . $order_id;
-        $vnp_TmnCode = env('VNP_TMN_CODE');//Mã website tại VNPAY 
+        $vnp_TmnCode = env('VNP_TMN_CODE');//Mã website tại VNPAY
         $vnp_HashSecret = env('VNP_HASH_SECRET'); //Chuỗi bí mật
-        $vnp_TxnRef = $order->invoice_code; //Mã đơn hàng. 
+        $vnp_TxnRef = $order->invoice_code; //Mã đơn hàng.
         $vnp_OrderInfo = "Thanh toán hóa đơn đơn hàng $order->invoice_code";
         $vnp_OrderType = "Haven";
         $vnp_Amount = $order->total * 100;
         $vnp_Locale = "VN";
         $vnp_BankCode = "NCB";
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
-        
+
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
@@ -48,14 +48,14 @@ class PaymentController extends Controller
             "vnp_ReturnUrl" => $vnp_Returnurl,
             "vnp_TxnRef" => $vnp_TxnRef,
         );
-        
+
         if (isset($vnp_BankCode) && $vnp_BankCode != "") {
             $inputData['vnp_BankCode'] = $vnp_BankCode;
         }
         if (isset($vnp_Bill_State) && $vnp_Bill_State != "") {
             $inputData['vnp_Bill_State'] = $vnp_Bill_State;
         }
-        
+
         //var_dump($inputData);
         ksort($inputData);
         $query = "";
@@ -70,10 +70,10 @@ class PaymentController extends Controller
             }
             $query .= urlencode($key) . "=" . urlencode($value) . '&';
         }
-        
+
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
-            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret);//  
+            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret);//
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
         $returnData = array('code' => '00'
@@ -85,16 +85,16 @@ class PaymentController extends Controller
     } else {
         return response()->json($returnData);
     }
-        
+
     }
 
-    // Hàm xử lý callback sau khi VNPay thanh toán
-    public function vnpayReturn(Request $request, $orderID)
+// Hàm xử lý callback sau khi VNPay thanh toán
+public function vnpayReturn(Request $request, $orderID)
 {
     // Lấy dữ liệu phản hồi
     $responseData = $request->toArray();
 
-    // Xác minh secure hash 
+    // Xác minh secure hash
     $secureHash = $responseData['vnp_SecureHash'] ?? '';
     unset($responseData['vnp_SecureHash']); // Loại bỏ secure hash khỏi dữ liệu để tính toán hash
 
@@ -135,7 +135,7 @@ class PaymentController extends Controller
     if($payment->p_vnp_reponse_code == 00){
         $order->payment_status = 'paid'; 
     }
-    
+
     $order->save();
 
     if ($request->vnp_ResponseCode == '00') { // Kiểm tra mã phản hồi từ VNPay
@@ -146,7 +146,8 @@ class PaymentController extends Controller
     } else {
         // Nếu thất bại, chuyển hướng đến trang thất bại (tuỳ chọn)
         return redirect()->to('http://localhost:3000/failure');
-    }
+
+    } 
 
     // return response()->json(['status' => true, 'message' => 'Payment successful', 'data' => $responseData]);
 }

@@ -6,6 +6,7 @@ export interface Variant {
   discount: number;
   DiscountedPrice?: number; // Added optional discountedPrice field
   FlashSalePrice?: number;
+  views?: number;
   flash_sales: {
     ProductFlashSaleCount: number;
     StatusFlashSaleStock: string;
@@ -42,6 +43,7 @@ export interface Variant {
     variant_value: string;
 
   };
+  created_at: string;
 }
 
 export interface Product {
@@ -73,7 +75,7 @@ export interface ProductProps {
   salePrice?: number;
   quantity?: number;
   discount: number;
-  images: string[];
+  image: string[];
   description?: string; // Added optional description field
   select?: boolean; // Added optional description field
   stock?: number; // Added optional
@@ -234,10 +236,106 @@ export interface CartItem {
   user_id: number | null;
   product_variant_id: number;
   quantity: number;
-  product_variant
-  : ProductProps,
-  selected?: boolean,
+  product_variant: {
+    name?: string; // Optional name of the product
+    image?: string; // Optional image URL of the product
+    price?: number; // Optional price of the product
+    discount?: number; // Optional discount percentage
+    FlashSalePrice?: number; // Optional flash sale price
+    DiscountedPrice?: number; // Optional discounted price
+    id?: number; // Optional ID of the product
+    priceMain?: number; // Optional price of the product
+    flash_sales: {
+      ProductFlashSaleCount: number;
+      StatusFlashSaleStock: string;
+      created_at: string;
+      end_time: string;
+      id: number;
+      pivot: {
+        discount_percent: number;
+        flash_sale_id: number;
+        id: number;
+        product_variant_id: number;
+        sold: number;
+        stock: number;
+      };
+    }[];
+  }
 }
+
+
+
+export interface Order {
+  id: number;
+  invoice_code: string;
+  refunded_stock: number;
+  full_name: string;
+  phone: string;
+  email: string;
+  total: string;
+  status: string;
+  province: string;
+  district: string;
+  ward: string;
+  address: string;
+  payment_transpot: string;
+  payment_method: string;
+  payment_status: string;
+  user_id: number;
+  created_at: string; // Consider using Date type if you will handle dates
+  updated_at: string; // Consider using Date type if you will handle dates
+}
+
+export interface OrderTracking {
+  id: number;
+  invoice_code: string;
+  refunded_stock: number;
+  full_name: string;
+  address: string;
+  created_at: string;
+  district: string;
+  email: string;
+  phone: string;
+  province: string;
+  ward: string;
+  total: number;
+  status: string;
+  payment_method: string;
+  payment_status: string;
+  payment_transport: string;
+  user: {
+    id: number;
+    full_name: string;
+    address: string;
+    created_at: string;
+    email: string;
+    phone: string;
+    role_id: number;
+    status: string;
+    image: string | null;
+    points: number;
+    facebook_id: string | null;
+    google_id: string | null;
+    ward: string;
+    district: string;
+    province: string;
+    updated_at: string;
+  };
+  order_details: {
+    id: number;
+    quantity: number;
+    price: number;
+    order_id: number;
+    product_variant_id: number;
+    product_variant: {
+      id: number;
+      name: string;
+      image: string;
+    }
+  }[];
+  updated_at: string;
+}
+
 
 // export interface CartItem {
 //   id: number;
@@ -260,3 +358,51 @@ export interface CartItem {
 //   quantity: number,
 //   selected?: boolean,
 // }
+
+export interface User {
+  id?: number;
+  name?: string;
+  email?: string;
+  password?: string;
+  google_id?: string | null;
+  facebook_id?: string | null;
+  image?: string | null;
+  phone?: string ;
+  address?: string;
+  status?: string;
+  point: number;
+  created_at?: string;
+  updated_at?: string;
+  role_id: number;
+  role: {
+      id: number;
+      name: string;
+      created_at: string | null;
+      updated_at: string | null;
+  };
+  province: string;
+  district: string;
+  ward: string;
+}
+
+export interface FavouriteItem {
+  id: number;
+  product_id: number;
+  image: string;
+  name: string;
+  DiscountedPrice: number;
+  Favored: boolean;
+  FlashSalePrice: number;
+  QuantityInCart: number;
+  StatusStock: string;
+  storedCart: boolean;
+  created_at: string;
+  discount: boolean;
+  // flash_sales: FlashSale[];
+  // product: Product;
+  price: number;
+  stock: number;
+  updated_at: string;
+  variant_value: string;
+  view: number;
+}

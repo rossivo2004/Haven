@@ -52,6 +52,7 @@ const menuItems = [
 ];
 
 function Header({ params }: { params: { lang: string } }) {
+    const userId = Cookies.get('user_id'); // Get user ID from cookies
     const dispatch = useDispatch();
     const router = useRouter();
     const [userData, setUserData] = useState<any>(null);
@@ -177,6 +178,7 @@ function Header({ params }: { params: { lang: string } }) {
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
         toast.success('Đăng xuất thành công');
+        Cookies.remove('checkout_data');
     };
 
 
@@ -313,7 +315,6 @@ function Header({ params }: { params: { lang: string } }) {
 
 
 
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
     useEffect(() => {
         if (userId) { // {{ edit_1 }}
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
@@ -458,33 +459,39 @@ function Header({ params }: { params: { lang: string } }) {
                                                 />
                                             </DropdownTrigger>
                                             <DropdownMenu aria-label="Profile Actions" variant="flat">
-                                                <DropdownItem key="profile" className="h-14 gap-2">
+                                                <DropdownItem key="profile" className="h-14 gap-2 dark:text-white">
                                                     <p className="font-semibold">Signed in as</p>
                                                     <p className="font-semibold">{userData.email}</p> {/* Display user email */}
                                                 </DropdownItem>
                                                 <DropdownItem key="settings">
-                                                    <Link href={'/profile'}>
+                                                    <Link href={'/profile'} className='dark:text-white'>
                                                         Trang cá nhân
                                                     </Link>
                                                 </DropdownItem>
-                                                <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                                              
+                                                {/* <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                                 <DropdownItem key="analytics">
                                                     <Link href={'/profile/notify'}>
                                                         Thông báo
                                                     </Link>
-                                                </DropdownItem>
+                                                </DropdownItem> */}
                                                 <DropdownItem key="system">
-                                                    <Link href={'/profile/order'}>
+                                                    <Link href={'/profile/order'} className='dark:text-white'>
                                                         Quản lí đơn hàng
                                                     </Link>
                                                 </DropdownItem>
-                                                <DropdownItem key="configurations">
+                                                <DropdownItem key="favourite">
+                                                    <Link href={'/profile/favourite'} className='dark:text-white'>
+                                                        Sản phẩm yêu thích
+                                                    </Link>
+                                                </DropdownItem>
+                                                {/* <DropdownItem key="configurations">
                                                     <Link href={'/profile/promotion'}>
                                                         Mã giảm giá
                                                     </Link>
-                                                </DropdownItem>
+                                                </DropdownItem> */}
                                                 <DropdownItem key="logout" color="danger" onClick={handleLogout}> {/* Add onClick to handle logout */}
-                                                    Đăng xuất
+                                                    <div className='dark:text-white'>Đăng xuất</div>
                                                 </DropdownItem>
                                             </DropdownMenu>
                                         </Dropdown>
@@ -545,7 +552,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                            {Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')} VND
+                                                                            {userId ? (
+                                                                                item.product_variant.flash_sales.length > 0
+                                                                                    ? item.product_variant.flash_sales[0].pivot.stock > 0 
+                                                                                        ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
+                                                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
+                                                                                    : item.product_variant.priceMain?.toLocaleString('vi-VN')
+                                                                            ) : item.product_variant.priceMain?.toLocaleString('vi-VN')} VND
                                                                         </div>
 
                                                                     </div>
@@ -594,7 +607,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             </svg>
                                         </label>
                                     </div>
-                                    <div className="border border-white h-6"></div>
+                                    {/* <div className="border border-white h-6"></div>
                                     <div className='pl-2'>
                                         <select
                                             value={language}
@@ -603,7 +616,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             <option className='text-black' value="vi">Vie</option>
                                             <option className='text-black' value="en">Eng</option>
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -614,9 +627,9 @@ function Header({ params }: { params: { lang: string } }) {
                                 <li className='flex items-center'>
                                     <Link href={'/'}>TRANG CHỦ</Link>
                                 </li>
-                                <li className='flex items-center'>
+                                {/* <li className='flex items-center'>
                                     <Link href={`/blog`}>TIN TỨC</Link>
-                                </li>
+                                </li> */}
                                 <li>
 
 
@@ -635,16 +648,16 @@ function Header({ params }: { params: { lang: string } }) {
                                                         <div className='row-span-2'>
                                                             <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
                                                         </div>
-                                                        <div className='col-span-3 row-span-2'>
-                                                            <div className='flex flex-col mb-4'>
-                                                                <div className='text-black text-lg'>Phân loại</div>
-                                                                <div className='grid grid-cols-2'>
+                                                        <div className='col-span-3 row-span-2 flex'>
+                                                            <div className='flex flex-col items-start pl-2 w-1/2'>
+                                                                <div className='text-black text-lg font-semibold'>Phân loại</div>
+                                                                <div className='flex flex-col items-start'>
                                                                     {categories.map((item, index) => (
                                                                         <Link key={index} href={`/shop?category[]=${item.name}`}>
-                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                                <div className='mr-2'>
+                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                                </div>
+                                                                                </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
                                                                         </Link>
@@ -652,15 +665,15 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 </div>
 
                                                             </div>
-                                                            <div>
-                                                                <div className='text-black text-lg'>Thương hiệu</div>
-                                                                <div className='grid grid-cols-2'>
+                                                            <div className='w-1/2'>
+                                                                <div className='text-black text-lg font-semibold'>Thương hiệu</div>
+                                                                <div className='flex flex-col items-start pl-2'>
                                                                     {brands.map((item, index) => (
                                                                         <Link key={index} href={`/shop?brand[]=${item.name}`}>
-                                                                            <div className="flex py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
-                                                                                <div className='mr-2'>
+                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                                {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
-                                                                                </div>
+                                                                                </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
                                                                         </Link>
@@ -720,7 +733,7 @@ function Header({ params }: { params: { lang: string } }) {
                                     <Link href={`/tracking`}>TRA CỨU</Link>
                                 </li>
                                 <li className='flex items-center'>
-                                    <Link href={`/tracking`}>VỀ CHÚNG TÔI</Link>
+                                    <Link href={`/about`}>VỀ CHÚNG TÔI</Link>
                                 </li>
                             </ul>
                         </div>
@@ -797,23 +810,27 @@ function Header({ params }: { params: { lang: string } }) {
                                             <p className="font-semibold">zoey@example.com</p>
                                         </DropdownItem>
                                         <DropdownItem key="settings">
-                                            <Link href={`/profile`}>
+                                            <Link href={`/profile`} className='dark:text-white'>
                                                 Trang cá nhân
                                             </Link>
                                         </DropdownItem>
-                                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
                                         <DropdownItem key="analytics">
-                                            <Link href={'/profile'}>
-                                                Trang cá nhân
+                                            <Link href={'/profile/order'}>
+                                                Quản lý đơn hàng
                                             </Link>
                                         </DropdownItem>
-                                        <DropdownItem key="system">System</DropdownItem>
+                                        <DropdownItem key="analytics">
+                                            <Link href={'/profile/favourite'}>
+                                                Sản phẩm yêu thích
+                                            </Link>
+                                        </DropdownItem>
+                                        {/* <DropdownItem key="system">System</DropdownItem>
                                         <DropdownItem key="configurations">Configurations</DropdownItem>
                                         <DropdownItem key="help_and_feedback">
                                             Help & Feedback
-                                        </DropdownItem>
-                                        <DropdownItem key="logout" color="danger">
-                                            Log Out
+                                        </DropdownItem> */}
+                                        <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                                            Đăng xuất
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>

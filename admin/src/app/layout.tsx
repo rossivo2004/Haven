@@ -20,14 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-[#f5f8ff]">
       <body className={inter.className}>
-        <div className="flex px-4">
+        <div className="flex px-4 h-auto">
         <ToastContainer className="" />
           <Sidebar />
-          <div className="flex-1 pl-0 md:pl-0 lg:pl-0">
+          <div className="flex-1 pl-0 md:pl-0 lg:pl-0 h-screen">
             <Header />
-            <div className="pt-16 px-4 mt-2 md:pl-64 lg:pl-64"> {/* Add padding top to accommodate header */}
+            <div className="pt-20 px-4 mt-2 md:pl-64 lg:pl-64"> {/* Add padding top to accommodate header */}
               {children}
             </div>
           </div>

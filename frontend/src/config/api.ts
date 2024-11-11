@@ -3,6 +3,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 const apiConfig = {
   products: {
     getAll: `${baseUrl}/api/product/`,
+    getAllProduct: `${baseUrl}/api/product/home`,
     getDetailByTag: `${baseUrl}/api/product/getProductByTag/`,
     deletePr: `${baseUrl}/api/product/delete/`,
     updatepr: `${baseUrl}/api/product/update/`,
@@ -19,6 +20,9 @@ const apiConfig = {
     // Show sản phẩm biến thể theo id
     getproductvariantsbyid: `${baseUrl}/api/productvariant/show/`,
 
+    //Shaw sản phẩm tương tự
+    // /getRelatedVariants/{productVariant
+    getRelatedVariants: `${baseUrl}/api/productvariant/getRelatedVariants/`,
   },
   categories: {
     getAll: `${baseUrl}/api/category/`,
@@ -90,6 +94,8 @@ const apiConfig = {
     updatePassword: `${baseUrl}/api/password/update`,
 
     saveGoogleUser: `${baseUrl}/api/save-google-user`,
+
+    updateUser: `${baseUrl}/api/users/update/`,
   },
 
   favourite: {
@@ -147,6 +153,39 @@ const apiConfig = {
     ///clear/{userId}
     clearCartByUserId: `${baseUrl}/api/cart/clear/`,
   },
+
+
+  order: {
+    //Tạo đơn hàng
+    createOrder: `${baseUrl}/api/checkout/orders`,
+
+    //Trừ điểm khi dùng
+    subtractionPoint: `${baseUrl}/api/checkout/deduct-points`,
+
+    //Show order user
+    ///showorder/{userId}
+    showOrderUser: `${baseUrl}/api/checkout/showorderuser/`,
+
+    //Show order theo id
+    ///showorderdetail/{order}
+    showOrderDetail: `${baseUrl}/api/checkout/showorderdetail/`,
+
+    //Show order theo mã đơn hàg
+    ///showorderdetailcode/{code}
+    showOrderDetailCode: `${baseUrl}/api/checkout/showorderdetailcode/`,
+
+    // Trừ điểm user
+    deductPoints : `${baseUrl}/api/checkout/deduct-points`,
+
+        //Hủy đơn hàng dựa trên id
+    ///orders/cancelorder/{orderId}
+    cancelOrder: `${baseUrl}/api/checkout/orders/cancelorder/`,
+  },
+
+
+  payment: {
+    createPayment: `${baseUrl}/api/payment/vnpay_payment`
+  }
 
   
 

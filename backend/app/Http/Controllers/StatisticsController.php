@@ -28,7 +28,6 @@ class StatisticsController extends Controller
     return response()->json([
         'revenue' => $monthlyRevenue,
         'revenue_total' => $totalRevenue,
-        
     ]);
 }
 
@@ -81,8 +80,6 @@ public function getProductMostLeastStatistics()
         'products_by_month' => $productsByMonth,
     ]);
 }
-
-
 
 
 public function getUserStatistics()
@@ -264,5 +261,5 @@ public function getRevenueComparison()
 }
 
 
-
 }
+

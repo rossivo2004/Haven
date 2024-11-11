@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; // Sử dụng Auth User cho Laravel authentication
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
     // Các trường được phép mass assignment
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id', 'point',
+        'name', 'email', 'password', 'role_id', 'image', 'phone', 'address', 'status', 'google_id', 'facebook_id', 'point', 'province', 'district', 'ward',
     ];
 
     // Các trường sẽ bị ẩn khi trả về model
@@ -46,5 +47,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

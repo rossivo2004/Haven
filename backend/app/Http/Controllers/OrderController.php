@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
 
 class OrderController extends Controller
+
 { 
         public function checkout(Request $request)
     {
@@ -121,7 +122,6 @@ class OrderController extends Controller
                 $user->point += $loyaltyPoints;
                 $user->save();
             }
-        }
 
         // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
         if ($user_id) {
@@ -130,18 +130,26 @@ class OrderController extends Controller
                 ->delete();
         }
 
-        // Thêm thông báo cho admin
-        // Notification::create([
-        //     'invoice_code' => $order->invoice_code,
-        //     'is_read' => false,
-        // ]);
-
         return response()->json([
             'message' => 'Order created successfully!',
             'order' => $order,
             'loyalty_points_added' => $loyaltyPoints
         ], 201);
     }
+
+    // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
+    if ($user_id) {
+        Cart::where('user_id', $user_id)
+            ->whereIn('product_variant_id', array_column($products, 'id'))
+            ->delete();
+    }
+
+    return response()->json([
+        'message' => 'Order created successfully!',
+        'order' => $order,
+        'loyalty_points_added' => $loyaltyPoints
+    ], 201);
+}
 
 
     public function showOrder($userId){
@@ -152,10 +160,10 @@ class OrderController extends Controller
 
         return response()->json($orders);
         }
-        
+
         return response()->json([
             'message' => 'Không có đơn hàng'
-        ]); 
+        ]);
 
     }
 
@@ -169,15 +177,15 @@ class OrderController extends Controller
         }
         return response()->json([
             'message' => 'Không có đơn hàng'
-        ]); 
-        
+        ]);
+
     }
 
     public function showOrderdetailcode($ordercode)
 {
     if ($ordercode) {
         $order = Order::with([
-            'payment', 
+            'payment',
             'orderDetails.productVariant' => function ($query) {
                 $query->select('id', 'name', 'image'); // Chỉ lấy các trường cần thiết
             },
@@ -192,6 +200,7 @@ class OrderController extends Controller
     }
 
 }
+
 
     public function show(){
         $orders = Order::orderBy('id', 'DESC')->get();
@@ -214,7 +223,7 @@ class OrderController extends Controller
     if ($order->status === 'canceled') {
         return response()->json(['error' => 'Không thể cập nhật trạng thái đơn hàng đã hủy'], 400);
     }
-    
+
     // Kiểm tra nếu trạng thái mới hợp lệ
     if ($newStatusIndex === false) {
         return response()->json(['error' => 'Trạng thái không hợp lệ'], 400);
@@ -231,7 +240,7 @@ class OrderController extends Controller
     }
 
     $order->status = $newStatus;
-    
+
     // Kiểm tra nếu đơn hàng đã hoàn thành thì cho payment_status là paid
     if ($newStatus === 'complete') {
         $order->payment_status = 'paid';
@@ -354,19 +363,5 @@ public function deductPoints(Request $request)
     return response()->json($view, 200);
 }
 
-
-        // Xóa thông báo
-    //     public function deletenotify($order)
-    // {
-    //     $notification = Order::find($order);
-
-    //     if (!$notification) {
-    //         return response()->json(['message' => 'Không tìm thấy thông báo'], 404);
-    //     }
-
-    //     $notification->delete();
-
-    //     return response()->json(['message' => 'Đã xóa thông báo thành công'], 200);
-    // }
 
 }

@@ -5,11 +5,15 @@ import { Input } from '@nextui-org/input';
 import { Button } from '@nextui-org/button';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import apiConfig from '@/src/config/api';
+import { Spinner } from '@nextui-org/react';
 
 function BodyTracking() {
     const [trackingCode, setTrackingCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleTracking = (e: React.FormEvent) => {
+    const handleTracking = async (e: React.FormEvent) => { // Make the function async
         e.preventDefault();
 
         if (!trackingCode.trim()) {
@@ -17,22 +21,18 @@ function BodyTracking() {
             return;
         }
 
-        // Implement your tracking logic here
-        toast.success('Đang tra cứu đơn hàng...');
-
-        // Example: Call an API to track the order
-        // fetch(`/api/track-order?code=${trackingCode}`)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         if (data.success) {
-        //             toast.success('Đơn hàng của bạn đang được xử lý');
-        //         } else {
-        //             toast.error('Mã đơn hàng không hợp lệ');
-        //         }
-        //     })
-        //     .catch(error => {
-        //         toast.error('Có lỗi xảy ra. Vui lòng thử lại sau');
-        //     });
+        try {
+            setIsLoading(true); // Show loading animation
+            const response = await axios.get(`${apiConfig.order.showOrderDetailCode}${trackingCode}`); // Call the API
+            // console.log(response.data);
+            
+            window.location.href = `/trackingorder/${response.data.order.invoice_code}`;
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi lấy thông tin đơn hàng'); // Error handling
+            console.error(error);
+        } finally {
+            setIsLoading(false); // Hide loading animation
+        }
     };
 
     return (
@@ -48,11 +48,11 @@ function BodyTracking() {
 
             <div className='w-full h-[400px] flex lg:flex-row flex-col gap-10 lg:mt-10'>
                 <div className='lg:w-1/3 w-full flex flex-col justify-center'>
-                    <div className='text-4xl font-semibold mb-4'>Tra cứu đơn hàng</div>
+                    <div className='text-4xl font-semibold mb-4 dark:text-white'>Tra cứu đơn hàng</div>
                     <div>
                         <form onSubmit={handleTracking}>
-                            <div className='mb-6'>
-                                <label htmlFor="trackingCode" className='text-xl mb-2'>Mã đơn hàng</label>
+                            <div className='mb-2'>
+                                <label htmlFor="trackingCode" className='text-xl mb-2 dark:text-white'>Mã đơn hàng</label>
                                 <Input 
                                     id="trackingCode" 
                                     placeholder='Nhập mã đơn hàng' 
@@ -61,8 +61,8 @@ function BodyTracking() {
                                     onChange={(e) => setTrackingCode(e.target.value)}
                                 />
                             </div>
-                            <Button className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
-                            Tra cứu</Button>
+                            <Button type='submit' className="w-full bg-yellow-500 text-white p-3 rounded mt-4 font-bold">
+                            {isLoading ? <Spinner /> : "Tra cứu"}</Button>
                         </form>
                     </div>
                 </div>

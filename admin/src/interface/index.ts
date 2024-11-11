@@ -86,3 +86,24 @@ export interface Role {
   id: number;
   name: string;
 }
+
+export interface Order {
+  id: number;
+  invoice_code: string;
+  refunded_stock: number;
+  full_name: string;
+  phone: string;
+  email: string;
+  total: string;
+  status: string;
+  province: string;
+  district: string;
+  ward: string;
+  address: string;
+  payment_transpot: string;
+  payment_method: string;
+  payment_status: string;
+  user_id: number;
+  created_at: string; // Consider using Date type if you will handle dates
+  updated_at: string; // Consider using Date type if you will handle dates
+}
