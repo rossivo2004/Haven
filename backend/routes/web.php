@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
+use App\Http\Controllers\StatisticsController;
 use App\Models\ProductImage;
 
 // Quản lý roles
@@ -191,11 +192,13 @@ route::group([
     'prefix' => 'api/checkout'
 ],function(){
     Route::get('/showorder', [OrderController::class, 'show']); // lấy danh sach đơn hàng tất cả
-    Route::get('/showorder/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
+    Route::get('/showorderuser/{userId}', [OrderController::class, 'showOrder']); // lấy danh sach đơn hàng của 1 người dùng
     Route::get('/showorderdetail/{order}', [OrderController::class, 'showOrderdetail']); // lấy chi tiết của 1 đơn hàng
+    Route::get('/showorderdetailcode/{ordercode}', [OrderController::class, 'showOrderdetailcode']); // lấy chi tiết của 1 đơn hàng dựa tên mã đơn hàng
     Route::post('/orders', [OrderController::class, 'checkout']); // tạo đơn hàng
     Route::post('/orders/cancelorder/{orderId}', [OrderController::class, 'cancelOrder']); // Hủy đơn hàng
     Route::post('/orders/reorder/{orderId}', [OrderController::class, 'reorder']); // mua lại đơn hàng
+    Route::post('/deduct-points', [OrderController::class, 'deductPoints']); // trừ điểm tích lũy của người dùng đã sử dụng
     Route::put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
 });
 
@@ -204,4 +207,37 @@ route::group([
 ],function(){
     Route::get('/vnpay_return/{orderID}', [PaymentController::class, 'vnpayReturn']); // trả về dữ liệu lưu vào db
     Route::post('/vnpay_payment', [PaymentController::class, 'vnpay_payment']); // thanh toán vnpay
+});
+
+route::group([
+    'prefix' => 'api/statics'
+],function(){
+    Route::get('/', [StatisticsController::class, 'getMonthlyStatistics']); // Thống kê doanh thu theo tháng, sản phẩm bán chạy, bán ít theo tháng
+    Route::get('/mostleast', [StatisticsController::class, 'getProductMostLeastStatistics']); // Thống kê doanh thu theo tháng, sản phẩm bán chạy, bán ít theo tháng
+    Route::get('/user', [StatisticsController::class, 'getUserStatistics']); // Thống kê có bao nhiêu người dùng
+    Route::get('/order', [StatisticsController::class, 'getOrderStatistics']); // Thống kê có bao nhiêu đơn hàng (có làm thêm có bao nhiêu đơn hàng thành công và thất bai)
+    Route::get('/product', [StatisticsController::class, 'getProductVariantStatics']); // Thống kê có bao nhiêu sản phẩm biến thể
+    // Route::get('/blog', [StatisticsController::class, 'getBlogStatics']); // Thống kê có bao nhiêu bài viết
+    Route::get('/category', [StatisticsController::class, 'getCategoryStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo category
+    Route::get('/brand', [StatisticsController::class, 'getBrandStatistics']); // Thống kê có bao nhiêu sản phẩm doanh thu theo brand
+    Route::get('/comparison', [StatisticsController::class, 'getRevenueComparison']); // Thống kê so sánh % tháng này so với tháng trước
+});
+
+
+// route::group([
+//     'prefix' => 'api/notify'
+// ],function(){
+//     Route::get('/view', [NotificationController::class, 'watchnotify']); // Xem thông báo    
+//     Route::get('/unread', [NotificationController::class, 'countUnread']); // Số lượng thông báo chưa đọc      
+//     Route::post('/mark-as-read/{order}', [NotificationController::class, 'markAsRead']); // Admin kích vào thì đã đọc
+//     Route::delete('/delete/{order}', [NotificationController::class, 'deletenotify']); // Xóa thông báo
+// });
+
+route::group([
+    'prefix' => 'api/ordernotify'
+],function(){
+    Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo    
+    Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc      
+    Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
+    // Route::delete('/delete/{order}', [OrderController::class, 'deletenotify']); // Xóa thông báo
 });

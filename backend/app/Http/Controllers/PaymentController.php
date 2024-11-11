@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\OrderDetail;
+use App\Mail\OrderConfirmationMail;
 
 class PaymentController extends Controller
 {
@@ -130,13 +132,23 @@ class PaymentController extends Controller
     ]);
 
     // Cập nhật trạng thái đơn hàng
-    if($payment->p_vnp_reponse_code == 24){
-        $order->payment_status = 'unpaid'; 
+    if($payment->p_vnp_reponse_code == 00){
+        $order->payment_status = 'paid'; 
     }
     
     $order->save();
 
-    return response()->json(['status' => true, 'message' => 'Payment successful', 'data' => $responseData]);
+    if ($request->vnp_ResponseCode == '00') { // Kiểm tra mã phản hồi từ VNPay
+        // Nếu thành công
+        // Gửi email xác nhận đơn hàng
+        Mail::to($order->email)->send(new OrderConfirmationMail($order));
+        return redirect()->to('http://localhost:3000/thankorder');
+    } else {
+        // Nếu thất bại, chuyển hướng đến trang thất bại (tuỳ chọn)
+        return redirect()->to('http://localhost:3000/failure');
+    }
+
+    // return response()->json(['status' => true, 'message' => 'Payment successful', 'data' => $responseData]);
 }
 
 }

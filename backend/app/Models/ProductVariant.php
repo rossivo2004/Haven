@@ -26,6 +26,11 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
     public function flashSales() {
         return $this->belongsToMany(FlashSale::class, FlashSaleProduct::class)
                     ->withPivot('id','discount_percent', 'stock','sold');
@@ -131,6 +136,9 @@ class ProductVariant extends Model
             }
         }
     }
+
+
+
     protected $appends = ['DiscountedPrice','FlashSalePrice','StatusStock','Favorited','StoredCart','QuantityInCart'];
     protected $with = ['flashSales','product'];
 }

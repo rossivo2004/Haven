@@ -9,109 +9,140 @@ use App\Models\User;
 use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\ProductVariant;
+use App\Models\FlashSaleProduct;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
 
 class OrderController extends Controller
 { 
-    public function checkout(Request $request)
+        public function checkout(Request $request)
     {
         $user_id = $request->input('user_id', null);
-        $selectedProductVariantIds = $request->input('product_variant_id', []);
-        $orderData = $request->only(['invoice_code','full_name', 'phone', 'email', 'total', 'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method']);
-
-        // Kiểm tra giỏ hàng của người dùng đã đăng nhập
-        if ($user_id) {
-            $cartItems = Cart::where('user_id', $user_id)
-                             ->whereIn('product_variant_id', $selectedProductVariantIds)
-                             ->get();
-
-            // Tính tổng tiền giỏ hàng cho người dùng đã đăng nhập
-            // foreach ($cartItems as $item) {
-            //     $total += $item->quantity * $item->productVariant->price;
-            // }
-            if($cartItems->isEmpty()){
-                return response()->json([
-                    'message' => 'Giỏ hàng người dùng trống'
-                ]);
-            }
-
-        } else {
-            // Người dùng chưa đăng nhập: lấy giỏ hàng từ session
-            $cart = $request->session()->get('cart_items', []);
-            $cartItems = array_filter($cart, function($item) use ($selectedProductVariantIds) {
-                return in_array($item['product_variant_id'], $selectedProductVariantIds);
-            });
-
-            // Tính tổng tiền giỏ hàng cho người dùng chưa đăng nhập
-            // foreach ($cartItems as $item) {
-            //     $product = ProductVariant::find($item['product_variant_id']);
-            //     if ($product) {
-            //         $total += $item['quantity'] * $product->price;
-            //     }
-            // }
-        }
-
-        // Tính phí vận chuyển (TP.HCM có id là 1)
-        // $hoChiMinhProvinceId = 1;
-        // $shippingFee = ($request->province == $hoChiMinhProvinceId) ? 0 : 30000;
-        // $total += $shippingFee;
-        // Xác định trạng thái thanh toán dựa trên phương thức thanh toán   
+        $orderData = $request->only([
+            'invoice_code', 'full_name', 'phone', 'email', 'total', 
+            'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method'
+        ]);
+        $paymentStatus = 'unpaid';
         
-        $paymentStatus = ($orderData['payment_method'] == 1) ? 'unpaid' : 'paid';
+        // Lấy danh sách sản phẩm từ yêu cầu
+        $products = $request->input('product_variant_id', []);
+
+        // Kiểm tra nếu giỏ hàng trống
+        if (empty($products)) {
+            return response()->json([
+                'message' => 'Giỏ hàng trống hoặc sản phẩm không hợp lệ'
+            ], 400);
+        }
 
         // Tạo đơn hàng
         $order = Order::create(array_merge($orderData, [
             'user_id' => $user_id,
-            'status' => 'pending', // hoặc trạng thái mặc định khác
+            'status' => 'pending',
             'payment_status' => $paymentStatus,
+            'is_read' => false
         ]));
 
-        Mail::to($orderData['email'])->send(new OrderConfirmationMail($order));
+        
+        if($orderData['payment_method'] == 1){
+            // Gửi mail xác nhận đơn hàng
+            Mail::to($orderData['email'])->send(new OrderConfirmationMail($order));
+        }
 
-        // Thêm từng sản phẩm vào chi tiết đơn hàng
-        foreach ($cartItems as $item) {
-            $product = ProductVariant::find($item['product_variant_id']);
-            if ($product) {
+        // Lặp qua từng sản phẩm và cập nhật kho
+        foreach ($products as $item) {
+            $productVariant = ProductVariant::find($item['id']);
+            if ($productVariant) {
+                $quantity = $item['quantity'];
+                $finalPrice = $productVariant->price;  // Mặc định là giá thông thường
+
+                // Kiểm tra xem sản phẩm có đang trong chương trình flashsale không
+                $flashSaleProduct = FlashSaleProduct::where('product_variant_id', $productVariant->id)->first();
+
+                if ($flashSaleProduct) {
+
+                    if ($flashSaleProduct->stock >= $quantity && $productVariant->stock >= $quantity) {
+                        $discountedPrice = $productVariant->price * (1 - $flashSaleProduct->discount_percent / 100);
+                        $finalPrice = round($discountedPrice, 2); 
+
+                        // Cập nhật stock 
+                        $flashSaleProduct->stock -= $quantity;
+                        $flashSaleProduct->sold += $quantity;
+                        $flashSaleProduct->save();
+                        
+                        $productVariant->stock -= $quantity;
+                        $productVariant->save();
+                    } else {
+                        // Không đủ stock trong flashsale, sử dụng discount product_variant
+                        if ($productVariant->stock >= $quantity) {
+                            $discountedPrice = $productVariant->price * (1 - $productVariant->discount / 100);
+                            $finalPrice = round($discountedPrice, 2); 
+
+                            // Cập nhật stock
+                            $productVariant->stock -= $quantity;
+                            $productVariant->save();
+                        } else {
+                            return response()->json([
+                                'message' => 'Số lượng sản phẩm không đủ trong kho'
+                            ], 400);
+                        }
+                    }
+                } else {
+                    // Không phải flashsale, thì sử dụng bình thường
+                    if ($productVariant->stock >= $quantity) {
+                        // Áp dụng giảm giá cho biến thể sản phẩm nếu có
+                        $discountedPrice = $productVariant->price * (1 - $productVariant->discount / 100);
+                        $finalPrice = round($discountedPrice, 2);
+
+                        $productVariant->stock -= $quantity;
+                        $productVariant->save();
+                    } else {
+                        return response()->json([
+                            'message' => 'Số lượng sản phẩm không đủ trong kho'
+                        ], 400);
+                    }
+                }
+
+                // Tạo đơn hàng
                 OrderDetail::create([
                     'order_id' => $order->id,
-                    'product_variant_id' => $item['product_variant_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $product->price,
-                ]);
-                $product->stock -= $item->quantity;
-                $product->save();
+                    'product_variant_id' => $productVariant->id,
+                    'quantity' => $quantity,
+                    'price' => $finalPrice,
+                ]);     
             }
         }
 
-        // Cập nhật điểm tích lũy cho người dùng
-    if ($user_id) {
-        $user = User::find($user_id);
-        if ($user) {
-            $loyaltyPoints = $orderData['total'] * 0.01; // 1% của tổng số tiền đơn hàng
-            $user->point += $loyaltyPoints;
-            $user->save();
+        // Cộng điểm thưởng nếu là người dùng đã đăng nhập
+        $loyaltyPoints = 0;
+        if ($user_id) {
+            $user = User::find($user_id);
+            if ($user) {
+                $loyaltyPoints = $orderData['total'] * 0.01;
+                $user->point += $loyaltyPoints;
+                $user->save();
+            }
         }
-    }
 
-        // Cập nhật giỏ hàng: xóa các sản phẩm đã mua khỏi giỏ hàng
+        // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
         if ($user_id) {
             Cart::where('user_id', $user_id)
-                ->whereIn('product_variant_id', $selectedProductVariantIds)
+                ->whereIn('product_variant_id', array_column($products, 'id'))
                 ->delete();
-        } else {
-            foreach ($selectedProductVariantIds as $productId) {
-                unset($cart[$productId]);
-            }
-            $request->session()->put('cart_items', $cart);
         }
+
+        // Thêm thông báo cho admin
+        // Notification::create([
+        //     'invoice_code' => $order->invoice_code,
+        //     'is_read' => false,
+        // ]);
 
         return response()->json([
             'message' => 'Order created successfully!',
             'order' => $order,
-            'loyalty_points_added' => $user_id ? $loyaltyPoints : 0
+            'loyalty_points_added' => $loyaltyPoints
         ], 201);
     }
+
 
     public function showOrder($userId){
 
@@ -141,6 +172,26 @@ class OrderController extends Controller
         ]); 
         
     }
+
+    public function showOrderdetailcode($ordercode)
+{
+    if ($ordercode) {
+        $order = Order::with([
+            'payment', 
+            'orderDetails.productVariant' => function ($query) {
+                $query->select('id', 'name', 'image'); // Chỉ lấy các trường cần thiết
+            },
+            'user'
+        ])->where('invoice_code', $ordercode)->first();
+
+        if ($order) {
+            return response()->json([
+                'order' => $order
+            ]);
+        }
+    }
+
+}
 
     public function show(){
         $orders = Order::orderBy('id', 'DESC')->get();
@@ -180,6 +231,12 @@ class OrderController extends Controller
     }
 
     $order->status = $newStatus;
+    
+    // Kiểm tra nếu đơn hàng đã hoàn thành thì cho payment_status là paid
+    if ($newStatus === 'complete') {
+        $order->payment_status = 'paid';
+    }
+
     $order->save();
 
     return response()->json(['message' => 'Cập nhật trạng thái thành công'], 200);
@@ -235,8 +292,81 @@ public function reorder(Request $request, $orderId)
     return response()->json(['message' => 'Đơn hàng đã được tạo lại từ đơn hàng đã hủy'], 201);
 }
 
+public function deductPoints(Request $request)
+{
+    $user_id = $request->input('user_id');
+    $usedPoints = $request->input('used_points', 0); // Nhập điểm tích mà người dùng đã dùng
+
+    $user = User::find($user_id);
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    // Kiểm tra xem người dùng có đủ điểm tích lũy không
+    if ($user->point < $usedPoints) {
+        return response()->json(['message' => 'Không đủ điểm tích lũy'], 400);
+    }
+
+    // Trừ điểm và lưu lại
+    $user->point -= $usedPoints;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Điểm đã được trừ thành công!',
+        'points_used' => $usedPoints,
+        'remaining_points' => $user->point
+    ], 200);
+}
+
+    // Đánh dấu thông báo là đã đọc
+    public function markAsRead($order)
+    {
+        $notification = Order::find($order);
+        if (!$notification) {
+            return response()->json(['message' => 'Thông báo không tồn tại'], 404);
+        }
+
+        $notification->is_read = true;
+        $notification->save();
+
+        return response()->json(['message' => 'Đã đánh dấu thông báo là đã đọc'], 200);
+    }
+
+    // Đếm số lượng thông báo chưa đọc
+    public function countUnread()
+    {
+        $unreadCount = Order::where('is_read', false)->count();
+
+        return response()->json(['Thông báo chưa đọc' => $unreadCount], 200);
+    }   
+
+    // Xem thông báo
+    public function watchnotify()
+{
+    $view = Order::select('invoice_code', 'created_at') // Chỉ lấy các trường cần thiết
+                 ->orderBy("id", "DESC")
+                 ->get();
+
+    if(!$view){
+        return response()->json(['message' => 'Không có thông báo !']);
+    }
+
+    return response()->json($view, 200);
+}
 
 
+        // Xóa thông báo
+    //     public function deletenotify($order)
+    // {
+    //     $notification = Order::find($order);
 
+    //     if (!$notification) {
+    //         return response()->json(['message' => 'Không tìm thấy thông báo'], 404);
+    //     }
+
+    //     $notification->delete();
+
+    //     return response()->json(['message' => 'Đã xóa thông báo thành công'], 200);
+    // }
 
 }
