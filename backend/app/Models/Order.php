@@ -24,7 +24,8 @@ class Order extends Model
         'payment_status',
         'user_id',
         'invoice_code',
-        'refunded_stock'
+        'refunded_stock',
+        'is_read'
     ];
 
     public function user() {
@@ -41,6 +42,8 @@ class Order extends Model
 
     public function getTotalAttribute($value)
     {
-        return intval($value); // Loại bỏ phần .00
+    return intval($value); // Loại bỏ phần .00
     }
+
+
 }

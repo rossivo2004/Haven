@@ -28,7 +28,6 @@ class StatisticsController extends Controller
     return response()->json([
         'revenue' => $monthlyRevenue,
         'revenue_total' => $totalRevenue,
-
     ]);
 }
 
@@ -81,6 +80,7 @@ public function getProductMostLeastStatistics()
         'products_by_month' => $productsByMonth,
     ]);
 }
+
 
 public function getUserStatistics()
 {
@@ -247,13 +247,13 @@ public function getRevenueComparison()
         'current_month_revenue' => [
             [
                 'month' => $currentMonthYear,
-                'revenue' => number_format($currentMonthRevenue, 0, '.', '')
+                'revenue' => number_format($currentMonthRevenue, 0, '.', '') 
             ]
         ],
         'previous_month_revenue' => [
             [
                 'month' => $previousMonthYear,
-                'revenue' => number_format($previousMonthRevenue, 0, '.', '')
+                'revenue' => number_format($previousMonthRevenue, 0, '.', '') 
             ]
         ],
         'percentage_change' => number_format($percentageChange, 2),
@@ -261,5 +261,5 @@ public function getRevenueComparison()
 }
 
 
-
 }
+
