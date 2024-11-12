@@ -42,7 +42,7 @@ import { logout } from '@/src/store/userSlice';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
-import { fetchUserProfile } from '@/src/config/token'; // Import the fetchUserProfile function
+import { fetchUserProfile } from '@/src/config/token';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -86,49 +86,72 @@ function Header({ params }: { params: { lang: string } }) {
         return 'light';
     });
 
-    const cartItems = useSelector((state: RootState) => state.cart.items); // Get cart items from Redux
-    const cartCounts = cartItems.length; // Get the count of items in the cart
+    const cartItems = useSelector((state: RootState) => state.cart.items);
+    const CartCount = cartItems.length; // Get the count of items in the cart
+
+    console.log(cartItems);
 
     const [userProducts, setUserProducts] = useState<Variant[]>([]); // State to hold user-specific products
 
+    const token = Cookies.get('access_token'); // Get token from cookies
     useEffect(() => {
-        const token = Cookies.get('access_token'); // Get token from cookies
         if (token) {
             fetchUserProfile() // Fetch user data using the token
                 .then(data => {
                     setUserData(data); // Set user data in state
-                    fetchUserProducts(data.id); // Fetch products for the logged-in user
+                    // fetchUserProducts(data.id); // Fetch products for the logged-in user
                     setUserId(data.id);
                 })
                 .catch(error => {
                     console.error('Error fetching user data:', error);
                 });
+        } 
+        // else {
+        //     // If not logged in, check for cart items in cookies
+        //     const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        //     if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
+        //         setCart(existingCartItems.cart_items); // Set cart state from cookies
+        //         setCartCount(existingCartItems.cart_items.length); // Update cart count
+        //     } else {
+        //         console.warn('No cart items found in cookies');
+        //     }
+        // }
+    }, []); // Add cartCount to the dependency array
+
+    const fetchUserProducts = async () => { // New function to fetch user-specific products
+        if (userId) {
+            const fetchUserCart = async () => {
+                try {
+                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
+                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
+                    if (response.data && response.data) { // Check if cart_items exists
+                        setCart(response.data); // Adjust according to your API response structure
+                        setCartCount(response.data.length);
+                    } else {
+                        console.warn('No cart items found in response');
+                    }
+                } catch (error) {
+                    console.error('Error fetching user cart:', error);
+                }
+            };
+            fetchUserCart();
         } else {
-            // If not logged in, check for cart items in cookies
+            // If no user ID, show cart from cookies
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
-                setCartCount(existingCartItems.cart_items.length); // Update cart count
+                setCartCount(existingCartItems.cart_items.length);
+                console.log(1);
+                
             } else {
                 console.warn('No cart items found in cookies');
             }
         }
-    }, []); // Add cartCount to the dependency array
-
-    const fetchUserProducts = async (userId: string) => { // New function to fetch user-specific products
-        try {
-            const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-            // setUserProducts(response.data.products); // Assuming the API returns products in this structure
-            if (response.data && response.data) { // Check if cart_items exists
-                setCart(response.data); // Adjust according to your API response structure
-                setCartCount(response.data.length);
-            } else {
-                console.warn('No cart items found in response');
-            }
-        } catch (error) {
-            console.error('Error fetching user products:', error);
-        }
     };
+
+    useEffect(() => {
+        fetchUserProducts();
+    }, [userId,cartItems]);
 
     const handleLogout = () => {
         signOut();
@@ -274,7 +297,7 @@ function Header({ params }: { params: { lang: string } }) {
 
 
     useEffect(() => {
-        if (userData) { // {{ edit_1 }}
+        if (userId) { // {{ edit_1 }}
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items.length > 0) {
                 // Prepare items for moving to database
@@ -308,7 +331,7 @@ function Header({ params }: { params: { lang: string } }) {
                 moveCartToDatabase(); // Call the async function
             }
         }
-    }, [userData]); // Update dependency to userData
+    }, [userData,cartItems]); // Update dependency to userData
 
 
     console.log(cart);
@@ -510,13 +533,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                        {
+                                                                        {userId ? (
                                                                                 item.product_variant.flash_sales.length > 0
                                                                                     ? item.product_variant.flash_sales[0].pivot.stock > 0 
                                                                                         ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
                                                                                         : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
                                                                                     : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')
-                                                                            } VND
+                                                                            ) : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')} VND
                                                                         </div>
 
                                                                     </div>

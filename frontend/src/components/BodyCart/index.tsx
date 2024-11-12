@@ -20,7 +20,7 @@ import { addToCart, deleteCart, updateCart } from '@/src/store/cartSlice';
 import Loading from '../ui/Loading';
 import { confirmAlert } from 'react-confirm-alert'; // Import react-confirm-alert
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for styling
-import { fetchUserProfile } from '@/src/config/token'; // Import the fetchUserProfile function
+import { fetchUserProfile } from '@/src/config/token';
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -58,7 +58,6 @@ const Body_Cart = () => {
                     console.log('Fetched cart data:', response.data); // Log the fetched cart data
                     if (response.data && response.data) { // Check if cart_items exists
                         setCart(response.data); // Adjust according to your API response structure
-                        // setCartCount(response.data.length);
                     } else {
                         console.warn('No cart items found in response');
                     }
@@ -74,8 +73,6 @@ const Body_Cart = () => {
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
-
-                // setCartCount(existingCartItems.cart_items.length);
             } else {
                 console.warn('No cart items found in cookies');
             }
@@ -133,6 +130,7 @@ const Body_Cart = () => {
                             ? { ...cartItem, quantity: newQuantity }
                             : cartItem
                     );
+                    dispatch(updateCart(updatedCart)); // Dispatch updateCart action
                     return updatedCart;
                 });
                 toast.success('Cập nhật số lượng thành công');
@@ -151,6 +149,7 @@ const Body_Cart = () => {
             );
             Cookies.set('cart_items', JSON.stringify({ cart_items: updatedCartItems }));
             setCart(updatedCartItems);
+            dispatch(updateCart(updatedCartItems)); // Dispatch updateCart action
             toast.success('Cập nhật số lượng thành công trong giỏ hàng');
         }
     };
@@ -169,6 +168,7 @@ const Body_Cart = () => {
             const updatedCartItems = existingCartItems.cart_items.filter((cartItem: CartItem) => cartItem.product_variant.id !== item.product_variant.id);
             Cookies.set('cart_items', JSON.stringify({ cart_items: updatedCartItems }));
             setCart(updatedCartItems);
+            dispatch(updateCart(updatedCartItems)); // Dispatch updateCart action
             toast.success('Xóa sản phẩm thành công');
         }
         setLoading(false);
@@ -288,19 +288,19 @@ const Body_Cart = () => {
                                         </div>
                                         <div className="text-right flex gap-2">
                                             <div>
-                                                <span className="text-gray-500 text-sm">
-                                                    {
-                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
+                                            <span className="text-gray-500 text-sm">
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')
-                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
-                                                } đ
+                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')} đ
                                                 </span>
                                                 <div className='text-2xl text-price font-bold'>
-                                                    {
-                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? (Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice) * item.quantity).toLocaleString('vi-VN')
-                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
-                                                } đ
+                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')} đ
                                                 </div>
                                             </div>
                                             <div className='flex items-center justify-end' >

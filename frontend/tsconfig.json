@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/middleware.ts", "src/components/AccountSection/EyeSlashFilledIcon tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/middleware.ts", "src/components/AccountSection/EyeSlashFilledIcon tsx", "../admin/src/app/signin/SigninLayout.tsx"],
   "exclude": ["node_modules"]
 }

@@ -78,6 +78,18 @@ const apiConfig = {
   },
 
   users: {
+    login: `${baseUrl}/api/login`,
+    logout: `${baseUrl}/api/logout`,
+    register: `${baseUrl}/api/register/send-code`,
+    verify: `${baseUrl}/api/register/verify-code`,
+
+    loginToken: `${baseUrl}/api/auth/login`,
+
+    refreshToken: `${baseUrl}/api/auth/refresh`,
+
+
+    getUserFromToken: `${baseUrl}/api/auth/profile`,
+
     getAll: `${baseUrl}/api/users/`,
 
     createUser: `${baseUrl}/api/users/store/`,

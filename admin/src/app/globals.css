@@ -2,18 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.sidebar_active {
-  background-color: rgba(105, 108, 255, 0.2);
-  color: #696CFF;
-  border-right: none;
-  border-radius: 8px;
-  padding: 10px 15px;
-}
-
-.shd-1{
-  box-shadow: 0px 0px 15px 10px rgba(0,0,0,0.1);
-}
-
 body{
   background-color: #f5f8ff;
 }
