@@ -399,9 +399,10 @@ const handleDelete = async (categoryId: string) => {
                 <div>
                     <div className="flex gap-2">
                         <Input
+                        className="bg-white"
                          isClearable
                             type="text"
-                            placeholder="Tìm kiếm sản phẩm"
+                            placeholder="Tìm kiếm phân loại"
                             labelPlacement="outside"
                             size="md"
                             endContent={<SearchIcon />}

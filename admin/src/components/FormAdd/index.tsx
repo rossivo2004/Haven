@@ -79,9 +79,7 @@ const CreateProduct = () => {
     const [currentPage, setCurrentPage] = useState(1); // Add state for current page
     const productsPerPage = 10; // Define how many products per page
 
-    const indexOfLastProduct = currentPage * productsPerPage; // Calculate index of last product
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage; // Calculate index of first product
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct); // Get current products
+    const [searchTerm, setSearchTerm] = useState(""); // Thêm state cho tìm kiếm
 
     const handleAddVariant = () => {
         setVariants([...variants, {
@@ -407,7 +405,7 @@ const CreateProduct = () => {
         setLoadingProducts(true); // Start loading
         try {
             const response = await axios.get(`${apiConfig.products.getAll}`, { withCredentials: true });
-            setProducts(response.data.products.data);
+            setProducts(response.data.products);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -566,6 +564,16 @@ const CreateProduct = () => {
         });
     };
 
+    // Lọc sản phẩm dựa trên từ khóa tìm kiếm
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Cập nhật chỉ số phân trang dựa trên filteredProducts
+    const indexOfLastProduct = currentPage * productsPerPage; // Tính chỉ số sản phẩm cuối cùng
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage; // Tính chỉ số sản phẩm đầu tiên
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct); // Lấy sản phẩm hiện tại từ danh sách đã lọc
+
     return (
         <div className="p-4 !pt-0">
              <div className="pb-5 h-[62px]">
@@ -582,7 +590,14 @@ const CreateProduct = () => {
                     Quản lý sản phẩm
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
+                    <Input
+                    
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị tìm kiếm
+                    />
+                    <Button className='bg-[#696CFF] text-white px-4 w-32' onPress={onOpen}>
                         Thêm sản phẩm
                     </Button>
                     {/* <div>
@@ -967,11 +982,11 @@ const CreateProduct = () => {
 
                                     <div className="flex justify-between items-center mt-4">
                                     <div className="text-sm">
-                        {`${indexOfFirstProduct + 1} - ${Math.min(indexOfLastProduct, products.length)} của ${products.length} sản phẩm`}
+                        {`${indexOfFirstProduct + 1} - ${Math.min(indexOfLastProduct, filteredProducts.length)} của ${filteredProducts.length} sản phẩm`}
                     </div>
                                     <div className="flex gap-2">
 
-                                        {Array.from({ length: Math.ceil(products.length / productsPerPage) }, (_, index) => (
+                                        {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }, (_, index) => (
                                             <div
                                                 className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md'
                                                 key={index + 1}
@@ -1157,7 +1172,8 @@ const CreateProduct = () => {
                                             <div id="variants" className="mb-8">
                                                 <h4 className="text-lg font-semibold mb-1">Sản phẩm biến thể</h4>
 
-                                                {productsVa.map((product, index) => (
+<div className='grid grid-cols-2 gap-2'>
+  {productsVa.map((product, index) => (
                                                     <div className="mb-4 border-b pb-4" key={index}>
                                                         {editingVariant && editingVariant.id === product.id ? (
                                                             <form onSubmit={handleUpdateVariant} encType="multipart/form-data">
@@ -1250,6 +1266,8 @@ const CreateProduct = () => {
                                                         )}
                                                     </div>
                                                 ))}
+</div>
+                                              
 
 
 
@@ -1359,9 +1377,11 @@ const CreateProduct = () => {
                                                 ))}
 
                                                 <div className="mb-4 border-t pt-4">
-                                                    <h5 className="text-md font-semibold mb-2">Thêm biến thể mới</h5>
+                                                    <h5 className="text-md font-semibold mb-2 ">Thêm biến thể mới</h5>
                                                     {!showNewVariantForm && (
-                                                        <Button color="primary" onPress={() => setShowNewVariantForm(!showNewVariantForm)}>
+                                                        <Button
+                                                            className='w-full border-2 border-[#696bff] bg-[#f5f8ff] text-[#696bff]'
+                                                        color="primary" onPress={() => setShowNewVariantForm(!showNewVariantForm)}>
                                                             Hiển thị form thêm biến thể
                                                         </Button>
                                                     )}

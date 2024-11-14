@@ -29,6 +29,7 @@ function BodySign() {
 
             if (userProfile.role_id === 2) { // Check if role is 2
                 toast.success('Đăng nhập thành công!'); // Show success message
+                window.location.href = '/admin';
                 console.log(response.data);
             } else {
                 Cookies.remove('access_token'); // Remove access_token from cookie if role is not 2

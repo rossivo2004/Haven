@@ -6,3 +6,6 @@ body{
   background-color: #f5f8ff;
 }
 
+.sidebar_active {
+  background-color: #f5f8ff; /* Màu nền cho phần tử đang hoạt động */
+}

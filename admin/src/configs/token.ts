@@ -2,6 +2,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import apiConfig from './api';
 
+// ... existing imports ...
+
 const refreshToken = async () => {
     const refreshToken = Cookies.get('refresh_token'); // Retrieve the refresh token from cookies
 
@@ -14,9 +16,12 @@ const refreshToken = async () => {
         const { access_token } = response.data; // Assuming the new token is returned in this format
         Cookies.set('access_token', access_token); // Update the access token in cookies
     } catch (error: any) {
+        console.error('Refresh token error:', error); // Log the error for debugging
         throw new Error('Error refreshing token: ' + error.message);
     }
 };
+
+// ... existing fetchUserProfile function ...
 
 export const fetchUserProfile = async (): Promise<any> => {
     let token = Cookies.get('access_token'); // Retrieve the token from cookies
@@ -38,6 +43,7 @@ export const fetchUserProfile = async (): Promise<any> => {
             await refreshToken(); // Attempt to refresh the token
             return fetchUserProfile(); // Retry fetching the user profile
         }
+        console.error('Fetch user profile error:', error); // Log the error for debugging
         throw new Error('Error fetching user profile: ' + error.message);
     }
 };

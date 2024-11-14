@@ -1,13 +1,11 @@
 'use client'
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, User } from "@nextui-org/react";
-import { Badge, Switch } from "@nextui-org/react";
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useEffect, useState } from "react";
 import { fetchUserProfile } from '@/configs/token';
 import Cookies from 'js-cookie'; // Import js-cookie for cookie management
+import Notify from "../Notify";
 
 const Header: React.FC = () => {
-  const [isInvisible, setIsInvisible] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const token = Cookies.get('access_token');
 
@@ -35,11 +33,7 @@ const Header: React.FC = () => {
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center gap-6">
-          <div>
-            <Badge color="danger" content={5} isInvisible={isInvisible} shape="circle">
-              <NotificationsIcon className="fill-current" />
-            </Badge>
-          </div>
+          <Notify />
           <div className="">
             <Dropdown placement="bottom-end">
               <DropdownTrigger>

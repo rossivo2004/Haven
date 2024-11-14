@@ -76,36 +76,39 @@ function BodyOrders() {
 
     const [order, setOrder] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [idOrrder, setIdOrrder] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
-    const [selectedStatus, setSelectedStatus] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
-    const [idOrrder, setIdOrrder] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
-    const [currentPage, setCurrentPage] = useState<number>(1); // State to track the current page
-    const [totalPages, setTotalPages] = useState<number>(1); // State to track total pages
+    const productsPerPage = 10;
 
-    const productsPerPage = 10; // Define the number of products per page
+    const filteredOrders = useMemo(() => {
+        return order.filter(item => 
+            item.invoice_code.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [order, searchTerm]);
 
-    // Calculate the orders to display based on the current page
     const ordersToDisplay = useMemo(() => {
-        const startIndex = (currentPage - 1) * 10; // Calculate start index
-        return order.slice(startIndex, startIndex + 10); // Slice the orders array
-    }, [order, currentPage]);
+        const startIndex = (currentPage - 1) * productsPerPage;
+        return filteredOrders.slice(startIndex, startIndex + productsPerPage);
+    }, [filteredOrders, currentPage]);
 
-    // ... existing code ...
     const handleEditStatus = (status: string, idOrder: number) => {
-        setSelectedStatus(status); // Cập nhật trạng thái đã chọn
-        console.log("Selected Status:", status); // Kiểm tra giá trị
-        setIdOrrder(String(idOrder)); // Set the idOrrder state correctly
-        onOpen(); // Mở modal
+        setSelectedStatus(status);
+        console.log("Selected Status:", status);
+        setIdOrrder(String(idOrder));
+        onOpen();
     };
-    // ... existing code ...
 
     const fecthOrder = async () => {
         setLoading(true);
         try {
             const response = await axios.get(apiConfig.order.getAll);
-            const data = response.data; // Changed from response.json() to response.data
+            const data = response.data;
             setOrder(data);
-            setTotalPages(Math.ceil(data.length / 10)); // Calculate total pages based on orders
+            setTotalPages(Math.ceil(data.length / productsPerPage));
         } catch (error) {
             console.log("Lỗi");
         } finally {
@@ -165,16 +168,16 @@ function BodyOrders() {
             buttons: [
                 {
                     label: "Yes",
-                    onClick: async () => { // Thay đổi thành async để sử dụng await
+                    onClick: async () => {
                         try {
-                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`); // Thêm await để chờ phản hồi
-                            if (response.status === 400) { // Kiểm tra nếu phản hồi trả về 400
-                                toast.error("Lỗi: Không thể hủy đơn hàng"); // Thông báo lỗi
-                                return; // Dừng thực hiện nếu có lỗi
+                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`);
+                            if (response.status === 400) {
+                                toast.error("Lỗi: Không thể hủy đơn hàng");
+                                return;
                             }
-                            toast.success("Hủy đơn thành công"); // Sửa thông báo thành công
+                            toast.success("Hủy đơn thành công");
                         } catch (error) {
-                            toast.error("Lỗi khi hủy đơn hàng"); // Cập nhật thông báo lỗi
+                            toast.error("Lỗi khi hủy đơn hàng");
                         }
                     },
                 },
@@ -187,8 +190,8 @@ function BodyOrders() {
 
     const handleConfirmUpdate = () => {
         if (idOrrder) {
-            console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus); // Kiểm tra giá trị
-            updateOrderStatus(Number(idOrrder), selectedStatus); // Sử dụng selectedStatus làm giá trị trạng thái
+            console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus);
+            updateOrderStatus(Number(idOrrder), selectedStatus);
         }
     };
 
@@ -196,21 +199,20 @@ function BodyOrders() {
         try {
             await axios.put(`${apiConfig.order.updateOrderStatus}${idOrder}`, { status });
             toast.success("Cập nhật trạng thái đơn hàng thành công");
-            fecthOrder(); // Refresh the order list after updating
+            fecthOrder();
         } catch (error) {
             toast.error("Lỗi khi cập nhật trạng thái");
         }
     };
 
-    // Function to handle page change
     const handlePageChange = (page: number) => {
-        setCurrentPage(page); // Update current page
+        setCurrentPage(page);
     };
 
     return (
         <div>
             <div className="flex justify-between items-center">
-            <div className="pb-5 h-[62px]">
+                <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
@@ -219,12 +221,17 @@ function BodyOrders() {
                     />
                 </div>
             </div>
-                <div className='flex justify-between mb-4'>
-                    <div className='font-semibold text-xl'>
-                        Quản lý đơn hàng
-                    </div>
-
+            <div className='flex justify-between mb-4'>
+                <div className='font-semibold text-xl'>
+                    Quản lý đơn hàng
                 </div>
+                <Input
+                    className="w-1/4"
+                    placeholder="Tìm kiếm theo mã đơn hàng"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
 
             <div>
                 <div className="mb-4">
@@ -270,10 +277,10 @@ function BodyOrders() {
                 </div>
                 <div className="flex justify-between items-center mt-4">
                     <div className="text-sm">
-                        {`${(currentPage - 1) * productsPerPage + 1} - ${Math.min(currentPage * productsPerPage, order.length)} của ${order.length} đơn hàng`}
+                        {`${(currentPage - 1) * productsPerPage + 1} - ${Math.min(currentPage * productsPerPage, filteredOrders.length)} của ${filteredOrders.length} đơn hàng`}
                     </div>
                     <div className="flex gap-2">
-                        {Array.from({ length: totalPages }, (_, index) => (
+                        {Array.from({ length: Math.ceil(filteredOrders.length / productsPerPage) }, (_, index) => (
                             <div
                                 className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md text-white'
                                 key={index + 1}
@@ -301,7 +308,7 @@ function BodyOrders() {
                                     <RadioGroup className="w-full !justify-between mb-2" orientation="horizontal" value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
                                         {orderStatuses.map((status) => (
                                             <CustomRadio key={status} value={status}>
-                                                {getStatusTextModal(status)} {/* Use the getStatusText function to display the correct text */}
+                                                {getStatusTextModal(status)}
                                             </CustomRadio>
                                         ))}
                                     </RadioGroup>

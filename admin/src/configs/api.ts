@@ -24,6 +24,15 @@ const apiConfig = {
 
   productsva: {
     getAll: `${baseUrl}/api/productvariant`,
+
+    ///productvariant/store/{id}
+    createproductvariants : `${baseUrl}/api/productvariant/store/`,
+
+    ///update/{productVariant}
+    updateproductvariants : `${baseUrl}/api/productvariant/update/`,
+
+    ///delete/{productVariant}
+    deleteproductvariants : `${baseUrl}/api/productvariant/delete/`,
   },
 
   categories: {
@@ -146,6 +155,12 @@ const apiConfig = {
     getUser: `${baseUrl}/api/statics/user`,
     getComparison: `${baseUrl}/api/statics/comparison`,
     getMostLeast: `${baseUrl}/api/statics/mostleast`,
+  },
+
+  ordernotify: {
+    getAll: `${baseUrl}/api/ordernotify/view`,
+    unread: `${baseUrl}/api/ordernotify/unread`,
+    markAsRead: `${baseUrl}/api/ordernotify/mark-as-read/`,
   }
 };
 

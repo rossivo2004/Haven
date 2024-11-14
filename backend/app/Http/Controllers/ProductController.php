@@ -19,47 +19,29 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        // $startTime = Carbon::parse('2024-10-02 15:16:00');
-        // $endTime = Carbon::parse('2024-10-04 12:08:00');
-        
-        // return response()->json([
-        //     'flashSaleProducts' =>  ProductVariant::whereHas('flashSales', function ($query) {
-        //         $query->where('status', 1); // Chỉ lấy flash sale có status = 1 (active)
-        //     })->get(),
-        //     'categories' => Category::orderBy('id', 'desc')->get(),
-        //     'newProducts' => ProductVariant::orderBy('id', 'desc')->get(),
-        //     'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
-        //     ]);
-        
-        $search = $request->input('search');
-        $products = Product::when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%');
-        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
+
+
+        // $search = $request->input('search');
+        $products = Product::orderBy('id', 'desc')->get();
 
         return response()->json([
             'success' => true,
             'products' => $products,
         ], 200);
 
-        // return view('Product.home', [
-        //     'products' =>   $products,
-        //     // 'categories' => $categories::orderBy('id', 'desc')->get(),
-        //     // 'brands' => $brands::orderBy('id', 'desc')->get(),
-        //     // 'category_id' => $category_id
-        // ]);
 
-       
+
+
     }
 
-    
 
     public function shop(Request $request)
     {
         $brands = new Brand();
         $categories = new Category();
-         
+
         $search = $request->input('search');
         $categoryNames = $request->input('category');
         $brandNames = $request->input('brand');
@@ -77,7 +59,7 @@ class ProductController extends Controller
         // return response()->json([
         //     'categoriesOption' => $categoriesOption,
         //     'brandsOption' => $brandsOption,
-        // ]); 
+        // ]);
 
         $productVariants = ProductVariant::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
@@ -104,18 +86,18 @@ class ProductController extends Controller
 
         })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
 
-      
+
         // return view('Product.shop', [
         //     'categories' => $categories::orderBy('id', 'desc')->get(),
         //     'brands' => $brands::orderBy('id', 'desc')->get(),
         //     'productvariants' => $productVariants,
-        // ]);  
+        // ]);
         return response()->json([
             'categories' => $categories::orderBy('id', 'desc')->get(),
             'brands' => $brands::orderBy('id', 'desc')->get(),
             'productvariants' => $productVariants,
-        ]);  
- 
+        ]);
+
     }
 
     public function create()
@@ -125,11 +107,11 @@ class ProductController extends Controller
         return response()->json([
             'categories' => $categories::orderBy('id', 'desc')->get(),
             'brands' => $brands::orderBy('id', 'desc')->get(),
-        ]);  
+        ]);
         // return view('Product.store', [
         //     'categories' => $categories::orderBy('id', 'desc')->get(),
         //     'brands' => $brands::orderBy('id', 'desc')->get(),
-        // ]);    
+        // ]);
     }
 
     /**
@@ -138,19 +120,19 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
-          
+
         $product = new Product();
         $product->fill($request->all());
         $product->name = $request->name_product;
         $product->save();
         $productId = $product->id;
-       
+
 
         $images = $request->file('images') ?? [];
         foreach($images as $item){
         $product_img = new ProductImage();
         $extension =  $item->getClientOriginalExtension();
-        $filename = time() . '.' . $extension; 
+        $filename = time() . '.' . $extension;
         $uploadedFileUrl = Cloudinary::upload($item->getRealPath(), [
             'public_id' => $filename
         ])->getSecurePath();
@@ -161,22 +143,22 @@ class ProductController extends Controller
 
         $names = $request->input('name');
         $prices = $request->input('price');
-        $images = $request->file('image'); 
+        $images = $request->file('image');
         $stocks = $request->input('stock');
         $variant_values = $request->input('variant_value');
         $discounts = $request->input('discount');
-        
-        
+
+
         // $product_variant = new ProductVariant();
 
         foreach ($names as $index => $name) {
             $productVariant = new ProductVariant();
             $productVariant->name = $name;
             $productVariant->price = $prices[$index];
-    
+
             // Xử lý upload hình ảnh
             $extension = $images[$index]->getClientOriginalExtension();
-            $filename = time() . '.' . $extension; 
+            $filename = time() . '.' . $extension;
             $uploadedFileUrl = Cloudinary::upload($images[$index]->getRealPath(), [
                 'public_id' => $filename
             ])->getSecurePath();
@@ -187,7 +169,7 @@ class ProductController extends Controller
             $productVariant->product_id = $productId;
             $productVariant->save();
         }
-            
+
             // Return a success response
             return response()->json([
                 'success' => true,
@@ -208,12 +190,12 @@ class ProductController extends Controller
      */
     public function detail(ProductVariant $productVariant)
     {
-       
+
         return response()->json([
             'productVariant' => $productVariant,
             'productImages' => ProductImage::where('product_id',$productVariant->product->id)->get(),
             'relatedProductVariants' => ProductVariant::where('product_id',$productVariant->product->id)->get(),
-            
+
         ]);
         // return view('Product.detail', [
         //     'productVariant' => $productVariant,
@@ -225,7 +207,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-    
+
         return response()->json([
             'success' => true,
             'product' => $product
@@ -234,13 +216,13 @@ class ProductController extends Controller
 
     public function getProductVariants(Product $product)
     {
-        
+
         return response()->json([
             'success' => true,
             'productVariants' => ProductVariant::where('product_id', $product->id)->paginate(20),
             ]);
     }
-    
+
     public function home()
     {
         return response()->json([
@@ -252,7 +234,7 @@ class ProductController extends Controller
             'Featured'   => ProductVariant::orderBy('view', 'desc')->get(),
             ]);
         // return view('Product.detail', [
-       
+
         // ]);
     }
     /**
@@ -263,7 +245,7 @@ class ProductController extends Controller
         $brands = new Brand();
         $categories = new Category();
         $variants = ProductVariant::where('product_id',$product->id)->get();
-        
+
 
         return response()->json([
             'product' => $product,
@@ -286,18 +268,18 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-       
+
         try {
             $product->fill($request->all());
             $product->name = $request->name_product;
             $product->update();
-    
+
             // // xóa ảnh tham khảo
             // $delete_images = $request->delete_images ?? [];
             // foreach($delete_images as $item){
             //     $product_img = new ProductImage();
             //     $productImg = $product_img::find($item);
-              
+
             //     $parsedUrl = parse_url($productImg->image, PHP_URL_PATH);
             //     // Loại bỏ phần '/image/upload/' và các thư mục khác
             //     $pathParts = explode('/', $parsedUrl);
@@ -314,7 +296,7 @@ class ProductController extends Controller
             // foreach($images as $item){
             //     $product_img = new ProductImage();
             //     $extension =  $item->getClientOriginalExtension();
-            //     $filename = time() . '.' . $extension; 
+            //     $filename = time() . '.' . $extension;
             //     $uploadedFileUrl = Cloudinary::upload($item->getRealPath(), [
             //         'public_id' => $filename
             //     ])->getSecurePath();
@@ -323,8 +305,8 @@ class ProductController extends Controller
             //     $product_img->product_id = $product->id;
             //     $product_img->save();
             // }
-    
-    
+
+
             // $variantIds = $request->input('variant_id');
             // $names = $request->input('name');
             // $prices = $request->input('price');
@@ -332,14 +314,14 @@ class ProductController extends Controller
             // $stocks = $request->input('stock');
             // $variant_values = $request->input('variant_value');
             // $discounts = $request->input('discount');
-        
-    
+
+
             // foreach ($names as $index => $name) {
             //     if (isset($variantIds[$index])) {
             //         $productVariant = ProductVariant::findOrFail($variantIds[$index]);
             //         $productVariant->name = $names[$index];
             //         $productVariant->price = $prices[$index];
-            
+
             //         // Cập nhật hình ảnh nếu có
             //         if (isset($images[$index])) {
             //             $parsedUrl = parse_url($productVariant->image, PHP_URL_PATH);
@@ -349,18 +331,18 @@ class ProductController extends Controller
             //         $fileWithExtension = end($pathParts);
             //             // Loại bỏ phần extension (đuôi file .jpg, .png, ...)
             //         $publicId = pathinfo($fileWithExtension, PATHINFO_FILENAME);
-            
+
             //         Cloudinary::destroy($publicId);
-            
+
             //         // đổi tên file ảnh rồi mới thêm vào á đổi tên theo thời gian
             //         $extension = $images[$index]->getClientOriginalExtension();
-            //         $filename = time() . '.' . $extension; 
+            //         $filename = time() . '.' . $extension;
             //         $uploadedFileUrl = Cloudinary::upload($images[$index]->getRealPath(), [
             //             'public_id' => $filename
             //         ])->getSecurePath();
             //         $productVariant->image = $uploadedFileUrl;
             //         }
-            
+
             //         $productVariant->stock = $stocks[$index];
             //         $productVariant->variant_value = $variant_values[$index];
             //         $productVariant->discount = $discounts[$index];
@@ -369,16 +351,16 @@ class ProductController extends Controller
             //         $productVariant = new ProductVariant();
             //         $productVariant->name = $name;
             //         $productVariant->price = $prices[$index];
-            
+
             //         // Xử lý upload hình ảnh
-                  
+
             //         $productVariant->stock = $stocks[$index];
             //         $productVariant->variant_value = $variant_values[$index];
             //         $productVariant->discount = $discounts[$index];
             //         $productVariant->product_id = $product->id;
-    
+
             //         $extension = $images[$index]->getClientOriginalExtension();
-            //         $filename = time() . '.' . $extension; 
+            //         $filename = time() . '.' . $extension;
             //         $uploadedFileUrl = Cloudinary::upload($images[$index]->getRealPath(), [
             //             'public_id' => $filename
             //         ])->getSecurePath();
@@ -393,7 +375,7 @@ class ProductController extends Controller
             // foreach($delete_variants as $item){
             //     $product_variant = new ProductVariant();
             //     $variant = $product_variant::find($item);
-              
+
             //     $parsedUrl = parse_url($variant->image, PHP_URL_PATH);
             //     // Loại bỏ phần '/image/upload/' và các thư mục khác
             //     $pathParts = explode('/', $parsedUrl);
@@ -427,7 +409,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-       
+
         try {
             $productImgOb = new ProductImage();
             $productVariantOb = new ProductVariant();
@@ -453,9 +435,9 @@ class ProductController extends Controller
                 $publicId = pathinfo($fileWithExtension, PATHINFO_FILENAME);
                 Cloudinary::destroy($publicId);
             }
-    
+
             $product->delete();
-            
+
             // Return a success response
             return response()->json([
                 'success' => true,
