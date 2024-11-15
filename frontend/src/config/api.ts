@@ -3,6 +3,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 const apiConfig = {
   products: {
     getAll: `${baseUrl}/api/product/`,
+    getAllProduct: `${baseUrl}/api/product/home`,
     getDetailByTag: `${baseUrl}/api/product/getProductByTag/`,
     deletePr: `${baseUrl}/api/product/delete/`,
     updatepr: `${baseUrl}/api/product/update/`,
@@ -78,6 +79,14 @@ const apiConfig = {
     logout: `${baseUrl}/api/logout`,
     register: `${baseUrl}/api/register/send-code`,
     verify: `${baseUrl}/api/register/verify-code`,
+
+    loginToken: `${baseUrl}/api/auth/login`,
+
+    //Lấy data user từ token
+    getUserFromToken: `${baseUrl}/api/auth/profile`,
+
+    // Refresh token
+    refreshToken: `${baseUrl}/api/auth/refresh`,
 
     // Lấy thông tin user theo id
     ///users/show/{id}
@@ -184,9 +193,15 @@ const apiConfig = {
 
   payment: {
     createPayment: `${baseUrl}/api/payment/vnpay_payment`
-  }
+  },
 
-  
+  post: {
+    getAll: `${baseUrl}/api/posts`,
+    createPost: `${baseUrl}/api/posts/store`,
+    updatePost: `${baseUrl}/api/posts/update/`,
+    deletePost: `${baseUrl}/api/posts/delete/`, 
+    getPostById: `${baseUrl}/api/posts/show/`,
+  } 
 
 
 };

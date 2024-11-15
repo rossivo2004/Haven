@@ -22,6 +22,19 @@ const apiConfig = {
     addproductimage : `${baseUrl}/api/productimage/store`,
   },
 
+  productsva: {
+    getAll: `${baseUrl}/api/productvariant`,
+
+    ///productvariant/store/{id}
+    createproductvariants : `${baseUrl}/api/productvariant/store/`,
+
+    ///update/{productVariant}
+    updateproductvariants : `${baseUrl}/api/productvariant/update/`,
+
+    ///delete/{productVariant}
+    deleteproductvariants : `${baseUrl}/api/productvariant/delete/`,
+  },
+
   categories: {
     getAll: `${baseUrl}/api/category/`,
     createCt: `${baseUrl}/api/category/store/`,
@@ -74,6 +87,18 @@ const apiConfig = {
   },
 
   users: {
+    login: `${baseUrl}/api/login`,
+    logout: `${baseUrl}/api/logout`,
+    register: `${baseUrl}/api/register/send-code`,
+    verify: `${baseUrl}/api/register/verify-code`,
+
+    loginToken: `${baseUrl}/api/auth/login`,
+
+    refreshToken: `${baseUrl}/api/auth/refresh`,
+
+
+    getUserFromToken: `${baseUrl}/api/auth/profile`,
+
     getAll: `${baseUrl}/api/users/`,
 
     createUser: `${baseUrl}/api/users/store/`,
@@ -130,7 +155,20 @@ const apiConfig = {
     getUser: `${baseUrl}/api/statics/user`,
     getComparison: `${baseUrl}/api/statics/comparison`,
     getMostLeast: `${baseUrl}/api/statics/mostleast`,
-  }
+  },
+
+  ordernotify: {
+    getAll: `${baseUrl}/api/ordernotify/view`,
+    unread: `${baseUrl}/api/ordernotify/unread`,
+    markAsRead: `${baseUrl}/api/ordernotify/mark-as-read/`,
+  },
+
+  post: {
+    getAll: `${baseUrl}/api/posts`,
+    createPost: `${baseUrl}/api/posts/store`,
+    updatePost: `${baseUrl}/api/posts/update/`,
+    deletePost: `${baseUrl}/api/posts/delete/`, 
+  } 
 };
 
 export default apiConfig;

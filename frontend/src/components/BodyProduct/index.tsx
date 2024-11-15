@@ -30,6 +30,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { addToCart, updateCart } from '@/src/store/cartSlice';
+import { fetchUserProfile } from '@/src/config/token';
 
 interface CustomRadioProps extends RadioProps {
     isSelected: boolean;
@@ -66,8 +67,10 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
 };
 
 function BodyProduct() {
+    const token = Cookies.get('access_token'); // Get token from cookies
     const { id } = useParams(); // get id product
     const [product, setProduct] = useState<Variant | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const [productFavourite, setProductFavourite] = useState<Variant | null>(null);
     const [activeVariant, setActiveVariant] = useState<string | null>(null);
     const router = useRouter();
@@ -82,6 +85,46 @@ function BodyProduct() {
     const [loading, setLoading] = useState(true);
     const [isFavorited, setIsFavorited] = useState<boolean>(false);
     const [mainPrice, setMainPrice] = useState<number | null>(null);
+
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, [token]); 
+
+    useEffect(() => {
+        const fetchProductFavourite = async () => {
+            if (userId) {
+                try {
+                    const response = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+
+                    // Check if the response data is empty
+                    if (response.data && response.data.length > 0) {
+                        console.log(response.data);
+                        const favorites = response.data; // Assuming this returns an array of favorite products
+                        const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
+                        setIsFavorited(isProductFavorited); // Update state
+                    } else {
+                        // If no favorites found, set isFavorited to false
+                        setIsFavorited(false);
+                    }
+                } catch (error: any) { // Specify the type of error as 'any'
+                    console.error('Error fetching favorites:', error); // Handle errors
+                    setIsFavorited(false); // Ensure isFavorited is false on error
+                }
+            } else {
+                setIsFavorited(false); // Ensure isFavorited is false if no user ID
+            }
+        };
+        fetchProductFavourite();
+    }, [userId, product]);
 
     const dispatch = useDispatch();
     // const cart = useSelector((state) => state.cart);
@@ -102,32 +145,8 @@ function BodyProduct() {
     }, [id]);
 
 
-    useEffect(() => {
-        const fetchProductFavourite = async () => {
-            const userId = Cookies.get('user_id');
-            if (userId) {
-                try {
-                    const response = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+   
 
-                    // Check if the response data is empty
-                    if (response.data && response.data.length > 0) {
-                        const favorites = response.data; // Assuming this returns an array of favorite products
-                        const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
-                        setIsFavorited(isProductFavorited); // Update state
-                    } else {
-                        // If no favorites found, set isFavorited to false
-                        setIsFavorited(false);
-                    }
-                } catch (error: any) { // Specify the type of error as 'any'
-                    console.error('Error fetching favorites:', error); // Handle errors
-                    setIsFavorited(false); // Ensure isFavorited is false on error
-                }
-            } else {
-                setIsFavorited(false); // Ensure isFavorited is false if no user ID
-            }
-        };
-        fetchProductFavourite();
-    }, [product]);
 
     // ... existing code ...
 
@@ -147,7 +166,7 @@ function BodyProduct() {
         fetchData();
     }, [id]);
 
-    console.log(product);
+    // console.log(product);
 
     useEffect(() => {
         const fetchProductPromotion = async () => {
@@ -201,11 +220,15 @@ function BodyProduct() {
 
     useEffect(() => {
         if (product) {
-            const flashSaleStock = product.flash_sales[0].pivot.stock; // Assuming flash_sales is an array
-            if (flashSaleStock === 0) {
-                setMainPrice(product.DiscountedPrice ?? null); // Set to DiscountedPrice or null if undefined
+            if (product && product.flash_sales.length > 0) { // Check if flash_sales has elements
+                const flashSaleStock = product.flash_sales[0].pivot.stock; // Assuming flash_sales is an array
+                if (flashSaleStock === 0) {
+                    setMainPrice(product.DiscountedPrice ?? null); // Set to DiscountedPrice or null if undefined
+                } else {
+                    setMainPrice(product.FlashSalePrice ?? null); // Set to the regular price or null if undefined
+                }
             } else {
-                setMainPrice(product.FlashSalePrice ?? null); // Set to the regular price or null if undefined
+                setMainPrice(product.DiscountedPrice ?? null);
             }
         }
     }, [product]);
@@ -223,7 +246,6 @@ function BodyProduct() {
 
 
     const handleAddToFavorites = async (productVariantId: number) => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
         if (!userId) {
             toast.error('Bạn cần đăng nhập để thêm sản phẩm vào yêu thích.');
             return;
@@ -272,7 +294,6 @@ function BodyProduct() {
 // ... existing code ...
 
 const handleAddToCart = async () => {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
     const body = {
         user_id: userId ? parseInt(userId) : null, // Parse user ID if it exists
         product_variant_id: product?.id, // Ensure product ID is used
@@ -375,6 +396,25 @@ const handleAddToCart = async () => {
     }
 };
 
+const handleBuyNow = async () => {
+    
+
+    const checkoutData = {
+        productId: product?.id, // Use the current product ID
+        selectedItems: [{
+            id: product?.id,
+            quantity: quantity, // Use the quantity state
+            name: product?.name || '', // Get name for the selected item
+            image: product?.image || '' // Get image for the selected item
+        }],
+        totalAmount: mainPrice, // Save total amount
+        pointCart: 0, // Assuming no loyalty points for now
+    };
+
+    Cookies.set('checkout_data', JSON.stringify(checkoutData)); // Save selected items and total amount to cookies
+    router.push('/checkout'); // Redirect to checkout page
+};
+
 const fetchUpdatedCart = async (userId: string) => {
     try {
         const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
@@ -442,7 +482,23 @@ const fetchUpdatedCart = async (userId: string) => {
 
             <div className='flex gap-10 lg:flex-row flex-col-reverse mb-20'>
                 <div className='lg:w-1/2 w-full'>
-                    <div className='lg:text-3xl text-2xl font-bold mb-4 dark:text-white'>{product?.name}</div>
+                   <div className='flex items-center justify-between'>
+                   <div className='lg:text-3xl text-2xl font-bold mb-4 dark:text-white'>{product?.name}</div>
+                    <div className='cursor-pointer'>
+                    {isFavorited ? ( // Conditional rendering based on isFavorited state
+                                <div  className=" text-red-600">
+                                    <FavoriteIcon onClick={() => handleAddToFavorites(product?.id as number)}/>
+                                </div>
+                            ) : (
+                                <div
+                                    // Ensure product ID is treated as a number
+                                    className=" text-red-600"
+                                >
+                                    <FavoriteBorderIcon  onClick={() => handleAddToFavorites(product?.id as number)}/>
+                                </div>
+                            )}
+                    </div>
+                   </div>
                     {/* <div className="flex items-center mb-4">
                         {[...Array(4)].map((_, i) => (
                             <svg key={i} className="w-4 h-4 text-yellow-300 me-1" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -500,8 +556,8 @@ const fetchUpdatedCart = async (userId: string) => {
                     <div className='flex gap-2 mb-4'>
                         {variantsPr?.map((item) => (
                             <a href={`/product/${item.id}`} key={item.id}>
-                                <div className={`p-1 border font-medium dark:text-white border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main dark:text-white text-white border-main' : ''}`}>
-                                    {item.name}
+                                <div className={`py-1 px-2 border font-medium dark:text-white border-main text-main rounded-lg ${product?.id === item.id ? 'bg-main dark:text-white text-white border-main' : ''}`}>
+                                    {item.variant_value}
                                 </div>
                             </a>
                         ))}
@@ -544,18 +600,11 @@ const fetchUpdatedCart = async (userId: string) => {
                             <Button onClick={handleAddToCart} className="flex flex-1 bg-[#FFC535] border border-[#FFC535] text-base text-white font-semibold rounded py-7">
                                 <AddShoppingCartIcon /> Thêm vào giỏ hàng
                             </Button>
-                            {isFavorited ? ( // Conditional rendering based on isFavorited state
-                                <Button onClick={() => handleAddToFavorites(product?.id as number)} className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7">
-                                    <FavoriteIcon /> Đã thích
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={() => handleAddToFavorites(product?.id as number)} // Ensure product ID is treated as a number
-                                    className="flex flex-1 bg-[#f79a9a] text-base text-red-600 border-2 border-red-600 font-semibold rounded py-7"
-                                >
-                                    <FavoriteBorderIcon /> Yêu thích
-                                </Button>
-                            )}
+                           
+                            <Button onClick={handleBuyNow} className="flex flex-1 text-[#FFC535] border border-[#FFC535] text-base bg-transparent font-semibold rounded py-7">
+                                <AddShoppingCartIcon /> Mua ngay
+                            </Button>
+                           
                         </div>
                     </div>
 

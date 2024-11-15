@@ -10,26 +10,46 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { toast } from "react-toastify";
 import { Spinner } from "@nextui-org/react";
 import Loading from "../ui/Loading";
+import { fetchUserProfile } from "@/src/config/token";
 
 function ProfileFavourite() {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null); 
     const [favourite, setFavourite] = useState<FavouriteItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []);
+
     const getFavourite = async () => {
-        setLoading(true)
-        const res = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`)
-        setFavourite(res.data)
-        setLoading(false)
+        if (!userId) return; // Ensure userId is not null before making the API call
+        setLoading(true);
+        try {
+            const res = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
+            setFavourite(res.data);
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+            toast.error('Có lỗi xảy ra khi lấy danh sách yêu thích.'); // Notify error
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
-        getFavourite()
-    }, [userId])
+        getFavourite();
+    }, [userId]);
 
     const handleAddToFavorites = async (productVariantId: number) => {
         
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
         if (!userId) {
             toast.error('Bạn cần đăng nhập để thêm sản phẩm vào yêu thích.');
             return;
@@ -76,16 +96,16 @@ function ProfileFavourite() {
                     </div>
                 )}
                 {!loading && favourite.map((item) => (
-                    <div className="w-full h-auto lg:h-[360px] flex flex-col group mb-2 pb-3 rounded-lg re z-0" key={item.id}>
+                    <div className="w-full h-auto px-2 lg:h-[360px] flex flex-col group mb-2 pb-3 rounded-lg re z-0" key={item.id}>
                         <Link href={`/product/${item.id}`}>
-                            <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
+                            <div className="w-full h-[140px] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
                                 <Image
                                     loading="lazy"
                                     src={item.image}
                                     alt={item.name}
                                     width={500}
                                     height={500}
-                                    className="w-full lg:h-[260px] h-full object-cover group-hover:scale-110 transition-all"
+                                    className="w-full lg:h-[260px] h-full object-contain group-hover:scale-110 transition-all"
                                 />
                             </div>
                         </Link>

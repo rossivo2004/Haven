@@ -14,14 +14,30 @@ import axios from 'axios';
 import apiConfig from '@/src/config/api';
 import { User } from '@/src/interface';
 import { useEffect, useState } from 'react';
-
+import { fetchUserProfile } from '@/src/config/token';
 
 function Profile_SideMenu() {
     const pathname = usePathname()
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userId, setUserId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null); 
 
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile using token
+                setUserId(userProfile.id); // Set user ID from the fetched profile
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        getUserId(); // Call the function to get user ID
+    }, []);
+
+    console.log(userId);
+
     const fetchUser = async () => {
+        if (!userId) return; // Ensure userId is not null before making the request
         try {
             const response = await axios.get(`${apiConfig.user.getUserById}${userId}`, { withCredentials: true });
             console.log('Fetched cart data:', response.data);

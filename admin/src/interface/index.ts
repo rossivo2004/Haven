@@ -19,6 +19,7 @@ export interface ProductImage {
     product_id: number;
     created_at: string;
     updated_at: string;
+    url: string;
   }
   
 export interface Product {
@@ -33,6 +34,24 @@ export interface Product {
     updated_at: string;
     ProductVariantCount: number;
     product_images: ProductImage[];
+  }
+
+export interface Product1 {
+    id: number;
+    name: string;
+    description: string;
+    category_id: number;
+    brand_id: number;
+    brand: { id: number; name: string; image: string; tag: string };
+    category: { id: number; name: string; image: string; tag: string };
+    created_at: string;
+    updated_at: string;
+    ProductVariantCount: number;
+    product_images: ProductImage[];
+    price: string;
+    stock: string;
+    discount: string;
+    variant_value: string;
   }
   
 export interface FlashSale {

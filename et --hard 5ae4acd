@@ -1,0 +1,141 @@
+[33m1e838f6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #35 from rossivo2004/Nghia
+[33m5ae4acd[m up
+[33m3d00eaa[m add JWT_token
+[33m2bcb890[m Merge pull request #34 from rossivo2004/Nghia
+[33m8a815ee[m add ward
+[33m60a40d3[m up 08/11
+[33m2a92a85[m Merge branch 'main' of https://github.com/rossivo2004/Haven
+[33m0305069[m up 11/07
+[33m62c97fb[m Merge pull request #33 from rossivo2004/Huy
+[33m6bb8639[m related product variants
+[33mf72c07d[m Merge branch 'main' of https://github.com/rossivo2004/Haven
+[33m26e0465[m up
+[33md899427[m Merge pull request #32 from rossivo2004/Nghia
+[33m1da225b[m Merge branch 'main' of https://github.com/rossivo2004/Haven into Nghia
+[33mc9398a9[m add check status
+[33m7e53896[m Merge pull request #31 from rossivo2004/Nghia
+[33m9776c52[m add check status
+[33m6f15889[m Merge branch 'main' of https://github.com/rossivo2004/Haven
+[33mf1d43a5[m up 05/11
+[33m8909bc5[m Merge pull request #30 from rossivo2004/Nghia
+[33m844b8dd[m Merge branch 'main' of https://github.com/rossivo2004/Haven into Nghia
+[33m713ca6e[m Merge pull request #29 from rossivo2004/Huy
+[33mae6f038[m fix increase view 3
+[33m6710b68[m Merge pull request #28 from rossivo2004/Huy
+[33mf71087b[m fix increase view 2
+[33m058fb6a[m Merge pull request #27 from rossivo2004/Huy
+[33m00be473[m fix increase view
+[33me68aa54[m Merge pull request #26 from rossivo2004/Huy
+[33m51f3d28[m add QuantitySold
+[33m61400a4[m up 11/03
+[33m162678b[m them posts
+[33ma2f23c4[m add post
+[33mc88e5ee[m add post
+[33m28c6ec2[m Merge pull request #25 from rossivo2004/ngochuy
+[33m678efa8[m Updated 29/10
+[33m6c6a5fd[m up 29/10
+[33m12c3890[m Merge pull request #24 from rossivo2004/ngochuy
+[33mb888f26[m Update order and payment
+[33mafeccf9[m up cart FE
+[33m202ad6d[m up
+[33mf7fe542[m Merge pull request #23 from rossivo2004/TNghia
+[33m506eed7[m add post gg
+[33m83417d4[m add role
+[33md94631d[m pull main into TNghia
+[33mc3de3fa[m up
+[33mfb2b49f[m up
+[33ma6a71fd[m up forgot pass
+[33mfc02209[m up 22/10
+[33m9c95c7f[m up
+[33m3ffe3e4[m Nghia
+[33m0091e6b[m up
+[33m76c8352[m them lay id user
+[33m2657fb1[m Merge pull request #22 from rossivo2004/Huy
+[33me1ebf3c[m fix confilct
+[33m78c12dd[m up 18/10
+[33m157cf47[m[33m ([m[1;31morigin/Huy[m[33m)[m change price form
+[33m2608a1f[m up
+[33m77756d7[m Merge pull request #20 from rossivo2004/Huy
+[33mf211a7e[m add API get product not in flashsale
+[33m37887f2[m Merge pull request #19 from rossivo2004/Huy
+[33m1ef3908[m add cart, add info API Product variant 2
+[33ma3e0dae[m Merge pull request #18 from rossivo2004/Huy
+[33m13f86fa[m add cart, add info API Product variant
+[33m56628cd[m Merge pull request #17 from rossivo2004/Huy
+[33md09ed45[m update shop
+[33md4408c2[m Merge pull request #16 from rossivo2004/Huy
+[33ma4745c0[m add store ProductImage, store flash sale product,delete flash saleproduct,edit product, update product,flash sale
+[33mf2f6a39[m add store ProductImage, store flash sale product,delete flash saleproduct,edit product, update product,flash sale
+[33md5638e8[m Merge pull request #15 from rossivo2004/linh
+[33mc3047a4[m Merge pull request #14 from rossivo2004/Huy
+[33m718ddcb[m add api productVariant
+[33m325dea7[m add api productVariant
+[33m4931eb7[m Merge pull request #13 from rossivo2004/Huy
+[33m8110469[m add api productVariant
+[33m1dbe45a[m up
+[33m4a89876[m add delete productvariant
+[33m3690dfd[m add delete productvariant
+[33mb82930d[m Merge pull request #12 from rossivo2004/Huy
+[33mbd37ab0[m up
+[33m7e7ef2f[m up
+[33m3714bb8[m add show list products
+[33m5198185[m add validate images
+[33m1ac4a93[m Merge pull request #11 from rossivo2004/Huy
+[33m9b6f2ae[m Solve conflic
+[33m16a077c[m up
+[33m54bf0f7[m update API product,flashsale,brand,category,productvariant,pagination, getBrand/CategoryByTag
+[33m84f4051[m update API product,flashsale,brand,category,productvariant,pagination
+[33mf917e71[m[33m ([m[1;31morigin/linh[m[33m)[m blog
+[33m483e8c6[m Merge branch 'main' of https://github.com/rossivo2004/Haven
+[33ma7b78d7[m up
+[33m68d0fdc[m Merge pull request #9 from rossivo2004/Huy
+[33m54207e3[m update API product,flashsale,brand,category,productvariant
+[33me947cef[m up 01/10/2024
+[33me0f70b5[m up 30/09/2024
+[33m1d9bcbe[m Merge pull request #8 from rossivo2004/Huy
+[33m30d6840[m up
+[33m6a704fc[m remove csrf token
+[33m77d340d[m csrf token
+[33m1013a41[m Merge pull request #7 from rossivo2004/Huy
+[33mfcf460f[m up
+[33m2e61dd3[m csrf token
+[33m57737f6[m Merge branch 'main' of https://github.com/rossivo2004/Haven
+[33me1a7997[m up
+[33m8bf8da2[m Merge pull request #6 from rossivo2004/Huy
+[33m34a6ec4[m Merge pull request #5 from rossivo2004/revert-4-thanhtai
+[33m70ce416[m[33m ([m[1;31morigin/revert-4-thanhtai[m[33m)[m Revert "bodytr"
+[33mbe27d35[m Merge pull request #4 from rossivo2004/thanhtai
+[33m4bdfb20[m add CSRF
+[33m9c4f942[m Merge pull request #3 from rossivo2004/Huy
+[33m377a743[m add backend
+[33m2383cde[m update 25/09/2024
+[33m66b5c5d[m bodytr
+[33m7c92288[m update 23/09/2024
+[33m7c023e8[m up
+[33maab8fa6[m up
+[33m19a0f8b[m update 16/09/2024
+[33mfe81cd5[m up
+[33m83bc798[m up
+[33m28c4ea8[m update 10/09
+[33m44990e8[m up
+[33m37a6d9a[m up
+[33m28ba48e[m up
+[33m9a6bd08[m up
+[33m007fbcd[m up
+[33m06c9d24[m uo
+[33m3941474[m i
+[33md11f3cf[m up
+[33m69b6539[m ip
+[33m0eb167b[m up
+[33m8ab4ac3[m Merge pull request #2 from rossivo2004/thanhtai
+[33mec813f6[m Thông điệp commit của bạn
+[33madd759c[m Remove frontend directory
+[33m66998a0[m update 03/09
+[33mcb99d02[m up
+[33m2e8faef[m update 29/08
+[33m214a6c2[m 'Body_Bodycart'
+[33m68846d6[m moi
+[33m80b19ed[m up
+[33m28a352c[m update
+[33m4e2aa67[m ha
+[33mc36f945[m first commit

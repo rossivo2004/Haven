@@ -82,9 +82,9 @@ function BodyTrackingorder() {
                 <div>
 
                     <div className="py-4 px-4 space-y-6 dark:text-white">
+                        <div className="mb-2 text-xl ">Bạn đang xem đơn hàng: <span className="font-semibold">{order.invoice_code}</span></div>
                         {order?.order_details.map((item) => (
                             <div>
-                                <div className="mb-2 text-xl ">Bạn đang xem đơn hàng: <span className="font-semibold">{order.invoice_code}</span></div>
                                 <div className="flex justify-between items-center" key={item.id}>
                                     {/* Product Image and Details */}
                                     <div className="flex items-center gap-2 justify-center">

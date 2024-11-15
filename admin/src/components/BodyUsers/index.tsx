@@ -29,6 +29,8 @@ function BodyUsers() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); // State for add modal
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1); // State for current page
+    const itemsPerPage = 10; // Define how many items to show per page
 
     const handleEditUser = (user: User) => {
         setSelectedUser(user); // Set the selected user for editing
@@ -73,7 +75,7 @@ function BodyUsers() {
     const handleUpdateUser = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!selectedUser) return; // Ensure selectedUser is not null
-    
+
         const { id, point, ...updatedData } = selectedUser; // Exclude status from destructuring
         const updatedStatus = selectedUser.status; // Keep status as a string
         const payload = {
@@ -171,6 +173,12 @@ function BodyUsers() {
 
     console.log(user);
 
+    const totalItems = user.length; // Total number of users
+    const indexOfLastItem = currentPage * itemsPerPage; // Index of last item on current page
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage; // Index of first item on current page
+    const currentItems = user.slice(indexOfFirstItem, indexOfLastItem); // Get current items for the page
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage); // Calculate total pages
 
     return (
         <div>
@@ -180,17 +188,22 @@ function BodyUsers() {
                     <p className="text-white text-lg">Đang xử lý...</p>
                 </div>
             )}
-            <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+                 <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
-                            { name: 'User', link: '#' },
+                            { name: 'Sản phẩm chính', link: '#' },
                         ]}
                     />
                 </div>
-                <div>
-                    <Button onPress={handleAddUser}>Thêm user</Button>
+            <div className="flex justify-between items-center w-full">
+                <div className="w-full">
+                    <div className='flex justify-between mb-4 wf'>
+                        <div className='font-semibold text-xl'>
+                            Quản lý người dùng
+                        </div>
+                        <Button onPress={handleAddUser} className="bg-[#696bff] text-white font-medium">Thêm user</Button>
+                    </div>
                     <Modal size="5xl" scrollBehavior="inside" isOpen={isAddModalOpen} onOpenChange={() => setIsAddModalOpen(false)} isDismissable={false} isKeyboardDismissDisabled={true}>
                         <ModalContent>
                             <Formik
@@ -321,7 +334,7 @@ function BodyUsers() {
                             <TableColumn>Thao tác</TableColumn>
                         </TableHeader>
                         <TableBody>
-                            {user?.map((item, ind) => (
+                            {currentItems?.map((item, ind) => (
                                 <TableRow key={ind}>
                                     <TableCell>
                                         <div className="flex flex-col">
@@ -332,7 +345,7 @@ function BodyUsers() {
                                     <TableCell>{item.point}</TableCell>
                                     <TableCell>
                                         <div>
-                                            {item.role_id === 1 ? <div className="bg-green-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-green-600 border-2 border-green-600">User</div> : item.role_id === 0 ? <div className="bg-yellow-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-yellow-600 border-2 border-yellow-600">Admin</div> : 'unknown'}
+                                            {item.role_id === 1 ? <div className="bg-green-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-green-600 border-2 border-green-600">User</div> : item.role_id === 2 ? <div className="bg-yellow-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-yellow-600 border-2 border-yellow-600">Admin</div> : 'unknown'}
                                         </div>
                                     </TableCell>
                                     <TableCell>{item.status === 'active' ? <div className="bg-green-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-green-600 border-2 border-green-600">Active</div> : <div className="bg-red-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-red-600 border-2 border-red-600">Banned</div>}</TableCell>
@@ -347,15 +360,29 @@ function BodyUsers() {
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex justify-end w-full">
-                    {/* <CustomPagination
-                    totalItems={filteredProducts.length}
-                    itemsPerPage={itemsPerPage}
-                    currentPage={currentPage}
-                    onPageChange={(page: number) => setCurrentPage(page)}
-                /> */}
-                    <Pagination showControls total={10} initialPage={1} />
+                <div className="flex justify-between items-center w-full">
+                    <div className="mr-4">
+                        <span>{`${indexOfFirstItem + 1}-${Math.min(indexOfLastItem, totalItems)} của ${totalItems} người dùng`}</span>
+                    </div>
+                    <div className="flex justify-center mt-4">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <div
+                                className={`cursor-pointer w-10 h-10 flex items-center justify-center rounded-md border-2 
+                                ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-transparent text-blue-600'}`}
+                                key={index + 1}
+                                onClick={() => setCurrentPage(index + 1)}
+                                style={{
+                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent',
+                                    border: '2px solid #696bff',
+                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                }}
+                            >
+                                {index + 1}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
             </div>
 
             <div>

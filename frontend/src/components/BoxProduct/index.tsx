@@ -27,19 +27,19 @@ function BoxProduct({ product }: { product: Variant }) {
         return Math.min(discounted, flashSale).toLocaleString('vi-VN');
     };
 
-    console.log(product);
+    // console.log(product);
 
     return (
         <Link href={`   /product/${id}`} >
-            <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 pb-3 rounded-lg">
-                <div className="w-full h-[140px] bg-[#f2f2f1] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg">
+            <div className="w-full h-auto lg:h-[420px] flex flex-col group mb-2 pb-3 rounded-lg px-2">
+                <div className="w-full h-[140px] object-cover lg:h-[240px] flex items-center justify-center overflow-hidden rounded-lg px-2 ">
                     <Image
                     loading="lazy"
                         src={image}
                         alt={name}
                         width={500}
                         height={500}
-                        className="w-full lg:h-[260px] h-full object-cover group-hover:scale-110 transition-all"
+                        className="w-full lg:h-[260px] h-full object-contain group-hover:scale-110 transition-all"
                         
                     />
                 </div>

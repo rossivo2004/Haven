@@ -3,8 +3,6 @@ import './style.css';
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Table, TableHeader, TableColumn, TableRow, TableCell, TableBody, Tooltip, Radio, cn, RadioGroup } from "@nextui-org/react";
 import TableOrder from "../TableOrder";
-import CustomPagination from "@/components/Pagination";
-import { Pagination } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/input";
@@ -12,7 +10,7 @@ import { EyeIcon } from "./EyeIcon";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { confirmAlert } from "react-confirm-alert";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Order } from '@/interface';
 import axios from 'axios';
 import apiConfig from '@/configs/api';
@@ -71,33 +69,46 @@ const getStatusTextModal = (status: string) => {
 };
 
 
-const orderStatuses = ['pending', 'preparing', 'transport', 'complete']; 
+const orderStatuses = ['pending', 'preparing', 'transport', 'complete'];
 
 function BodyOrders() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const [order, setOrder] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [idOrrder, setIdOrrder] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
-    const [selectedStatus, setSelectedStatus] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
-    const [idOrrder, setIdOrrder] = useState<string>(''); // Thêm state để lưu trạng thái đã chọn
-    
+    const productsPerPage = 10;
 
-// ... existing code ...
-const handleEditStatus = (status: string, idOrder: number) => {
-    setSelectedStatus(status); // Cập nhật trạng thái đã chọn
-    console.log("Selected Status:", status); // Kiểm tra giá trị
-    setIdOrrder(String(idOrder)); // Set the idOrrder state correctly
-    onOpen(); // Mở modal
-};
-// ... existing code ...
+    const filteredOrders = useMemo(() => {
+        return order.filter(item => 
+            item.invoice_code.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [order, searchTerm]);
+
+    const ordersToDisplay = useMemo(() => {
+        const startIndex = (currentPage - 1) * productsPerPage;
+        return filteredOrders.slice(startIndex, startIndex + productsPerPage);
+    }, [filteredOrders, currentPage]);
+
+    const handleEditStatus = (status: string, idOrder: number) => {
+        setSelectedStatus(status);
+        console.log("Selected Status:", status);
+        setIdOrrder(String(idOrder));
+        onOpen();
+    };
 
     const fecthOrder = async () => {
         setLoading(true);
         try {
             const response = await axios.get(apiConfig.order.getAll);
-            const data = response.data; // Changed from response.json() to response.data
+            const data = response.data;
             setOrder(data);
+            setTotalPages(Math.ceil(data.length / productsPerPage));
         } catch (error) {
             console.log("Lỗi");
         } finally {
@@ -157,16 +168,16 @@ const handleEditStatus = (status: string, idOrder: number) => {
             buttons: [
                 {
                     label: "Yes",
-                    onClick: async () => { // Thay đổi thành async để sử dụng await
+                    onClick: async () => {
                         try {
-                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`); // Thêm await để chờ phản hồi
-                            if (response.status === 400) { // Kiểm tra nếu phản hồi trả về 400
-                                toast.error("Lỗi: Không thể hủy đơn hàng"); // Thông báo lỗi
-                                return; // Dừng thực hiện nếu có lỗi
+                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`);
+                            if (response.status === 400) {
+                                toast.error("Lỗi: Không thể hủy đơn hàng");
+                                return;
                             }
-                            toast.success("Hủy đơn thành công"); // Sửa thông báo thành công
+                            toast.success("Hủy đơn thành công");
                         } catch (error) {
-                            toast.error("Lỗi khi hủy đơn hàng"); // Cập nhật thông báo lỗi
+                            toast.error("Lỗi khi hủy đơn hàng");
                         }
                     },
                 },
@@ -179,8 +190,8 @@ const handleEditStatus = (status: string, idOrder: number) => {
 
     const handleConfirmUpdate = () => {
         if (idOrrder) {
-            console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus); // Kiểm tra giá trị
-            updateOrderStatus(Number(idOrrder), selectedStatus); // Sử dụng selectedStatus làm giá trị trạng thái
+            console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus);
+            updateOrderStatus(Number(idOrrder), selectedStatus);
         }
     };
 
@@ -188,16 +199,20 @@ const handleEditStatus = (status: string, idOrder: number) => {
         try {
             await axios.put(`${apiConfig.order.updateOrderStatus}${idOrder}`, { status });
             toast.success("Cập nhật trạng thái đơn hàng thành công");
-            fecthOrder(); // Refresh the order list after updating
+            fecthOrder();
         } catch (error) {
             toast.error("Lỗi khi cập nhật trạng thái");
         }
     };
 
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+                <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
@@ -205,6 +220,17 @@ const handleEditStatus = (status: string, idOrder: number) => {
                         ]}
                     />
                 </div>
+            </div>
+            <div className='flex justify-between mb-4'>
+                <div className='font-semibold text-xl'>
+                    Quản lý đơn hàng
+                </div>
+                <Input
+                    className="w-1/4"
+                    placeholder="Tìm kiếm theo mã đơn hàng"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             <div>
@@ -217,7 +243,7 @@ const handleEditStatus = (status: string, idOrder: number) => {
                             <TableColumn><div className='flex justify-center w-full'>Thao tác</div></TableColumn>
                         </TableHeader>
                         <TableBody>
-                            {order.map((item, ind) => (
+                            {ordersToDisplay.map((item, ind) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.invoice_code}</TableCell>
                                     <TableCell><div className='flex justify-center w-full'>{new Date(item.created_at).toLocaleDateString('en-GB')}</div></TableCell>
@@ -230,10 +256,10 @@ const handleEditStatus = (status: string, idOrder: number) => {
                                                 </span>
                                             </Tooltip>
                                             <Tooltip content="Edit status">
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditStatus(item.status, item.id)}>
-                            <EditIcon />
-                        </span>
-                    </Tooltip>
+                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditStatus(item.status, item.id)}>
+                                                    <EditIcon />
+                                                </span>
+                                            </Tooltip>
                                             <Tooltip color="danger" content="Delete order">
                                                 <span
                                                     className="text-lg text-danger cursor-pointer active:opacity-50"
@@ -249,9 +275,26 @@ const handleEditStatus = (status: string, idOrder: number) => {
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex justify-end w-full">
-
-                    <Pagination showControls total={10} initialPage={1} />
+                <div className="flex justify-between items-center mt-4">
+                    <div className="text-sm">
+                        {`${(currentPage - 1) * productsPerPage + 1} - ${Math.min(currentPage * productsPerPage, filteredOrders.length)} của ${filteredOrders.length} đơn hàng`}
+                    </div>
+                    <div className="flex gap-2">
+                        {Array.from({ length: Math.ceil(filteredOrders.length / productsPerPage) }, (_, index) => (
+                            <div
+                                className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md text-white'
+                                key={index + 1}
+                                onClick={() => handlePageChange(index + 1)}
+                                style={{
+                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent',
+                                    border: currentPage === index + 1 ? '2px solid #696bff' : '2px solid #696bff',
+                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                }}
+                            >
+                                {index + 1}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
@@ -262,25 +305,25 @@ const handleEditStatus = (status: string, idOrder: number) => {
                             <ModalHeader className="flex gap-1">Đơn hàng</ModalHeader>
                             <ModalBody>
                                 <div>
-                                <RadioGroup className="w-full !justify-between mb-2" orientation="horizontal" value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
-    {orderStatuses.map((status) => (
-        <CustomRadio key={status} value={status}>
-            {getStatusTextModal(status)} {/* Use the getStatusText function to display the correct text */}
-        </CustomRadio>
-    ))}
-</RadioGroup>   
+                                    <RadioGroup className="w-full !justify-between mb-2" orientation="horizontal" value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
+                                        {orderStatuses.map((status) => (
+                                            <CustomRadio key={status} value={status}>
+                                                {getStatusTextModal(status)}
+                                            </CustomRadio>
+                                        ))}
+                                    </RadioGroup>
                                     <div>
                                         <Button color='danger' onClick={() => cancelOrder(Number(idOrrder))}>Hủy đơn hàng</Button>
                                     </div>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onClose}>
-        Đóng
-    </Button>
-    <Button color="primary" onPress={() => { handleConfirmUpdate(); onClose(); }}>
-        Xác nhận
-    </Button>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Đóng
+                                </Button>
+                                <Button color="primary" onPress={() => { handleConfirmUpdate(); onClose(); }}>
+                                    Xác nhận
+                                </Button>
                             </ModalFooter>
                         </>
                     )}

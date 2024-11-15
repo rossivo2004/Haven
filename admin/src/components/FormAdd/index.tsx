@@ -11,7 +11,6 @@ import { Spinner } from "@nextui-org/react"; // Optional: if you want a spinner
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from "@nextui-org/table";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import Image from 'next/image';
-import { Pagination } from "@nextui-org/react";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
@@ -19,6 +18,7 @@ import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { EyeIcon } from "./EyeIcon";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import BreadcrumbNav from '../Breadcrumb/Breadcrumb';
 
 interface Variant {
     name: string;
@@ -47,10 +47,7 @@ const CreateProduct = () => {
         brand_id: '',
     });
 
-    const [pagination, setPagination] = useState({
-        last_page: 1,  // Default value for total pages
-        current_page: 1 // Default value for current page
-    });
+
     const [products, setProducts] = useState<Product[]>([]);
     const [productsVa, setProductsVa] = useState<ProductVa[]>([]);
     // ... existing code ...
@@ -78,6 +75,11 @@ const CreateProduct = () => {
 
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [selectedVariantImages, setSelectedVariantImages] = useState<{ [key: number]: File[] }>({}); // Add this line
+
+    const [currentPage, setCurrentPage] = useState(1); // Add state for current page
+    const productsPerPage = 10; // Define how many products per page
+
+    const [searchTerm, setSearchTerm] = useState(""); // Thêm state cho tìm kiếm
 
     const handleAddVariant = () => {
         setVariants([...variants, {
@@ -399,12 +401,11 @@ const CreateProduct = () => {
         }
     };
 
-    const fetchProducts = async (page = 1) => {
+    const fetchProducts = async () => {
         setLoadingProducts(true); // Start loading
         try {
-            const response = await axios.get(`${apiConfig.products.getAll}?page=${page}&per_page=5`, { withCredentials: true });
-            setProducts(response.data.products.data);
-            setPagination(response.data.products); // Update pagination data
+            const response = await axios.get(`${apiConfig.products.getAll}`, { withCredentials: true });
+            setProducts(response.data.products);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -427,7 +428,6 @@ const CreateProduct = () => {
     const fetchPagination = async () => {
         try {
             const response = await axios.get(apiConfig.products.getAll, { withCredentials: true });
-            setPagination(response.data.products);
         } catch (error) {
             console.error('Error fetching brands:', error);
         }
@@ -564,15 +564,40 @@ const CreateProduct = () => {
         });
     };
 
+    // Lọc sản phẩm dựa trên từ khóa tìm kiếm
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Cập nhật chỉ số phân trang dựa trên filteredProducts
+    const indexOfLastProduct = currentPage * productsPerPage; // Tính chỉ số sản phẩm cuối cùng
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage; // Tính chỉ số sản phẩm đầu tiên
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct); // Lấy sản phẩm hiện tại từ danh sách đã lọc
+
     return (
-        <div className="p-4">
+        <div className="p-4 !pt-0">
+             <div className="pb-5 h-[62px]">
+                    <BreadcrumbNav
+                        items={[
+                            { name: 'Trang chủ', link: '/' },
+                            { name: 'Sản phẩm chính', link: '#' },
+                        ]}
+                    />
+                </div>
             {/* {loading && <Spinner />} */}
             <div className='flex justify-between mb-4'>
                 <div className='font-semibold text-xl'>
                     Quản lý sản phẩm
                 </div>
                 <div className='flex items-center gap-2'>
-                    <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
+                    <Input
+                    
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị tìm kiếm
+                    />
+                    <Button className='bg-[#696CFF] text-white px-4 w-32' onPress={onOpen}>
                         Thêm sản phẩm
                     </Button>
                     {/* <div>
@@ -881,9 +906,9 @@ const CreateProduct = () => {
                             </div>
                             <div className='flex gap-2 justify-end'>
                                 <Button color="danger" onClick={clo}>
-                                    Close
+                                    Đóng
                                 </Button>
-                                <Button color="primary" type='submit'>Lưu</Button>
+                                <Button className='bg-[#4f46b5] text-white' type='submit'>Lưu</Button>
                             </div>
                         </form>
                     </ModalBody>
@@ -913,7 +938,7 @@ const CreateProduct = () => {
                                             <TableColumn><div className='flex items-center justify-center'>Thao tác</div></TableColumn>
                                         </TableHeader>
                                         <TableBody>
-                                            {products.map((product, index) => {
+                                            {currentProducts.map((product, index) => {
                                                 return (
                                                     <TableRow key={index}>
                                                         <TableCell>
@@ -954,6 +979,31 @@ const CreateProduct = () => {
                                             })}
                                         </TableBody>
                                     </Table>
+
+                                    <div className="flex justify-between items-center mt-4">
+                                    <div className="text-sm">
+                        {`${indexOfFirstProduct + 1} - ${Math.min(indexOfLastProduct, filteredProducts.length)} của ${filteredProducts.length} sản phẩm`}
+                    </div>
+                                    <div className="flex gap-2">
+
+                                        {Array.from({ length: Math.ceil(filteredProducts.length / productsPerPage) }, (_, index) => (
+                                            <div
+                                                className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md'
+                                                key={index + 1}
+                                                onClick={() => setCurrentPage(index + 1)}
+                                                style={{ 
+                                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent', 
+                                                    border: '2px solid #696bff',
+                                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                                }}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                        ))}
+
+                                    </div>
+                                     
+                                    </div>
 
                                 </div>
 
@@ -1122,7 +1172,8 @@ const CreateProduct = () => {
                                             <div id="variants" className="mb-8">
                                                 <h4 className="text-lg font-semibold mb-1">Sản phẩm biến thể</h4>
 
-                                                {productsVa.map((product, index) => (
+<div className='grid grid-cols-2 gap-2'>
+  {productsVa.map((product, index) => (
                                                     <div className="mb-4 border-b pb-4" key={index}>
                                                         {editingVariant && editingVariant.id === product.id ? (
                                                             <form onSubmit={handleUpdateVariant} encType="multipart/form-data">
@@ -1215,6 +1266,8 @@ const CreateProduct = () => {
                                                         )}
                                                     </div>
                                                 ))}
+</div>
+                                              
 
 
 
@@ -1324,9 +1377,11 @@ const CreateProduct = () => {
                                                 ))}
 
                                                 <div className="mb-4 border-t pt-4">
-                                                    <h5 className="text-md font-semibold mb-2">Thêm biến thể mới</h5>
+                                                    <h5 className="text-md font-semibold mb-2 ">Thêm biến thể mới</h5>
                                                     {!showNewVariantForm && (
-                                                        <Button color="primary" onPress={() => setShowNewVariantForm(!showNewVariantForm)}>
+                                                        <Button
+                                                            className='w-full border-2 border-[#696bff] bg-[#f5f8ff] text-[#696bff]'
+                                                        color="primary" onPress={() => setShowNewVariantForm(!showNewVariantForm)}>
                                                             Hiển thị form thêm biến thể
                                                         </Button>
                                                     )}
@@ -1408,12 +1463,7 @@ const CreateProduct = () => {
                 </Modal>
 
             </div>
-            <Pagination
-                total={pagination.last_page}  // total number of pages
-                initialPage={pagination.current_page}  // current page
-                onChange={(page) => fetchProducts(page)} // fetch products when page changes
-                showControls
-            />
+          
         </div>
     );
 };

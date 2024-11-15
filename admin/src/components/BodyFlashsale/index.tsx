@@ -74,6 +74,21 @@ function BodyFlashsale() {
 
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
 
+    const [currentPage, setCurrentPage] = useState<number>(1); // Current page state
+    const itemsPerPage = 5; // Number of items per page
+
+    // Calculate the index of the last item on the current page
+    const indexOfLastItem = currentPage * itemsPerPage;
+    // Calculate the index of the first item on the current page
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    // Get current items
+    const currentFlashsales = flashsale.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Function to handle page change
+    const handlePageChange = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
+    };
+
     const fetchProducts = async () => {
         try {
             const response = await axios.get(apiConfig.products.getallproductvariants, { withCredentials: true });
@@ -342,23 +357,28 @@ function BodyFlashsale() {
     };
     return (
         <div>
-                {loading && (
+            {loading && (
                 <div className="fixed z-[9999] inset-0 bg-gray-800 bg-opacity-75 flex gap-3 justify-center items-center w-screen h-screen ">
                     <Spinner size="lg" color="white" />
                     <p className="text-white text-lg">Đang xử lý...</p>
                 </div>
             )}
-            <div className="flex justify-between items-center">
-                <div className="py-5 h-[62px]">
+                <div className="pb-5 h-[62px]">
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
-                            { name: 'Flash Sale', link: '#' },
+                            { name: 'Chương trình khuyến mãi', link: '#' },
                         ]}
                     />
                 </div>
-                <div>
-                    <Button onPress={onOpen} color="primary">Thêm chương trình khuyển mãi</Button>
+            <div className="flex justify-between items-center w-full">
+                <div className="w-full">
+                    <div className="flex items-center justify-between mb-4 w-full">
+                        <div className="text-xl font-bold">Chương trình khuyến mãi</div>
+                       <div>
+                       <Button onPress={onOpen} className="bg-[#696bff] text-white font-medium">Thêm chương trình khuyển mãi</Button>
+                       </div>
+                    </div>
                     <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true}>
                         <ModalContent>
                             {(onClose) => (
@@ -460,54 +480,74 @@ function BodyFlashsale() {
                         </TableHeader>
 
 
-                        <TableBody items={flashsale}>
-                            
+                        <TableBody items={currentFlashsales}>
+
                             {(item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>
                                         <div className="flex items-center justify-center">
-                                        {item.id}
+                                            {item.id}
                                         </div>
-                                    </TableCell>
-                                    <TableCell>
-                                       <div className="flex items-center justify-center">
-                                       <div className="w-28 flex items-center justify-center">
-                                            {item.status === 0 ? <div className="bg-red-600 text-white font-bold p-1 rounded-lg">Chưa bắt đầu</div> : item.status === 1 ? <div className="bg-green-600 text-white font-bold p-1 rounded-lg">Đang diễn ra</div> : item.status}
-                                        </div>
-                                       </div>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center justify-center">
-                                        {item.start_time}
+                                            <div className="w-28 flex items-center justify-center">
+                                                {item.status === 0 ? <div className="bg-red-600 text-white font-bold p-1 rounded-lg">Chưa bắt đầu</div> : item.status === 1 ? <div className="bg-green-600 text-white font-bold p-1 rounded-lg">Đang diễn ra</div> : item.status}
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                      <div className="flex items-center justify-center">
-                                      {item.end_time}
-                                      </div>
-                                    </TableCell>
-                                    <TableCell>
-                                       <div className="flex items-center justify-center">
-                                       {item.ProductFlashSaleCount}
-                                       </div>
-                                    </TableCell>
-                                    <TableCell>
-                                       <div className="flex items-center justify-center">
-                                       <div className='flex items-center gap-2'>
-                                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => openEditModal(item)}>
-                                                <EditIcon />
-                                            </span>
-                                            <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => handleDelete(item.id)}><DeleteIcon /></span>
+                                        <div className="flex items-center justify-center">
+                                            {item.start_time}
                                         </div>
-                                       </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center justify-center">
+                                            {item.end_time}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center justify-center">
+                                            {item.ProductFlashSaleCount}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center justify-center">
+                                            <div className='flex items-center gap-2'>
+                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => openEditModal(item)}>
+                                                    <EditIcon />
+                                                </span>
+                                                <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => handleDelete(item.id)}><DeleteIcon /></span>
+                                            </div>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex justify-end w-full">
-                    {/* <Pagination showControls total={10} initialPage={1} /> */}
+                <div className="flex items-center justify-between mt-4">
+                    <div className="text-sm">
+                        {`${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, flashsale.length)} của ${flashsale.length} chương trình khuyến mãi`}
+                    </div>
+                    <div className="flex gap-2">
+                      
+                        {Array.from({ length: Math.ceil(flashsale.length / itemsPerPage) }, (_, index) => (
+                            <Button 
+                                key={index + 1} 
+                                onClick={() => handlePageChange(index + 1)} 
+                                
+                                style={{ 
+                                    backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent', 
+                                    border: '2px solid #696bff',
+                                    color: currentPage === index + 1 ? 'white' : '#696bff'
+                                }}
+                            >
+                                {index + 1}
+                            </Button>
+                        ))}
+                      
+                    </div>
                 </div>
             </div>
 

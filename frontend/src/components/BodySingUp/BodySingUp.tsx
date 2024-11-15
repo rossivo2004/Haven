@@ -50,7 +50,7 @@ function BodySingUp() {
             if (response.status === 200) {
                 // Save user data to cookies
                 dispatch(setUser(values));
-                toast.success('Gửi mã thành công!');
+                toast.success('Đăng kí thành công!');
                 router.push('/verify');
             } else {
                 toast.error('Đăng kí thất bại! Vui lòng thử lại.');

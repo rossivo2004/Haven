@@ -32,7 +32,7 @@ const ImageSwiper: React.FC<ImageSwiperProps> = ({ imgDemo }) => {
                     key={index} 
                     className={`slide ${index === activeIndex ? 'active' : 'inactive'}`} // Apply classes based on active index
                 >
-                    <img src={image} alt={`Slide ${index + 1}`} className='rounded-lg'/>
+                    <img src={image} alt={`Slide ${index + 1}`} className='rounded-lg !object-contain'/>
                 </div>
             ))}
         </Carousel>

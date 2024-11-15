@@ -16,7 +16,14 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\FlashSaleProductController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\ChatbotController;
 use App\Models\ProductImage;
+
+//chatbot
+use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Middleware\Dialogflow;
+use BotMan\BotMan\BotManFactory;
+use BotMan\BotMan\Drivers\DriverManager;
 
 
 // Define API routes for posts
@@ -236,4 +243,20 @@ route::group([
     Route::get('/comparison', [StatisticsController::class, 'getRevenueComparison']); // Thống kê so sánh % tháng này so với tháng trước
 });
 
+
+route::group([
+    'prefix' => 'api/ordernotify'
+],function(){
+    Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo
+    Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc
+    Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
+});
+
+
+
+Route::post('/question', [ChatbotController::class, 'index']);
+
+route::get("/", function(){
+    return view('welcome');
+});
 

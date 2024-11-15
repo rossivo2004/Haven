@@ -42,6 +42,7 @@ import { logout } from '@/src/store/userSlice';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
+import { fetchUserProfile } from '@/src/config/token';
 
 const menuItems = [
     { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
@@ -52,11 +53,10 @@ const menuItems = [
 ];
 
 function Header({ params }: { params: { lang: string } }) {
-    const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const [userData, setUserData] = useState<any>(null);
+    const [userId, setUserId] = useState<string | null>(null);
     const dispatch = useDispatch();
     const router = useRouter();
-    const [userData, setUserData] = useState<any>(null);
-    // const cart = useSelector((state: any) => state.cart.items);
     const [cartCount, setCartCount] = useState<number>(0);
     const [products, setProducts] = useState<Variant[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Variant[]>([]);
@@ -66,7 +66,6 @@ function Header({ params }: { params: { lang: string } }) {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const debouncedSearch = useDebounce(search, 300);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    // const totalItems = useSelector(selectTotalItems);
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -87,45 +86,40 @@ function Header({ params }: { params: { lang: string } }) {
         return 'light';
     });
 
-    const cartItems = useSelector((state: RootState) => state.cart.items); // Get cart items from Redux
-    const cartCounts = cartItems.length; // Get the count of items in the cart
+    const cartItems = useSelector((state: RootState) => state.cart.items);
+    const CartCount = cartItems.length; // Get the count of items in the cart
 
+    console.log(cartItems);
 
+    const [userProducts, setUserProducts] = useState<Variant[]>([]); // State to hold user-specific products
+
+    const token = Cookies.get('access_token'); // Get token from cookies
     useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
-        if (userId) {
-            // Fetch user's cart from the API
-            const fetchUserCart = async () => {
-                try {
-                    const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
-                    if (response.data && response.data) { // Check if cart_items exists
-                        setCart(response.data); // Adjust according to your API response structure
-                        setCartCount(response.data.length);
-                    } else {
-                        console.warn('No cart items found in response');
-                    }
-                } catch (error) {
-                    console.error('Error fetching user cart:', error);
-                }
-            };
-            fetchUserCart();
-        } else {
-            // If no user ID, show cart from cookies
-            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
-            if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
-                setCart(existingCartItems.cart_items); // Set cart state from cookies
-                setCartCount(existingCartItems.cart_items.length);
-            } else {
-                console.warn('No cart items found in cookies');
-            }
-        }
+        if (token) {
+            fetchUserProfile() // Fetch user data using the token
+                .then(data => {
+                    setUserData(data); // Set user data in state
+                    // fetchUserProducts(data.id); // Fetch products for the logged-in user
+                    setUserId(data.id);
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                });
+        } 
+        // else {
+        //     // If not logged in, check for cart items in cookies
+        //     const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        //     if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
+        //         setCart(existingCartItems.cart_items); // Set cart state from cookies
+        //         setCartCount(existingCartItems.cart_items.length); // Update cart count
+        //     } else {
+        //         console.warn('No cart items found in cookies');
+        //     }
+        // }
     }, []); // Add cartCount to the dependency array
 
-    useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user ID from cookies
+    const fetchUserProducts = async () => { // New function to fetch user-specific products
         if (userId) {
-            // Fetch user's cart from the API
             const fetchUserCart = async () => {
                 try {
                     const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
@@ -144,37 +138,25 @@ function Header({ params }: { params: { lang: string } }) {
         } else {
             // If no user ID, show cart from cookies
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
-            console.log(existingCartItems);
-
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
                 setCartCount(existingCartItems.cart_items.length);
+                console.log(1);
+                
             } else {
                 console.warn('No cart items found in cookies');
             }
-        }
-    }, [cartItems]); // Add cartCount to the dependency array
-
-
-    useEffect(() => {
-        const userId = Cookies.get('user_id'); // Get user_id from cookies
-        if (userId) {
-            fetchUserData(userId); // Fetch user data if user_id exists
-        }
-    }, []);
-
-    const fetchUserData = async (id: string) => {
-        try {
-            const response = await axios.get(`${apiConfig.user.getUserById}${id}`); // Adjust the API endpoint as needed
-            setUserData(response.data); // Store the user data in state
-        } catch (error) {
-            console.error('Error fetching user data:', error);
         }
     };
 
+    useEffect(() => {
+        fetchUserProducts();
+    }, [userId,cartItems]);
+
     const handleLogout = () => {
         signOut();
-        axios.post(apiConfig.user.logout, { withCredentials: true });
+        Cookies.remove('access_token'); // Remove token on logout
+        Cookies.remove('refresh_token'); // Remove token on logout
         dispatch(logout()); // Dispatch the logout action
         setUserData(null); // Clear user data after logout
         toast.success('Đăng xuất thành công');
@@ -219,7 +201,6 @@ function Header({ params }: { params: { lang: string } }) {
     // }, [cartItems]);
 
     // console.log(products);
-    console.log(cartItems);
 
 
     useEffect(() => {
@@ -321,7 +302,7 @@ function Header({ params }: { params: { lang: string } }) {
             if (existingCartItems.cart_items.length > 0) {
                 // Prepare items for moving to database
                 const itemsToMove = existingCartItems.cart_items.map((item: CartItem) => ({
-                    user_id: parseInt(userId), // Set user_id to null for each item
+                    user_id: userData.id, // Use userData.id instead of userId
                     product_variant_id: item.product_variant_id,
                     quantity: item.quantity,
                 }));
@@ -330,7 +311,7 @@ function Header({ params }: { params: { lang: string } }) {
                 const moveCartToDatabase = async () => {
                     try {
                         await axios.post(`${apiConfig.cart.moveCartToDatabase}`, {
-                            user_id: parseInt(userId), // Handle undefined case
+                            user_id: userData.id, // Use userData.id instead of userId
                             cart_items: itemsToMove,
                         }, {
                             headers: {
@@ -350,10 +331,10 @@ function Header({ params }: { params: { lang: string } }) {
                 moveCartToDatabase(); // Call the async function
             }
         }
-    }, [userId]);
+    }, [userData,cartItems]); // Update dependency to userData
 
 
-
+    console.log(cart);
 
 
     return (
@@ -365,7 +346,8 @@ function Header({ params }: { params: { lang: string } }) {
                     <div className="w-full bg-secondary lg:block hidden">
                         <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
                             <Link href={"/"} className="cursor-pointer">
-                                <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" />
+                                {/* <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" /> */}
+                                <img src="/images/havengif.gif" alt="Logo" className="w-[160px] h-auto object-fill" />
                             </Link>
                             <div
                                 className="relative flex-1 px-20"
@@ -552,13 +534,13 @@ function Header({ params }: { params: { lang: string } }) {
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                            {userId ? (
+                                                                        {userId ? (
                                                                                 item.product_variant.flash_sales.length > 0
                                                                                     ? item.product_variant.flash_sales[0].pivot.stock > 0 
                                                                                         ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
                                                                                         : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
-                                                                                    : item.product_variant.priceMain?.toLocaleString('vi-VN')
-                                                                            ) : item.product_variant.priceMain?.toLocaleString('vi-VN')} VND
+                                                                                    : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')
+                                                                            ) : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')} VND
                                                                         </div>
 
                                                                     </div>
@@ -621,15 +603,15 @@ function Header({ params }: { params: { lang: string } }) {
                             </div>
                         </div>
                     </div>
-                    <div className='w-full lg:block bg-main hidden sticky top-0'>
+                    <div className='w-full lg:block bg-main hidden sticky top-0 '>
                         <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                             <ul className='flex gap-16 text-white font-medium'>
                                 <li className='flex items-center'>
                                     <Link href={'/'}>TRANG CHỦ</Link>
                                 </li>
-                                <li className='flex items-center'>
+                                {/* <li className='flex items-center'>
                                     <Link href={`/blog`}>TIN TỨC</Link>
-                                </li>
+                                </li> */}
                                 <li>
 
 
@@ -644,17 +626,17 @@ function Header({ params }: { params: { lang: string } }) {
                                         }>
                                             {
                                                 isVisible ? (
-                                                    <div className="p-1 grid grid-cols-4 grid-rows-2 gap-4 relative">
+                                                    <div className="p-1 grid grid-cols-4 grid-rows-2 gap-4 relative ">
                                                         <div className='row-span-2'>
-                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
+                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[318px] rounded-lg h-full object-cover' />
                                                         </div>
                                                         <div className='col-span-3 row-span-2 flex'>
-                                                            <div className='flex flex-col items-start pl-2 w-1/2'>
+                                                            <div className='flex flex-col items-start pl-2 w-auto pr-4'>
                                                                 <div className='text-black text-lg font-semibold'>Phân loại</div>
-                                                                <div className='flex flex-col items-start'>
+                                                                <div className='grid grid-cols-2 items-start'>
                                                                     {categories.map((item, index) => (
                                                                         <Link key={index} href={`/shop?category[]=${item.name}`}>
-                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                            <div className="flex flex-col py-1 pr-10 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
@@ -665,12 +647,12 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 </div>
 
                                                             </div>
-                                                            <div className='w-1/2'>
+                                                            <div className='flex-1'>
                                                                 <div className='text-black text-lg font-semibold'>Thương hiệu</div>
-                                                                <div className='flex flex-col items-start pl-2'>
+                                                                <div className='grid grid-cols-3  items-start pl-2'>
                                                                     {brands.map((item, index) => (
                                                                         <Link key={index} href={`/shop?brand[]=${item.name}`}>
-                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                            <div className="flex flex-col py-1 pr-2 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
@@ -735,9 +717,16 @@ function Header({ params }: { params: { lang: string } }) {
                                 <li className='flex items-center'>
                                     <Link href={`/about`}>VỀ CHÚNG TÔI</Link>
                                 </li>
+                                <li className='flex items-center'>
+                                    <Link href={`/blog`}>BÀI VIẾT</Link>
+                                </li>
                             </ul>
+                            <div>
+    <img src="/images/santagif.gif" alt="" className='h-14'/>
+</div>
+                            </div>
+
                         </div>
-                    </div>
                 </div>
             </div>
 
