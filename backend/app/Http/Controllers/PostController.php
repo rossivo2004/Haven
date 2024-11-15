@@ -23,7 +23,19 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string|max:500',
         ]);
+
+        $thumbnailUrl = null;
+
+        if ($request->hasFile('thumbnail')) {
+            try {
+                $thumbnailUrl = Cloudinary::upload($request->file('thumbnail')->getRealPath())->getSecurePath();
+            } catch (Exception $e) {
+                return response()->json(['error' => 'Failed to upload thumbnail to Cloudinary'], 500);
+            }
+        }
 
         $content = $request->content;
         $dom = new DOMDocument();
@@ -58,11 +70,14 @@ class PostController extends Controller
         $post = Post::create([
             'title' => $request->title,
             'content' => $content,
-            'id_user' => Auth::id() 
+            'thumbnail' => $thumbnailUrl,
+            'description' => $request->description,
+            'id_user' => Auth::id(),
         ]);
 
         return response()->json(['message' => 'Post created successfully', 'post' => $post], 201);
     }
+
 
 
     public function show($id)
@@ -80,29 +95,41 @@ class PostController extends Controller
         if (!$post) {
             return response()->json(['error' => 'Post not found'], 404);
         }
-    
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'id_user' => 'nullable|exists:users,id' // Kiểm tra id_user nếu có
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string|max:500',
+            'id_user' => 'nullable|exists:users,id',
         ]);
-    
+
+        $thumbnailUrl = $post->thumbnail;
+
+        if ($request->hasFile('thumbnail')) {
+            try {
+                $thumbnailUrl = Cloudinary::upload($request->file('thumbnail')->getRealPath())->getSecurePath();
+            } catch (Exception $e) {
+                return response()->json(['error' => 'Failed to upload thumbnail to Cloudinary'], 500);
+            }
+        }
+
         $content = $request->content;
         $dom = new DOMDocument();
         @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    
+
         $images = $dom->getElementsByTagName('img');
-    
+
         foreach ($images as $img) {
             $src = $img->getAttribute('src');
-    
+
             if (strpos($src, 'data:image/') === 0) {
                 $data = base64_decode(explode(',', explode(';', $src)[1])[1]);
-    
+
                 $tempImage = tmpfile();
                 fwrite($tempImage, $data);
                 $tempFilePath = stream_get_meta_data($tempImage)['uri'];
-    
+
                 try {
                     $uploadedFileUrl = Cloudinary::upload($tempFilePath)->getSecurePath();
                     $img->removeAttribute('src');
@@ -115,18 +142,20 @@ class PostController extends Controller
                 }
             }
         }
-    
+
         $content = $dom->saveHTML();
-    
-        // Cập nhật bài viết, bao gồm id_user nếu được cung cấp
+
         $post->update([
             'title' => $request->title,
             'content' => $content,
-            'id_user' => $request->id_user ?? $post->id_user // Giữ nguyên id_user nếu không có trong request
+            'thumbnail' => $thumbnailUrl,
+            'description' => $request->description,
+            'id_user' => $request->id_user ?? $post->id_user,
         ]);
-    
+
         return response()->json(['message' => 'Post updated successfully', 'post' => $post], 200);
     }
+
     
 
     public function destroy($id)

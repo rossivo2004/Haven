@@ -17,6 +17,8 @@ class Post extends Model
         'title',
         'content',
         'image',
+        'thumbnail',
+        'description',
     ];
 
     // Nếu bạn không muốn sử dụng các cột timestamps (created_at, updated_at), bạn có thể disable chúng
