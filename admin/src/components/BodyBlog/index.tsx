@@ -1,21 +1,30 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BreadcrumbNav from "../Breadcrumb/Breadcrumb";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Spinner, Input } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip } from "@nextui-org/react";
 import axios from "axios";
 import apiConfig from "@/configs/api";
 import { Brand } from "@/interface";
 import "react-toastify/dist/ReactToastify.css";
-import $ from "jquery";
-import "summernote/dist/summernote-bs4.css"; // Import CSS của Summernote
-import "summernote/dist/summernote-bs4.min.js"; // Import JavaScript của Summernote
 import { toast } from "react-toastify";
+import CreatePostForm from "./TextEditor";
+import { EyeIcon } from "./EyeIcon";
+import { EditIcon } from "./EditIcon";
+import { DeleteIcon } from "./DeleteIcon";
+import dynamic from "next/dynamic";
+import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
 
-// Add this declaration at the top of your file
-declare global {
-    interface JQuery {
-        summernote: any; // or a more specific type if available
-    }
+interface Post {
+    content: string;
+    created_at: string;
+    id: number;
+    id_user: number | null;
+    image: string | null;
+    title: string;
+    updated_at: string;
 }
 
 function BodyBlog() {
@@ -24,8 +33,39 @@ function BodyBlog() {
     const [isAddBrandModalOpen, setIsAddBrandModalOpen] = useState(false);
     const [title, setTitle] = useState(""); // State for title
     const [content, setContent] = useState(""); // State for content
+    const [titleEdit, setTitleEdit] = useState(""); // State for title
+    const [contentEdit, setContentEdit] = useState(""); // State for content
+    const [editPost, setEditPost] = useState<Post | null>(null); // State for editing a post
+    const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false); // State for Add Post Modal
+
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [searchTerm, setSearchTerm] = useState(""); // State for search term
+    const [currentPage, setCurrentPage] = useState<number>(1); // State for current page
+    const productsPerPage = 10; // Number of posts per page
+
+    const modules = {
+        toolbar: [
+            [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+            [{ 'color': [] }, { 'background': [] }],
+            ['link', 'image'],
+            ['clean']                                         
+        ],
+    };
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+    const fetchPosts = async () => {
+        const response = await axios.get(apiConfig.post.getAll);
+        setPosts(response.data.posts);
+    };
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    console.log(posts);
 
     const handleOpenAddBrandModal = () => {
         setIsAddBrandModalOpen(true);
@@ -35,38 +75,66 @@ function BodyBlog() {
         setIsAddBrandModalOpen(false);
     };
 
-    const handleSubmit = async (onClose: () => void) => {
-        setLoading(true);
+    const handleEditPost = async (post: Post) => {
+        setEditPost(post);
+        setTitleEdit(post.title);
+        setContentEdit(post.content);
+        handleOpenAddBrandModal();
+    };
+
+    const updatePost = async (id: number, updatedPost: { title: string; content: string }) => {
         try {
-            const response = await axios.post(`${baseUrl}/blog`, { title, content });
-            console.log("Blog saved successfully:", response.data);
-            toast.success("Bài viết đã được lưu thành công!");
+            await axios.put(`${apiConfig.post.updatePost}${id}`, updatedPost);
+            toast.success("Post updated successfully!");
+            fetchPosts(); // Refresh the posts after update
+            handleCloseAddBrandModal(); // Close the modal after update
         } catch (error) {
-            console.error("Error saving blog:", error);
-            toast.error("Có lỗi xảy ra khi lưu bài viết.");
-        } finally {
-            setLoading(false);
-            onClose();
+            toast.error("Failed to update post.");
         }
     };
 
-    useEffect(() => {
-        // Initialize Summernote
-        $("#summernote").summernote({
-            height: 300,
-            placeholder: "Nhập nội dung bài viết...",
-            callbacks: {
-                onChange: function(contents: string) {
-                    setContent(contents); // Update content state when changed
-                }
-            }
-        });
+    const handleOpenAddPostModal = () => {
+        setIsAddPostModalOpen(true);
+    };
 
-        // Destroy Summernote on component unmount
-        return () => {
-            $("#summernote").summernote("destroy");
-        };
-    }, []);
+    const handleCloseAddPostModal = () => {
+        setIsAddPostModalOpen(false);
+    };
+
+    const deletePost = (id: number) => {
+        confirmAlert({
+            title: 'Xóa bài viết',
+            message: 'Bạn có chắc chắn muốn xóa bài viết này?',
+            buttons: [
+                {
+                    label: 'Có',
+                    onClick: async () => {
+                        try {
+                            await axios.delete(`${apiConfig.post.deletePost}${id}`); // Call the delete API
+                            toast.success("Post deleted successfully!");
+                            fetchPosts(); // Refresh the posts after deletion
+                        } catch (error) {
+                            toast.error("Failed to delete post.");
+                        }
+                    }
+                },
+                {
+                    label: 'Không',
+                }
+            ]
+        });
+    };
+
+    const filteredPosts = useMemo(() => {
+        return posts.filter(item => 
+            item.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [posts, searchTerm]);
+
+    const postsToDisplay = useMemo(() => {
+        const startIndex = (currentPage - 1) * productsPerPage;
+        return filteredPosts.slice(startIndex, startIndex + productsPerPage);
+    }, [filteredPosts, currentPage]);
 
     return (
         <div>
@@ -85,9 +153,41 @@ function BodyBlog() {
                     />
                 </div>
                 <div>
-                    <Button color="primary" onClick={handleOpenAddBrandModal}>
+<div className="flex gap-2">
+
+                     <Input
+                    className="mb-4"
+                    placeholder="Tìm kiếm theo tiêu đề bài viết"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Button color="primary" onClick={handleOpenAddPostModal}>
                         Viết bài mới
                     </Button>
+</div>
+                    <Modal
+                        size="5xl"
+                        scrollBehavior="inside"
+                        isOpen={isAddPostModalOpen}
+                        onOpenChange={handleCloseAddPostModal}
+                        isDismissable={false}
+                    >
+                        <ModalContent>
+                            {(onClose) => (
+                                <>
+                                    <ModalHeader>Thêm bài viết</ModalHeader>
+                                    <ModalBody>
+                                        <CreatePostForm />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="danger" onPress={onClose}>
+                                            Đóng
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
                     <Modal
                         size="5xl"
                         scrollBehavior="inside"
@@ -98,31 +198,36 @@ function BodyBlog() {
                         <ModalContent>
                             {(onClose) => (
                                 <>
-                                    <ModalHeader>Thêm bài viết mới</ModalHeader>
+                                    <ModalHeader>Sửa bài viết</ModalHeader>
                                     <ModalBody>
-                                        {/* Form viết blog */}
-                                        <Input 
-                                            fullWidth 
-                                            label="Tiêu đề" 
-                                            placeholder="Nhập tiêu đề bài viết..." 
-                                            value={title} 
-                                            onChange={(e) => setTitle(e.target.value)} 
-                                        />
-                                        <div className="mt-4">
-                                            <label>Nội dung bài viết</label>
-                                            <textarea id="summernote" name="editordata"></textarea>
-                                        </div>
+                                        <form onSubmit={(e) => { 
+                                            e.preventDefault(); 
+                                            if (editPost) {
+                                                updatePost(editPost.id, { title: titleEdit, content: contentEdit }); // Call updatePost with the post ID and updated values
+                                            }
+                                        }}>
+                                            <div>
+                                                <label>Tiêu đề:</label>
+                                                <Input
+                                                    type="text"
+                                                    value={titleEdit} // Use titleEdit instead of title
+                                                    onChange={(e) => setTitleEdit(e.target.value)} // Update titleEdit
+                                                    placeholder="Nhập tiêu đề bài viết"
+                                                    fullWidth
+                                                />
+                                            </div>
+
+                                            <div className="my-4">
+                                                <label>Nội dung:</label>
+                                                <ReactQuill value={contentEdit} onChange={setContentEdit} modules={modules} placeholder="Nhập nội dung bài viết..." /> // Use contentEdit instead of content
+                                            </div>
+
+                                            <Button type="submit" color="primary">Cập nhật bài</Button> // Change button text to reflect update action
+                                        </form>
                                     </ModalBody>
                                     <ModalFooter>
                                         <Button color="danger" onPress={onClose}>
                                             Đóng
-                                        </Button>
-                                        <Button 
-                                            color="primary" 
-                                            onPress={() => handleSubmit(onClose)} 
-                                            disabled={loading || !title || !content}
-                                        >
-                                            {loading ? 'Processing...' : 'Lưu bài viết'}
                                         </Button>
                                     </ModalFooter>
                                 </>
@@ -133,9 +238,64 @@ function BodyBlog() {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-                {/* Hiển thị nội dung của Summernote */}
-                <h3>Nội dung bài viết:</h3>
-                <div dangerouslySetInnerHTML={{ __html: content }}></div>
+               
+                <Table aria-label="Example static collection table">
+                    <TableHeader>
+                        <TableColumn>STT</TableColumn>
+                        <TableColumn><div className='flex justify-center w-full'>Tiêu đề</div></TableColumn>
+                        <TableColumn><div className='flex justify-center w-full'>Ngày đặt</div></TableColumn>
+                        <TableColumn><div className='flex justify-center w-full'>Thao tác</div></TableColumn>
+                    </TableHeader>
+                    <TableBody>
+                        {postsToDisplay.map((item, ind) => (
+                            <TableRow key={item.id}>
+                                <TableCell><div className=''>{ind + 1}</div></TableCell>
+                                <TableCell><div className='flex justify-center w-full'>{item.title}</div></TableCell>
+                                <TableCell><div className='flex justify-center w-full'>{new Date(item.created_at).toLocaleDateString('en-GB')}</div></TableCell>
+                                <TableCell>
+                                    <div className="relative flex items-center gap-2 justify-center">
+                                        <Tooltip content="Details">
+                                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                                <EyeIcon />
+                                            </span>
+                                        </Tooltip>
+                                        <Tooltip content="Edit status">
+                                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditPost(item)}>
+                                                <EditIcon />
+                                            </span>
+                                        </Tooltip>
+                                        <Tooltip color="danger" content="Delete post">
+                                            <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => deletePost(item.id)}>
+                                                <DeleteIcon />
+                                            </span>
+                                        </Tooltip>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className="flex justify-between items-center mt-4">
+                <div className="text-sm">
+                    {`${(currentPage - 1) * productsPerPage + 1} - ${Math.min(currentPage * productsPerPage, filteredPosts.length)} của ${filteredPosts.length} bài viết`}
+                </div>
+                <div className="flex gap-2">
+                    {Array.from({ length: Math.ceil(filteredPosts.length / productsPerPage) }, (_, index) => (
+                        <div
+                            className='cursor-pointer w-10 h-10 flex items-center justify-center rounded-md text-white'
+                            key={index + 1}
+                            onClick={() => setCurrentPage(index + 1)}
+                            style={{
+                                backgroundColor: currentPage === index + 1 ? '#696bff' : 'transparent',
+                                border: currentPage === index + 1 ? '2px solid #696bff' : '2px solid #696bff',
+                                color: currentPage === index + 1 ? 'white' : '#696bff'
+                            }}
+                        >
+                            {index + 1}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

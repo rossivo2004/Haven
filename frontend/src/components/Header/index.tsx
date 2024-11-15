@@ -346,7 +346,8 @@ function Header({ params }: { params: { lang: string } }) {
                     <div className="w-full bg-secondary lg:block hidden">
                         <div className="h-[74px] py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4">
                             <Link href={"/"} className="cursor-pointer">
-                                <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" />
+                                {/* <img src="/images/FoodHaven.png" alt="Logo" className="w-[140px] h-auto object-fill" /> */}
+                                <img src="/images/havengif.gif" alt="Logo" className="w-[160px] h-auto object-fill" />
                             </Link>
                             <div
                                 className="relative flex-1 px-20"
@@ -602,7 +603,7 @@ function Header({ params }: { params: { lang: string } }) {
                             </div>
                         </div>
                     </div>
-                    <div className='w-full lg:block bg-main hidden sticky top-0'>
+                    <div className='w-full lg:block bg-main hidden sticky top-0 '>
                         <div className='h-14 py-[10px] max-w-screen-xl mx-auto justify-between flex items-center px-4'>
                             <ul className='flex gap-16 text-white font-medium'>
                                 <li className='flex items-center'>
@@ -625,17 +626,17 @@ function Header({ params }: { params: { lang: string } }) {
                                         }>
                                             {
                                                 isVisible ? (
-                                                    <div className="p-1 grid grid-cols-4 grid-rows-2 gap-4 relative">
+                                                    <div className="p-1 grid grid-cols-4 grid-rows-2 gap-4 relative ">
                                                         <div className='row-span-2'>
-                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[180px] rounded-lg h-full object-cover' />
+                                                            <img src="/images/nav-1.jpg" alt="A cat sitting on a chair" className='w-[318px] rounded-lg h-full object-cover' />
                                                         </div>
                                                         <div className='col-span-3 row-span-2 flex'>
-                                                            <div className='flex flex-col items-start pl-2 w-1/2'>
+                                                            <div className='flex flex-col items-start pl-2 w-auto pr-4'>
                                                                 <div className='text-black text-lg font-semibold'>Phân loại</div>
-                                                                <div className='flex flex-col items-start'>
+                                                                <div className='grid grid-cols-2 items-start'>
                                                                     {categories.map((item, index) => (
                                                                         <Link key={index} href={`/shop?category[]=${item.name}`}>
-                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                            <div className="flex flex-col py-1 pr-10 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
@@ -646,12 +647,12 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 </div>
 
                                                             </div>
-                                                            <div className='w-1/2'>
+                                                            <div className='flex-1'>
                                                                 <div className='text-black text-lg font-semibold'>Thương hiệu</div>
-                                                                <div className='flex flex-col items-start pl-2'>
+                                                                <div className='grid grid-cols-3  items-start pl-2'>
                                                                     {brands.map((item, index) => (
                                                                         <Link key={index} href={`/shop?brand[]=${item.name}`}>
-                                                                            <div className="flex flex-col py-1 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-center">
+                                                                            <div className="flex flex-col py-1 pr-2 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
@@ -716,9 +717,16 @@ function Header({ params }: { params: { lang: string } }) {
                                 <li className='flex items-center'>
                                     <Link href={`/about`}>VỀ CHÚNG TÔI</Link>
                                 </li>
+                                <li className='flex items-center'>
+                                    <Link href={`/blog`}>BÀI VIẾT</Link>
+                                </li>
                             </ul>
+                            <div>
+    <img src="/images/santagif.gif" alt="" className='h-14'/>
+</div>
+                            </div>
+
                         </div>
-                    </div>
                 </div>
             </div>
 

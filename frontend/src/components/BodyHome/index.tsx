@@ -44,7 +44,7 @@ import apiConfig from '@/src/config/api';
 import { Category, Variant } from "@/src/interface";
 import axios from "axios";
 import Loading from "../ui/Loading";
-
+import Popup from "../Popup";
 
 
 function BodyHome() {
@@ -54,6 +54,8 @@ function BodyHome() {
     const [productDataSale, setProductDataSale] = useState<Variant[]>([]); // Change initial state to an empty array
     const [counter, setCounter] = useState(59); // Bắt đầu từ 59 giây
 
+    const [isPopupVisible, setPopupVisible] = useState(true);
+    const closePopup = () => setPopupVisible(false);
 
     // const [language, setLanguage] = useState('vi'); // Default to 'en'
     // const params = useParams(); 
@@ -174,6 +176,7 @@ function BodyHome() {
 
     return (
         <div className="">
+              {isPopupVisible && <Popup onClose={closePopup} />}
             <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
                 <>
                     <Swiper modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]} className="mySwiper w-full h-full" loop autoplay={{ delay: 3000, disableOnInteraction: false }}>

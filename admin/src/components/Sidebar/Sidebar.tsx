@@ -14,7 +14,7 @@ import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import AppsIcon from '@mui/icons-material/Apps';
-
+import WysiwygIcon from '@mui/icons-material/Wysiwyg';
 
 
 const Sidebar: React.FC = () => {
@@ -105,6 +105,13 @@ const Sidebar: React.FC = () => {
                 <Link href="/admin/orders">
                   <div className={`py-2 px-4 hover:bg-gray-100 rounded-lg mb-1 flex items-center ${pathname === '/admin/orders' ? 'sidebar_active' : ''}`}>
                     <LocalShippingIcon className="mr-2" /> Đơn hàng
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/blog">
+                  <div className={`py-2 px-4 hover:bg-gray-100 rounded-lg mb-1 flex items-center ${pathname === '/admin/blog' ? 'sidebar_active' : ''}`}>
+                    <WysiwygIcon className="mr-2" /> Bài viết
                   </div>
                 </Link>
               </li>

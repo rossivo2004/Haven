@@ -161,7 +161,14 @@ const apiConfig = {
     getAll: `${baseUrl}/api/ordernotify/view`,
     unread: `${baseUrl}/api/ordernotify/unread`,
     markAsRead: `${baseUrl}/api/ordernotify/mark-as-read/`,
-  }
+  },
+
+  post: {
+    getAll: `${baseUrl}/api/posts`,
+    createPost: `${baseUrl}/api/posts/store`,
+    updatePost: `${baseUrl}/api/posts/update/`,
+    deletePost: `${baseUrl}/api/posts/delete/`, 
+  } 
 };
 
 export default apiConfig;
