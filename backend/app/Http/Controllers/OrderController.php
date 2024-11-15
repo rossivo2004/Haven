@@ -137,18 +137,6 @@ class OrderController extends Controller
         ], 201);
     }
 
-    // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
-    if ($user_id) {
-        Cart::where('user_id', $user_id)
-            ->whereIn('product_variant_id', array_column($products, 'id'))
-            ->delete();
-    }
-
-    return response()->json([
-        'message' => 'Order created successfully!',
-        'order' => $order,
-        'loyalty_points_added' => $loyaltyPoints
-    ], 201);
 }
 
 
