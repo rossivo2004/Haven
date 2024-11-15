@@ -212,6 +212,10 @@ function BodyCheckout() {
             const response = await axios.get(`${apiConfig.user.getUserById}${userId}`, { withCredentials: true });
             if (response.data) {
                 setUser(response.data);
+
+                setSelectedProvince(response.data.province);
+                setSelectedDistrict(response.data.district);
+                setSelectedWard(response.data.ward);
             } else {
                 console.warn('No cart items found in response');
             }
@@ -376,75 +380,78 @@ function BodyCheckout() {
                                 </div>
 
                                 <div className='grid lg:grid-cols-3 grid-cols-1 gap-4'>
-                                    <div>
-                                        <div className=''>
-                                            Tỉnh/Thành phố (<span className='text-red-600'>*</span>)
+                                        <div>
+                                            <div className=''>
+                                                Tỉnh/Thành phố (<span className='text-red-600'>*</span>)
+                                            </div>
+                                            <select
+                                                className="bg-[#F4F4F5] w-full p-3 rounded-xl"
+                                                // isRequired
+                                                // placeholder='Tỉnh/Thành phố'
+                                                aria-label="Tỉnh/Thành phố"
+                                                // size='lg'
+                                                // variant='bordered'
+                                                value={selectedProvince}
+                                                onChange={(e) => setSelectedProvince(e.target.value)}
+                                            >
+                                                {provinces.map((province) => (
+                                                    <option key={province.id} value={province.id}>
+                                                        {province.full_name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
-                                        <Select
-                                            isRequired
-                                            placeholder='Tỉnh/Thành phố'
-                                            aria-label="Tỉnh/Thành phố"
-                                            size='lg'
-                                            variant='bordered'
-                                            value={selectedProvince}
-                                            onChange={(e) => setSelectedProvince(e.target.value)}
-                                        >
-                                            {provinces.map((province) => (
-                                                <SelectItem key={province.id} value={province.full_name}>
-                                                    {province.full_name}
-                                                </SelectItem>
-                                            )) as any}
-                                        </Select>
-                                    </div>
 
-                                    <div>
-                                        <div className=''>
-                                            Quận/Huyện (<span className='text-red-600'>*</span>)
+                                        <div>
+                                            <div className=''>
+                                                Quận/Huyện (<span className='text-red-600'>*</span>)
+                                            </div>
+                                            <select
+                                                className="bg-[#F4F4F5] w-full p-3 rounded-xl"
+                                                // isRequired
+                                                required
+                                                // placeholder='Quận/Huyện'
+                                                aria-label="Quận/Huyện"
+                                                // size='lg'
+                                                // variant='bordered'
+                                                value={selectedDistrict}
+                                                onChange={(e) => setSelectedDistrict(e.target.value)}
+                                                // isDisabled={!selectedProvince} // Disable if no province is selected
+                                                disabled={!selectedProvince}
+                                            >
+                                                {districts.map((district) => (
+                                                    <option key={district.id} value={district.id}>
+                                                        {district.full_name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
-                                        <Select
-                                            isRequired
-                                            placeholder='Quận/Huyện'
-                                            aria-label="Quận/Huyện"
-                                            size='lg'
-                                            variant='bordered'
-                                            value={selectedDistrict}
-                                            onChange={(e) => setSelectedDistrict(e.target.value)}
-                                            isDisabled={!selectedProvince} // Disable if no province is selected
-                                        >
-                                            {districts.map((district) => (
-                                                <SelectItem
-                                                    key={district.id}
-                                                    value={district.full_name}
-                                                >
-                                                    {district.full_name}
-                                                </SelectItem>
-                                            )) as any}
 
-                                        </Select>
-                                    </div>
-
-                                    <div>
-                                        <div className=''>
-                                            Phường/Xã (<span className='text-red-600'>*</span>)
+                                        <div>
+                                            <div className=''>
+                                                Phường/Xã (<span className='text-red-600'>*</span>)
+                                            </div>
+                                            <select
+                                                className="bg-[#F4F4F5] w-full p-3 rounded-xl"
+                                                // isRequired
+                                                required
+                                                // placeholder='Phường/Xã'
+                                                aria-label="Phường/Xã"
+                                                // size='lg'
+                                                // variant='bordered'
+                                                value={selectedWard}
+                                                onChange={(e) => setSelectedWard(e.target.value)}
+                                            // isDisabled={!selectedDistrict} // Disable if no district is selected
+                                            // disabled={!selectedDistrict}
+                                            >
+                                                {wards.map((ward) => (
+                                                    <option key={ward.id} value={ward.id}>
+                                                        {ward.full_name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
-                                        <Select
-                                            isRequired
-                                            placeholder='Phường/Xã'
-                                            aria-label="Phường/Xã"
-                                            size='lg'
-                                            variant='bordered'
-                                            value={selectedWard}
-                                            onChange={(e) => setSelectedWard(e.target.value)}
-                                            isDisabled={!selectedDistrict} // Disable if no district is selected
-                                        >
-                                            {wards.map((ward) => (
-                                                <SelectItem key={ward.id} value={ward.full_name}>
-                                                    {ward.full_name}
-                                                </SelectItem>
-                                            )) as any}
-                                        </Select>
                                     </div>
-                                </div>
 
 
                                 <div>

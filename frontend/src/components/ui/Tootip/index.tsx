@@ -35,7 +35,7 @@ const TooltipCu: React.FC<TooltipCuProps> = ({ title, position = 'left', childre
       <span className={styles.navTitle}>{title}</span>
       <div 
         className={`${styles.dropdown} ${isOpen ? styles.show : styles.hide}`} 
-        style={{ left: position === 'left' ? '0' : 'auto', right: position === 'right' ? '0' : 'auto' }}
+        style={{ left: position === 'left' ? '-200px' : 'auto', right: position === 'right' ? '0' : 'auto' }}
       >
         {children} {/* Render custom content */}
       </div>

@@ -15,16 +15,16 @@ use App\Mail\OrderConfirmationMail;
 
 class OrderController extends Controller
 
-{ 
+{
         public function checkout(Request $request)
     {
         $user_id = $request->input('user_id', null);
         $orderData = $request->only([
-            'invoice_code', 'full_name', 'phone', 'email', 'total', 
+            'invoice_code', 'full_name', 'phone', 'email', 'total',
             'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method'
         ]);
         $paymentStatus = 'unpaid';
-        
+
         // Lấy danh sách sản phẩm từ yêu cầu
         $products = $request->input('product_variant_id', []);
 
@@ -43,7 +43,7 @@ class OrderController extends Controller
             'is_read' => false
         ]));
 
-        
+
         if($orderData['payment_method'] == 1){
             // Gửi mail xác nhận đơn hàng
             Mail::to($orderData['email'])->send(new OrderConfirmationMail($order));
@@ -63,20 +63,20 @@ class OrderController extends Controller
 
                     if ($flashSaleProduct->stock >= $quantity && $productVariant->stock >= $quantity) {
                         $discountedPrice = $productVariant->price * (1 - $flashSaleProduct->discount_percent / 100);
-                        $finalPrice = round($discountedPrice, 2); 
+                        $finalPrice = round($discountedPrice, 2);
 
-                        // Cập nhật stock 
+                        // Cập nhật stock
                         $flashSaleProduct->stock -= $quantity;
                         $flashSaleProduct->sold += $quantity;
                         $flashSaleProduct->save();
-                        
+
                         $productVariant->stock -= $quantity;
                         $productVariant->save();
                     } else {
                         // Không đủ stock trong flashsale, sử dụng discount product_variant
                         if ($productVariant->stock >= $quantity) {
                             $discountedPrice = $productVariant->price * (1 - $productVariant->discount / 100);
-                            $finalPrice = round($discountedPrice, 2); 
+                            $finalPrice = round($discountedPrice, 2);
 
                             // Cập nhật stock
                             $productVariant->stock -= $quantity;
@@ -109,7 +109,7 @@ class OrderController extends Controller
                     'product_variant_id' => $productVariant->id,
                     'quantity' => $quantity,
                     'price' => $finalPrice,
-                ]);     
+                ]);
             }
         }
 
@@ -334,8 +334,8 @@ public function deductPoints(Request $request)
     {
         $unreadCount = Order::where('is_read', false)->count();
 
-        return response()->json(['Thông báo chưa đọc' => $unreadCount], 200);
-    }   
+        return response()->json(['notify' => $unreadCount], 200);
+    }
 
     // Xem thông báo
     public function watchnotify()

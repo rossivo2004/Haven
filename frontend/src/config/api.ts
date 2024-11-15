@@ -193,9 +193,15 @@ const apiConfig = {
 
   payment: {
     createPayment: `${baseUrl}/api/payment/vnpay_payment`
-  }
+  },
 
-  
+  post: {
+    getAll: `${baseUrl}/api/posts`,
+    createPost: `${baseUrl}/api/posts/store`,
+    updatePost: `${baseUrl}/api/posts/update/`,
+    deletePost: `${baseUrl}/api/posts/delete/`, 
+    getPostById: `${baseUrl}/api/posts/show/`,
+  } 
 
 
 };

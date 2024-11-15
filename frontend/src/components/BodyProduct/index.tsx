@@ -67,6 +67,7 @@ const CustomRadio = ({ isSelected, children, ...props }: CustomRadioProps) => {
 };
 
 function BodyProduct() {
+    const token = Cookies.get('access_token'); // Get token from cookies
     const { id } = useParams(); // get id product
     const [product, setProduct] = useState<Variant | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
@@ -96,7 +97,7 @@ function BodyProduct() {
         };
 
         getUserId(); // Call the function to get user ID
-    }, []); 
+    }, [token]); 
 
     useEffect(() => {
         const fetchProductFavourite = async () => {
@@ -396,10 +397,7 @@ const handleAddToCart = async () => {
 };
 
 const handleBuyNow = async () => {
-    if (!userId) {
-        toast.error('Bạn cần đăng nhập để mua hàng.'); // Notify user to log in
-        return;
-    }
+    
 
     const checkoutData = {
         productId: product?.id, // Use the current product ID

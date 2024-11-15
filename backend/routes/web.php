@@ -247,8 +247,8 @@ route::group([
 route::group([
     'prefix' => 'api/ordernotify'
 ],function(){
-    Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo    
-    Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc      
+    Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo
+    Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc
     Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
 });
 

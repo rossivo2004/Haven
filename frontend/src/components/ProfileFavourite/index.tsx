@@ -10,7 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { toast } from "react-toastify";
 import { Spinner } from "@nextui-org/react";
 import Loading from "../ui/Loading";
-import { fetchUserProfile } from '@/src/config/token';
+import { fetchUserProfile } from "@/src/config/token";
 
 function ProfileFavourite() {
     const [userId, setUserId] = useState<string | null>(null); 

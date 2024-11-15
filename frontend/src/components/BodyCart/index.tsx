@@ -20,7 +20,7 @@ import { addToCart, deleteCart, updateCart } from '@/src/store/cartSlice';
 import Loading from '../ui/Loading';
 import { confirmAlert } from 'react-confirm-alert'; // Import react-confirm-alert
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for styling
-import { fetchUserProfile } from '@/src/config/token'; // Import the fetchUserProfile function
+import { fetchUserProfile } from '@/src/config/token';
 
 const Body_Cart = () => {
     const dispatch = useDispatch();
@@ -58,7 +58,6 @@ const Body_Cart = () => {
                     console.log('Fetched cart data:', response.data); // Log the fetched cart data
                     if (response.data && response.data) { // Check if cart_items exists
                         setCart(response.data); // Adjust according to your API response structure
-                        // setCartCount(response.data.length);
                     } else {
                         console.warn('No cart items found in response');
                     }
@@ -74,8 +73,6 @@ const Body_Cart = () => {
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
-
-                // setCartCount(existingCartItems.cart_items.length);
             } else {
                 console.warn('No cart items found in cookies');
             }
@@ -122,59 +119,70 @@ const Body_Cart = () => {
             return; // Stop the function if quantity is invalid
         }
 
-        if (userId) {
-            // If user is logged in, update quantity via API
-            try {
-                setLoading(true);
-                await axios.put(`${apiConfig.cart.updateCartByUserId}${userId}/${item.product_variant.id}`, { quantity: newQuantity }, { withCredentials: true });
-                setCart(prevCart => {
-                    const updatedCart = prevCart.map(cartItem =>
-                        cartItem.product_variant.id === item.product_variant.id
-                            ? { ...cartItem, quantity: newQuantity }
-                            : cartItem
-                    );
-                    return updatedCart;
-                });
-                toast.success('Cập nhật số lượng thành công');
-            } catch (error) {
-                console.error('Error updating quantity:', error);
-                toast.error('Cập nhật số lượng thất bại');
-            } finally {
-                setLoading(false);
-            }
-        } else {
-            const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}') as { cart_items: CartItem[] }; // Specify type for existingCartItems
-            const updatedCartItems = existingCartItems.cart_items.map((cartItem: CartItem) => // Explicitly define cartItem type
+        // Optimistically update the cart state immediately
+        setCart(prevCart => {
+            return prevCart.map(cartItem =>
                 cartItem.product_variant.id === item.product_variant.id
                     ? { ...cartItem, quantity: newQuantity }
                     : cartItem
             );
-            Cookies.set('cart_items', JSON.stringify({ cart_items: updatedCartItems }));
-            setCart(updatedCartItems);
-            toast.success('Cập nhật số lượng thành công trong giỏ hàng');
+        });
+        // dispatch(updateCart(cart)); // Dispatch updateCart action
+
+        if (userId) {
+            // If user is logged in, update quantity via API
+            try {
+                await axios.put(`${apiConfig.cart.updateCartByUserId}${userId}/${item.product_variant.id}`, { quantity: newQuantity }, { withCredentials: true });
+                toast.success('Cập nhật số lượng thành công');
+                dispatch(updateCart(cart)); // Dispatch updateCart action
+
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                toast.error('Cập nhật số lượng thất bại');
+                // Optionally, revert the optimistic update if the API call fails
+                setCart(prevCart => {
+
+                    return prevCart.map(cartItem =>
+                        cartItem.product_variant.id === item.product_variant.id
+                            ? { ...cartItem, quantity: item.quantity } // Revert to previous quantity
+                            : cartItem
+                    );
+                });
+            }
+        } else {
+            // Handle case for users not logged in (if needed)
         }
     };
     // ... existing code ...
 
     const deleteItem = async (item: CartItem) => {
+        // Optimistically remove the item from the cart state immediately
+        setCart(prevCart => prevCart.filter(cartItem => cartItem.product_variant.id !== item.product_variant.id));
+        dispatch(updateCart(cart.filter(cartItem => cartItem.product_variant.id !== item.product_variant.id))); // Dispatch updateCart action
+
         if (userId) {
-            setLoading(true);
-            await axios.delete(`${apiConfig.cart.deleteCartByUserId}${userId}/${item.product_variant.id}`, { withCredentials: true });
-            setCart(prevCart => prevCart.filter(cartItem => cartItem.product_variant.id !== item.product_variant.id));
-            dispatch(updateCart(cart.filter(cartItem => cartItem.product_variant.id !== item.product_variant.id))); // Dispatch updateCart action
-            toast.success('Xóa sản phẩm thành công');
+            // If user is logged in, delete item via API
+            try {
+                await axios.delete(`${apiConfig.cart.deleteCartByUserId}${userId}/${item.product_variant.id}`, { withCredentials: true });
+                toast.success('Xóa sản phẩm thành công');
+                dispatch(updateCart([...cart, item])); // Dispatch updateCart action
+
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                toast.error('Xóa sản phẩm thất bại');
+                // Optionally, revert the optimistic update if the API call fails
+                setCart(prevCart => [...prevCart, item]); // Add the item back to the cart
+            }
         } else {
-            setLoading(true);
+            // Handle case for users not logged in (if needed)
             const existingCartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
             const updatedCartItems = existingCartItems.cart_items.filter((cartItem: CartItem) => cartItem.product_variant.id !== item.product_variant.id);
             Cookies.set('cart_items', JSON.stringify({ cart_items: updatedCartItems }));
             setCart(updatedCartItems);
+            dispatch(updateCart(updatedCartItems)); // Dispatch updateCart action
             toast.success('Xóa sản phẩm thành công');
         }
-        setLoading(false);
-
-        dispatch(deleteCart(cart)); // Pass the current cart as an argument
-    }
+    };
 
 
 
@@ -288,19 +296,19 @@ const Body_Cart = () => {
                                         </div>
                                         <div className="text-right flex gap-2">
                                             <div>
-                                                <span className="text-gray-500 text-sm">
-                                                    {
-                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
+                                            <span className="text-gray-500 text-sm">
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')
-                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
-                                                } đ
+                                                            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')} đ
                                                 </span>
                                                 <div className='text-2xl text-price font-bold'>
-                                                    {
-                                                        item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
+                                                    {userId
+                                                        ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? (Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice) * item.quantity).toLocaleString('vi-VN')
-                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN') // Use discounted price if flash sale stock is 0
-                                                } đ
+                                                            : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
+                                                        : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')} đ
                                                 </div>
                                             </div>
                                             <div className='flex items-center justify-end' >

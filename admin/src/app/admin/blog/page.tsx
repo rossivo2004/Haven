@@ -1,10 +1,11 @@
+import BodyBlog from "@/components/BodyBlog";
+
 function page() {
     return ( 
         <div>
-
-            a
+            <BodyBlog />
         </div>
-    );
+     );
 }
 
 export default page;

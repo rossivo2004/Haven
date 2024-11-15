@@ -11,7 +11,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from "react-toastify";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { fetchUserProfile } from '@/src/config/token';  
+import { fetchUserProfile } from "@/src/config/token";
 
 export const OrderSession: React.FC = () => {
     const [userId, setUserId] = useState<string | null>(null);

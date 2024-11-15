@@ -345,7 +345,7 @@ function BodyUsers() {
                                     <TableCell>{item.point}</TableCell>
                                     <TableCell>
                                         <div>
-                                            {item.role_id === 1 ? <div className="bg-green-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-green-600 border-2 border-green-600">User</div> : item.role_id === 0 ? <div className="bg-yellow-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-yellow-600 border-2 border-yellow-600">Admin</div> : 'unknown'}
+                                            {item.role_id === 1 ? <div className="bg-green-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-green-600 border-2 border-green-600">User</div> : item.role_id === 2 ? <div className="bg-yellow-200 w-min flex items-center justify-center px-2 py-[2px] rounded-lg text-yellow-600 border-2 border-yellow-600">Admin</div> : 'unknown'}
                                         </div>
                                     </TableCell>
                                     <TableCell>{item.status === 'active' ? <div className="bg-green-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-green-600 border-2 border-green-600">Active</div> : <div className="bg-red-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-red-600 border-2 border-red-600">Banned</div>}</TableCell>
