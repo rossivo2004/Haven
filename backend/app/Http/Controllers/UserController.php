@@ -235,63 +235,37 @@ class UserController extends Controller
         return view('verify');
     }
 
-    // Gửi mã xác thực đăng ký
-    public function sendRegisterCode(Request $request)
+    public function register(Request $request)
     {
-        $request->validate([
+        // Xác thực dữ liệu đầu vào
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'name' => 'required',
-            'password' => 'required|min:6',
+            'password' => 'required|string|min:8',
         ]);
 
-        $code = rand(10000, 99999);
-        PasswordReset::updateOrCreate(['email' => $request->email], ['token' => $code, 'created_at' => Carbon::now()]);
-
-        Mail::send('register-code', ['code' => $code], function ($message) use ($request) {
-            $message->to($request->email);
-            $message->subject('Mã xác thực đăng ký tài khoản');
-        });
-
-        return response()->json(['message' => 'Mã xác thực đã được gửi'], 200);
-    }
-
-    // Xác minh mã xác thực và tạo tài khoản mới
-    public function verifyRegisterCode(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:password_resets,email',
-            'code' => 'required|numeric|digits:5',
-        ]);
-
-        $reset = PasswordReset::where('email', $request->email)
-                            ->where('token', $request->code)
-                            ->where('created_at', '>=', Carbon::now()->subMinutes(30))
-                            ->first();
-
-        if (!$reset) {
-            return response()->json(['error' => 'Mã xác thực không đúng hoặc đã hết hạn'], 400);
-        }
-
-        // Tìm role có tên là "user"
+        // Tìm role "user"
         $role = Role::where('name', 'user')->first();
 
-        if ($role) {
-            // Tạo người dùng mới với role "user"
-            $newUser = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role_id' => $role->id, // Gán role_id
-            ]);
-
-            // Xóa thông tin đặt lại mật khẩu sau khi tạo tài khoản
-            PasswordReset::where('email', $request->email)->delete();
-
-            return response()->json(['message' => 'Tài khoản đã được tạo thành công'], 200);
-        } else {
+        if (!$role) {
             return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
         }
+
+        // Tạo tài khoản mới
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role_id' => $role->id,
+            'status' => 'active', // Đặt trạng thái mặc định là active
+        ]);
+
+        return response()->json([
+            'message' => 'Đăng ký thành công',
+            'user' => $user,
+        ], 201);
     }
+
 
 
 

@@ -70,10 +70,8 @@ Route::group(['prefix' => 'api/roles'], function () {
 
 
 // Đăng ký
-Route::group(['prefix' => 'api/register'], function() {
-    Route::post('/send-code', [UserController::class, 'sendRegisterCode'])->name('api.register.sendCode');
-    Route::post('/verify-code', [UserController::class, 'verifyRegisterCode'])->name('api.register.verifyCode');
-});
+Route::post('api/register', [UserController::class, 'register']);
+
 
 // Quên mật khẩu
 Route::group(['prefix' => 'api/password'], function() {
