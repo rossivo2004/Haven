@@ -16,12 +16,22 @@
     background: white;
     padding: 20px;
     border-radius: 8px;
-    width: 500px;
-    height: 250px;
+    width: 640px;
+    height: 380px;
     text-align: center;
     position: relative;
     background-image: url('/images/popup.png');
-
+    max-width: 90%;
+    max-height: 90%;
+    background-size: cover;
+  }
+  
+  @media (max-width: 768px) {
+    .popup {
+      width: 80%;
+      height: 200px;
+      
+    }
   }
   
   .closeBtn {

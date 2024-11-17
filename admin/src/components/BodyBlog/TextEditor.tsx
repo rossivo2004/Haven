@@ -15,16 +15,29 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 function CreatePostForm() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    // const [thumbnail, setThumbnail] = useState<File | null>(null);
+    const [description, setDescription] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Title:", title);
         console.log("Content:", content);
+        // console.log("Thumbnail:", thumbnail);
+        console.log("Description:", description);
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("content", content);
+        // if (thumbnail) {
+        //     formData.append("thumbnail", thumbnail);
+        // }
+        formData.append("description", description);
 
         try {
-            const response = await axios.post(apiConfig.post.createPost, {
-                title,
-                content,
+            const response = await axios.post(apiConfig.post.createPost, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             toast.success("Bài viết đã được lưu thành công!");
             console.log('Post saved:', response.data);
@@ -61,6 +74,31 @@ function CreatePostForm() {
             <div className="my-4">
                 <label>Nội dung:</label>
                 <ReactQuill value={content} onChange={setContent} modules={modules} placeholder="Nhập nội dung bài viết..." />
+            </div>
+
+            {/* <div className="my-4">
+                <label>Thumbnail:</label>
+                <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        if (e.target.files) {
+                            setThumbnail(e.target.files[0]);
+                        }
+                    }}
+                    fullWidth
+                />
+            </div> */}
+
+            <div className="my-4">
+                <label>Mô tả:</label>
+                <Input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Nhập mô tả bài viết"
+                    fullWidth
+                />
             </div>
 
             <Button type="submit" color="primary">Đăng bài</Button>

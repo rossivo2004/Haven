@@ -10,7 +10,8 @@
     background: #166fff;
     padding: 8px;
     border-radius: 8px;
-    max-width: 260px;
+    // max-width: 260px;
+    width: fit-content;
     color: white;
     text-align: right;
     align-self: flex-end;
@@ -28,5 +29,36 @@
         flex-direction: column;
     border: none !important;
 
+    }
+
+    .overflow-y-auto {
+        /* Hide scrollbar for WebKit browsers */
+        &::-webkit-scrollbar {
+            display: none; /* Hide scrollbar */
+        }
+
+        /* Hide scrollbar for Firefox */
+        scrollbar-width: none; /* Hide scrollbar */
+    }
+}
+
+.loading-dot {
+    width: 20px; /* Adjust size as needed */
+    height: 20px; /* Adjust size as needed */
+    border-radius: 50%;
+    background-color: #007bff; /* Change color as needed */
+    animation: pulse 1s infinite; /* Animation for pulsating effect */
+    margin: 10px auto; /* Center the dot */
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5); /* Scale up */
+    }
+    100% {
+        transform: scale(1); /* Scale back down */
     }
 }

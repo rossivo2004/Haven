@@ -8,8 +8,16 @@ type PopupProps = {
 };
 
 const Popup: React.FC<PopupProps> = ({ onClose }) => {
+  // Function to handle clicks on the overlay
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    // Check if the click is on the overlay (not on the popup)
+    if (event.currentTarget === event.target) {
+      onClose();
+    }
+  };
+
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.popup}>
         <button className={styles.closeBtn} onClick={onClose}><CloseIcon className='text-white'/></button>
       </div>

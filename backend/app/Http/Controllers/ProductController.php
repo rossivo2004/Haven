@@ -37,6 +37,7 @@ class ProductController extends Controller
     }
 
 
+
     public function shop(Request $request)
     {
         $brands = new Brand();
@@ -84,7 +85,7 @@ class ProductController extends Controller
                 }
             });
 
-        })->orderBy('id', 'desc')->paginate(20)->appends(request()->all());
+        })->orderBy('id', 'desc')->get();
 
 
         // return view('Product.shop', [

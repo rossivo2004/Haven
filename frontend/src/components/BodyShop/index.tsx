@@ -28,7 +28,7 @@ import Loading from '../ui/Loading';
 
 function BodyShop() {
     const itemsPerPage = 12;
-    const initialDisplayCount = 6; // Set initial display count to 6
+    const initialDisplayCount = 12; // Set initial display count to 6
     const [displayCount, setDisplayCount] = useState<number>(initialDisplayCount); // State for number of products to display
     const router = useRouter();
     // const [currentPage, setCurrentPage] = useState<number>(1);
@@ -57,7 +57,9 @@ function BodyShop() {
 
             const response = await axios.get(`${apiConfig.products.getallproductvariants}?${params.toString()}`, { withCredentials: true });
 
-            let fetchedVariants = response.data.productvariants.data;
+
+            // console.log(response.data);
+            let fetchedVariants = response.data.productvariants;
 
             // Apply sorting based on sortOrder
             if (sortOrder === 'low-to-high') {

@@ -25,6 +25,7 @@ interface Post {
     image: string | null;
     title: string;
     updated_at: string;
+    description: string ;
 }
 
 function BodyBlog() {
@@ -35,6 +36,8 @@ function BodyBlog() {
     const [content, setContent] = useState(""); // State for content
     const [titleEdit, setTitleEdit] = useState(""); // State for title
     const [contentEdit, setContentEdit] = useState(""); // State for content
+    const [thumbnailEdit, setThumbnailEdit] = useState<File | null>(null); // State for thumbnail as a File
+    const [descriptionEdit, setDescriptionEdit] = useState(""); // State for description
     const [editPost, setEditPost] = useState<Post | null>(null); // State for editing a post
     const [isAddPostModalOpen, setIsAddPostModalOpen] = useState(false); // State for Add Post Modal
 
@@ -54,11 +57,15 @@ function BodyBlog() {
         ],
     };
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const fetchPosts = async () => {
-        const response = await axios.get(apiConfig.post.getAll);
-        setPosts(response.data.posts);
+        try {
+            const response = await axios.get(apiConfig.post.getAll);
+            setPosts(response.data.posts);
+        } catch (error) {
+            console.error("Error fetching posts:", error); // Log the error
+            toast.error("Failed to fetch posts."); // Notify the user
+        }
     };
 
     useEffect(() => {
@@ -79,10 +86,22 @@ function BodyBlog() {
         setEditPost(post);
         setTitleEdit(post.title);
         setContentEdit(post.content);
+        setDescriptionEdit(post.description);
+    
         handleOpenAddBrandModal();
     };
+    
+    useEffect(() => {
+        if (editPost) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = editPost.content;
+            const firstImage = tempDiv.querySelector('img')?.src; // Get the first image source
+            console.log(firstImage); // Log the first image URL
+        }
+    }, [editPost]);
+    
 
-    const updatePost = async (id: number, updatedPost: { title: string; content: string }) => {
+    const updatePost = async (id: number, updatedPost: { title: string; content: string; thumbnail: File | null; description: string }) => {
         try {
             await axios.put(`${apiConfig.post.updatePost}${id}`, updatedPost);
             toast.success("Post updated successfully!");
@@ -203,7 +222,7 @@ function BodyBlog() {
                                         <form onSubmit={(e) => { 
                                             e.preventDefault(); 
                                             if (editPost) {
-                                                updatePost(editPost.id, { title: titleEdit, content: contentEdit }); // Call updatePost with the post ID and updated values
+                                                updatePost(editPost.id, { title: titleEdit, content: contentEdit, thumbnail: thumbnailEdit, description: descriptionEdit }); // Call updatePost with the post ID and updated values
                                             }
                                         }}>
                                             <div>
@@ -217,12 +236,26 @@ function BodyBlog() {
                                                 />
                                             </div>
 
-                                            <div className="my-4">
-                                                <label>Nội dung:</label>
-                                                <ReactQuill value={contentEdit} onChange={setContentEdit} modules={modules} placeholder="Nhập nội dung bài viết..." /> // Use contentEdit instead of content
+                                            <div>
+                                                <label>Mô tả:</label>
+                                                <Input
+                                                    type="text"
+                                                    value={descriptionEdit}
+                                                    onChange={(e) => setDescriptionEdit(e.target.value)}
+                                                    placeholder="Nhập mô tả bài viết"
+                                                    fullWidth
+                                                />
                                             </div>
 
-                                            <Button type="submit" color="primary">Cập nhật bài</Button> // Change button text to reflect update action
+                                            <div className="my-4">
+                                                <label>Nội dung:</label>
+                                                <ReactQuill value={contentEdit} onChange={setContentEdit} modules={modules} placeholder="Nhập nội dung bài viết..." />
+                                            </div>
+
+                                          
+
+
+                                            <Button type="submit" color="primary">Cập nhật bài</Button> 
                                         </form>
                                     </ModalBody>
                                     <ModalFooter>

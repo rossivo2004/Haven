@@ -10,7 +10,7 @@ import { Chip } from "@nextui-org/react";
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@nextui-org/react';
-
+import './style.css';
 import axios from 'axios';
 import apiConfig from '@/src/config/api';
 import Cookies from 'js-cookie';
@@ -127,7 +127,6 @@ const Body_Cart = () => {
                     : cartItem
             );
         });
-        // dispatch(updateCart(cart)); // Dispatch updateCart action
 
         if (userId) {
             // If user is logged in, update quantity via API
@@ -135,13 +134,11 @@ const Body_Cart = () => {
                 await axios.put(`${apiConfig.cart.updateCartByUserId}${userId}/${item.product_variant.id}`, { quantity: newQuantity }, { withCredentials: true });
                 toast.success('Cập nhật số lượng thành công');
                 dispatch(updateCart(cart)); // Dispatch updateCart action
-
             } catch (error) {
                 console.error('Error updating quantity:', error);
                 toast.error('Cập nhật số lượng thất bại');
                 // Optionally, revert the optimistic update if the API call fails
                 setCart(prevCart => {
-
                     return prevCart.map(cartItem =>
                         cartItem.product_variant.id === item.product_variant.id
                             ? { ...cartItem, quantity: item.quantity } // Revert to previous quantity
@@ -288,9 +285,15 @@ const Body_Cart = () => {
                                                 <p className="text-xl font-semibold dark:text-white">{item.product_variant.name}</p>
                                                 {/* <p className="text-sm text-gray-600">fssdf</p> */}
                                                 <div className="flex items-center mt-2 dark:text-white">
-                                                    <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded">-</button>
-                                                    <span className="px-4">{item.quantity}</span>
-                                                    <button onClick={() => updateQuantity(item, item.quantity + 1)} className="px-3 py-1 border rounded">+</button>
+                                                    <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded h-[34px]">-</button>
+                                                    <input 
+                                                        type="number" 
+                                                        value={item.quantity} 
+                                                        onChange={(e) => updateQuantity(item, Number(e.target.value))} 
+                                                        className="w-12 h-[34px] text-center border rounded" 
+                                                        min="1" 
+                                                    />
+                                                    <button onClick={() => updateQuantity(item, item.quantity + 1)} className="px-3 py-1 border rounded h-[34px]">+</button>
                                                 </div>
                                             </div>
                                         </div>

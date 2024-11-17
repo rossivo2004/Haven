@@ -47,11 +47,11 @@ function BodySingUp() {
                 },
             });
 
-            if (response.status === 200) {
+            if (response.status === 201) {
                 // Save user data to cookies
                 dispatch(setUser(values));
                 toast.success('Đăng kí thành công!');
-                router.push('/verify');
+                router.push('/signin');
             } else {
                 toast.error('Đăng kí thất bại! Vui lòng thử lại.');
             }

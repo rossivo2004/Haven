@@ -48,8 +48,8 @@ const [loading, setLoading] = useState(false);
 
             console.log(response.data);
 
-            Cookies.set('access_token', response.data.access_token, { expires: 7 }); // Set access_token in cookie for 7 days
-            Cookies.set('refresh_token', response.data.refresh_token, { expires: 7 }); // Set refresh_token in cookie for 7 days
+            Cookies.set('access_token', response.data.access_token, { expires: 1 }); // Set access_token in cookie for 7 days
+            Cookies.set('refresh_token', response.data.refresh_token, { expires: 1 }); // Set refresh_token in cookie for 7 days
             
             window.location.href = '/';
         } catch (error: any) {

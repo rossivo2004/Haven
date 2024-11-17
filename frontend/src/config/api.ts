@@ -77,7 +77,7 @@ const apiConfig = {
   user: {
     login: `${baseUrl}/api/login`,
     logout: `${baseUrl}/api/logout`,
-    register: `${baseUrl}/api/register/send-code`,
+    register: `${baseUrl}/api/register`,
     verify: `${baseUrl}/api/register/verify-code`,
 
     loginToken: `${baseUrl}/api/auth/login`,
@@ -201,7 +201,11 @@ const apiConfig = {
     updatePost: `${baseUrl}/api/posts/update/`,
     deletePost: `${baseUrl}/api/posts/delete/`, 
     getPostById: `${baseUrl}/api/posts/show/`,
-  } 
+  } ,
+
+  chatbot: {
+    getChatbot: `${baseUrl}/question`,
+  }
 
 
 };
