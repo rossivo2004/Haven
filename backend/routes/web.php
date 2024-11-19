@@ -33,6 +33,9 @@ Route::prefix('api/posts')->group(function () {
     Route::get('/show/{id}', [PostController::class, 'show']);
     Route::put('/update/{id}', [PostController::class, 'update']);
     Route::delete('/delete/{id}', [PostController::class, 'destroy']);
+    Route::get('/popular', [PostController::class, 'popularPosts']);
+    Route::get('/recent', [PostController::class, 'recentPosts']);
+
 });
 
 
