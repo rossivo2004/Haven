@@ -18,6 +18,22 @@ class PostController extends Controller
         return response()->json(['posts' => $posts], 200);
     }
 
+    public function popularPosts()
+    {
+        $posts = Post::orderBy('view', 'desc')->get();
+        return response()->json(['posts' => $posts], 200);
+    }
+
+
+
+    public function recentPosts()
+    {
+        $posts = Post::orderBy('created_at', 'desc')->get();
+        return response()->json(['posts' => $posts], 200);
+    }
+
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -82,12 +98,11 @@ class PostController extends Controller
 
     public function show($id)
     {
-        $post = Post::find($id);
-        if (!$post) {
-            return response()->json(['error' => 'Post not found'], 404);
-        }
+        $post = Post::findOrFail($id);
+        $post->increment('view'); // Tăng view lên 1
         return response()->json(['post' => $post], 200);
     }
+
 
     public function update(Request $request, $id)
     {
