@@ -168,6 +168,7 @@ const apiConfig = {
     createPost: `${baseUrl}/api/posts/store`,
     updatePost: `${baseUrl}/api/posts/update/`,
     deletePost: `${baseUrl}/api/posts/delete/`, 
+    
   } 
 };
 

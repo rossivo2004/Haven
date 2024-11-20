@@ -70,6 +70,10 @@ function BodyShop() {
                 fetchedVariants.sort((a: Variant, b: Variant) => 
                     Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0) - Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0)
                 );
+            } else if (sortOrder === 'a-to-z') {
+                fetchedVariants.sort((a: Variant, b: Variant) => a.name.localeCompare(b.name)); // Sort by name A-Z
+            } else if (sortOrder === 'z-to-a') {
+                fetchedVariants.sort((a: Variant, b: Variant) => b.name.localeCompare(a.name)); // Sort by name Z-A
             }
 
             setVariants(fetchedVariants);
@@ -154,37 +158,34 @@ function BodyShop() {
         // setCurrentPage(1);
     };
 
-    const handleChipClose = (filterItem: string) => {
-        if (priceFilter.includes(filterItem)) {
-            setPriceFilter(prev => prev.filter(item => item !== filterItem));
-        } else if (cateFilter.includes(filterItem)) {
-            setCateFilter(prev => prev.filter(item => item !== filterItem));
-        } else {
-            setBrandFilter(prev => prev.filter(item => item !== filterItem));
-        }
-        // setCurrentPage(1);
-    };
+   const handleChipClose = (filterItem: string) => {
+       if (priceFilter.includes(filterItem)) {
+           setPriceFilter(prev => prev.filter(item => item !== filterItem));
+       } else if (cateFilter.includes(filterItem)) {
+           setCateFilter(prev => prev.filter(item => item !== filterItem));
+       } else if (filterItem === sortOrder) { // Check if the filterItem is the sort order
+           setSortOrder(''); // Reset sort order
+           setFilter(prev => prev.filter(item => item !== filterItem)); // Remove from combined filter
+       } else {
+           setBrandFilter(prev => prev.filter(item => item !== filterItem));
+       }
+   };
 
     const resetFilter = () => {
         setPriceFilter([]);
         setCateFilter([]);
         setBrandFilter([]); // Ensure brand filter is also reset
         setFilter([]); // Reset unified filter as well
+        setSortOrder(''); // Reset sort order
     };
 
     function handleSort(order: string) {
         setSortOrder(order); // Set the sort order state
-        if (order === 'low-to-high') {
-            setVariants(prev => [...prev].sort((a, b) => Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0) - Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0)));
-        } else if (order === 'high-to-low') {
-            setVariants(prev => [...prev].sort((a, b) => Math.min(b.DiscountedPrice || 0, b.FlashSalePrice || 0) - Math.min(a.DiscountedPrice || 0, a.FlashSalePrice || 0)));
-        }
         fetchProduct(); // Fetch products again to ensure sorting is applied
 
         const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter, order]; // Include sort order in filters
         setFilter(combinedFilter); // Update filter state
         console.log(combinedFilter);
-        
     }
 
     const handlePriceRangeChange = (event: Event, value: number | number[], activeThumb: number) => {
@@ -289,10 +290,10 @@ function BodyShop() {
                                                 <DropdownMenu variant="faded" aria-label="More Filters" className='dark:text-white'>
                                                     {[...Array.from(new Set([...priceFilter, ...filter]))].map((filterItem) => (
                                                         <DropdownItem key={filterItem} onClick={() => handleChipClose(filterItem)}>
-                                                          <div className="flex justify-between">
-                                                          <div>{filterItem}</div>
-                                                          <div> <CloseIcon fontSize="small" /></div>
-                                                          </div>
+                                                            <div className="flex justify-between">
+                                                                <div>{filterItem}</div>
+                                                                <div><CloseIcon fontSize="small" /></div>
+                                                            </div>
                                                         </DropdownItem>
                                                     ))}
                                                 </DropdownMenu>
@@ -325,13 +326,14 @@ function BodyShop() {
                                 <Dropdown>
                                     <DropdownTrigger>
                                         <Button variant="bordered" endContent={<KeyboardArrowDownIcon />}>
-                                            Sắp xếp theo
+                                            {sortOrder === 'low-to-high' ? 'Giá từ thấp đến cao' : sortOrder === 'high-to-low' ? 'Giá từ cao đến thấp' : sortOrder === 'a-to-z' ? 'Tên A-Z' : sortOrder === 'z-to-a' ? 'Tên Z-A' : 'Sắp xếp theo'}
                                         </Button>
                                     </DropdownTrigger>
                                     <DropdownMenu variant="faded" aria-label="Static Actions" className='dark:text-white'>
-                                        <DropdownItem key="low-to-high" onClick={() => handleSort('low-to-high')}>Giá thấp đến cao</DropdownItem>
-                                        <DropdownItem key="high-to-low" onClick={() => handleSort('high-to-low')}>Giá cao đến thấp</DropdownItem>
-                                      
+                                        <DropdownItem key="low-to-high" onClick={() => handleSort('low-to-high')}>Giá từ thấp đến cao</DropdownItem>
+                                        <DropdownItem key="high-to-low" onClick={() => handleSort('high-to-low')}>Giá từ cao đến thấp</DropdownItem>
+                                        <DropdownItem key="a-to-z" onClick={() => handleSort('a-to-z')}>Tên A-Z</DropdownItem>
+                                        <DropdownItem key="z-to-a" onClick={() => handleSort('z-to-a')}>Tên Z-A</DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>
                             </div>

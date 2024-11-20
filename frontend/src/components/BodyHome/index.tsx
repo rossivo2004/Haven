@@ -270,7 +270,7 @@ function BodyHome() {
                             visible: { opacity: 1, x: 0 },
                         }}
                     >
-                        <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
+                        <div className="max-w-screen-xl mx-auto  px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
                             <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
                             {productDataSale.length > 0 && (
                                 <div className="flex items-center">
@@ -315,7 +315,7 @@ function BodyHome() {
                             )}
                         </div>
                     </motion.div>
-                    <div className="max-w-screen-xl mx-auto mb-14 relative h-auto">
+                    <div className="max-w-screen-xl mx-auto mb-14 relative h-auto px-4">
                         {loading ? <div className="w-full h-full flex items-center justify-center"><Spinner /></div> : productDataSale.length > 0 ? (
                             <div className="lg:grid md:grid grid lg:grid-cols-4 grid-cols-2 gap-4">
                                 {productDataSale.slice(0, 8).map((product) => (

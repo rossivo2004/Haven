@@ -93,10 +93,13 @@ function BodyBlog() {
     
     useEffect(() => {
         if (editPost) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = editPost.content;
-            const firstImage = tempDiv.querySelector('img')?.src; // Get the first image source
-            console.log(firstImage); // Log the first image URL
+            // Check if running in the browser
+            if (typeof window !== 'undefined') {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = editPost.content;
+                const firstImage = tempDiv.querySelector('img')?.src; // Get the first image source
+                console.log(firstImage); // Log the first image URL
+            }
         }
     }, [editPost]);
     

@@ -7,13 +7,15 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie'; // Import js-cookie for cookie management
 import { fetchUserProfile } from '@/configs/token';
+import { Spinner } from '@nextui-org/react';
 
 function BodySign() {
     const [email, setEmail] = useState(''); // State for email
     const [password, setPassword] = useState(''); // State for password
-
+    const [loading, setLoading] = useState(false); // State for loading
     const handleSubmit = async (e: React.FormEvent) => { // Handle form submission
         e.preventDefault();
+        setLoading(true); // Set loading to true
         try {
             const response = await axios.post(apiConfig.users.loginToken, { // Use axios to make the POST request
                 email,
@@ -21,8 +23,8 @@ function BodySign() {
             });
 
 
-            Cookies.set('access_token', response.data.access_token, { expires: 7 }); // Set access_token in cookie for 7 days
-            Cookies.set('refresh_token', response.data.refresh_token, { expires: 7 });
+            Cookies.set('access_token_admin', response.data.access_token, { expires: 7 }); // Set access_token in cookie for 7 days
+            Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 7 });
 
             const userProfile = await fetchUserProfile();
 
@@ -32,14 +34,16 @@ function BodySign() {
                 window.location.href = '/admin';
                 console.log(response.data);
             } else {
-                Cookies.remove('access_token'); // Remove access_token from cookie if role is not 2
-                Cookies.remove('refresh_token'); // Remove refresh_token from cookie if role is not 2
+                Cookies.remove('access_token_admin'); // Remove access_token from cookie if role is not 2
+                Cookies.remove('refresh_token_admin'); // Remove refresh_token from cookie if role is not 2
                 throw new Error('Bạn không có quyền truy cập!'); // Throw error if role is not 2
             }
 
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || 'Đăng nhập thất bại! Vui lòng thử lại.'; // Get error message from response
             toast.error(errorMessage); // Show error message
+        } finally {
+            setLoading(false); // Set loading to false
         }
     };
 
@@ -65,7 +69,9 @@ function BodySign() {
                                     <input type="password" name="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                                 </div>
                             
-                                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>
+                                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                                    {loading ? <Spinner size="sm" /> : 'Sign in'}
+                                </button>
                             </form>
                         </div>
                     </div>

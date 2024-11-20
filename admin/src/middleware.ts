@@ -7,7 +7,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import apiConfig from './configs/api';
 
 export async function middleware(req: NextRequest) {
-  const token = req.cookies.get('access_token');
+  const token = req.cookies.get('access_token_admin');
   const url = req.nextUrl.clone();
   let role = 1; // Changed from useState to a simple variable
 

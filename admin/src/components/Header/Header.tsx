@@ -7,7 +7,7 @@ import Notify from "../Notify";
 
 const Header: React.FC = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
-  const token = Cookies.get('access_token');
+  const token = Cookies.get('access_token_admin');
 
   const fetchUserProfileA = async () => {
     const profile = await fetchUserProfile();
@@ -21,8 +21,8 @@ const Header: React.FC = () => {
   console.log(userProfile);
 
   const handleLogout = () => {
-    Cookies.remove('access_token');
-    Cookies.remove('refresh_token');
+    Cookies.remove('access_token_admin');
+    Cookies.remove('refresh_token_admin');
     window.location.href = '/signin';
   };
 

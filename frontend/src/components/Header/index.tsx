@@ -437,7 +437,7 @@ function Header({ params }: { params: { lang: string } }) {
                                                     size='sm'
                                                     as="button"
                                                     className="transition-transform"
-                                                    src={userData.avatar || "https://i.pravatar.cc/150?u=a042581f4e29026704d"} // Use user avatar or a default
+                                                    src={userData.avatar || '/images/avatarnoel.jpg'} // Use user avatar or a default
                                                 />
                                             </DropdownTrigger>
                                             <DropdownMenu aria-label="Profile Actions" variant="flat">

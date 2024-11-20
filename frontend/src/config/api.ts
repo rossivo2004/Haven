@@ -201,6 +201,8 @@ const apiConfig = {
     updatePost: `${baseUrl}/api/posts/update/`,
     deletePost: `${baseUrl}/api/posts/delete/`, 
     getPostById: `${baseUrl}/api/posts/show/`,
+    popularPosts: `${baseUrl}/api/posts/popular`,
+    recentPosts: `${baseUrl}/api/posts/recent`,
   } ,
 
   chatbot: {
