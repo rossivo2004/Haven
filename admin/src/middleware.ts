@@ -63,17 +63,14 @@ export async function middleware(req: NextRequest) {
         },
       });
 
-      // Redirect to "/admin" if user is authenticated
+      // Redirect to "/admin" if user is authenticated and role is 2
       if (response.status === 200) {
-        // Call the API to get user profile data
-        const userProfileResponse = await axios.get(apiConfig.users.getUserFromToken, {
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        });
-        console.log('User profile data:', userProfileResponse.data);
-        
-        return NextResponse.redirect(new URL('/admin', req.url));
+        const userData = response.data;
+        const role = userData.role_id; // Get the role from user data
+
+        if (role === 2) { // Check if role is 2
+          return NextResponse.redirect(new URL('/admin', req.url));
+        }
       }
     } catch (error) {
       console.error('Error validating token on /signin:', (error as Error).message);
