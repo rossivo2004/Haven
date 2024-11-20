@@ -65,7 +65,7 @@ export async function middleware(req: NextRequest) {
 
       // Nếu user đã xác thực, điều hướng tới "/admin"
       if (response.status === 200) {
-        url.pathname = '/admin';
+        window.location.href = '/admin';
         return NextResponse.redirect(url);
       }
     } catch (error) {
