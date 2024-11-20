@@ -65,8 +65,9 @@ export async function middleware(req: NextRequest) {
 
       // Nếu user đã xác thực, điều hướng tới "/admin"
       if (response.status === 200) {
-        window.location.href = '/admin';
-        return NextResponse.redirect(url);
+        // url.pathname = '/admin';
+        // return NextResponse.redirect(url);
+        return NextResponse.redirect(new URL('/admin', req.url));
       }
     } catch (error) {
       console.error('Error validating token on /signin:', (error as Error).message);
