@@ -23,8 +23,8 @@ function BodySign() {
             });
 
 
-            Cookies.set('access_token_admin', response.data.access_token, { expires: 7 }); // Set access_token in cookie for 7 days
-            Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 7 });
+            Cookies.set('access_token_admin', response.data.access_token, { expires: 1 }); // Set access_token in cookie for 7 days
+            Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
 
             const userProfile = await fetchUserProfile();
 
