@@ -46,6 +46,8 @@ function BodyBlog() {
     const [currentPage, setCurrentPage] = useState<number>(1); // State for current page
     const productsPerPage = 10; // Number of posts per page
 
+    
+
     const modules = {
         toolbar: [
             [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
@@ -98,7 +100,6 @@ function BodyBlog() {
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = editPost.content;
                 const firstImage = tempDiv.querySelector('img')?.src; // Get the first image source
-                console.log(firstImage); // Log the first image URL
             }
         }
     }, [editPost]);
