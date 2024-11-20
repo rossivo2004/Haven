@@ -69,7 +69,7 @@ export async function middleware(req: NextRequest) {
         const role = userData.role_id; // Get the role from user data
 
         if (role === 2) { // Check if role is 2
-          return NextResponse.redirect(new URL('/admin', req.url));
+          // return NextResponse.redirect(new URL('/admin', req.url));
         }
       }
     } catch (error) {
