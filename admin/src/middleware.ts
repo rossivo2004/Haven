@@ -9,75 +9,71 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token_admin');
   const url = req.nextUrl.clone();
 
-  // Redirect to "/admin" if accessing root
+  // Nếu user truy cập "/" => Điều hướng sang "/admin"
   if (url.pathname === '/') {
     return NextResponse.redirect(new URL('/admin', req.url));
   }
 
-  // Logic for "/admin" access
+  // Logic kiểm tra cho "/admin"
   if (url.pathname.startsWith('/admin')) {
     if (!token) {
-      // Redirect to "/signin" if no token
+      // Nếu không có token, điều hướng tới "/signin"
       url.pathname = '/signin';
       return NextResponse.redirect(url);
     }
 
     try {
-      console.log('Calling API to validate token with URL:', apiConfig.users.getUserFromToken);
+      // Xác thực token bằng API
       const response = await axios.get(apiConfig.users.getUserFromToken, {
         headers: {
-          Authorization: `Bearer ${token.value}`,
+          Authorization: `Bearer ${token.value}`, // Đảm bảo token được truyền đúng
         },
       });
-      console.log('API response status:', response.status);
 
-      // Check if token is valid
+      // Nếu token không hợp lệ hoặc API trả lỗi
       if (response.status !== 200) {
         url.pathname = '/signin';
         return NextResponse.redirect(url);
       }
 
       const userData = response.data;
-      const role = userData.role_id;
+      const role = userData.role_id; // Trích xuất role từ API
 
-      // Check user role
+      // Nếu user không phải là admin (role !== 2)
       if (role !== 2) {
-        console.error('Unauthorized access attempt by role:', role);
+        console.error('Unauthorized access attempt by role:', role); // Log để kiểm tra
         url.pathname = '/signin';
         return NextResponse.redirect(url);
       }
     } catch (error) {
+      // Xử lý lỗi khi gọi API thất bại
       console.error('Error fetching user data:', (error as Error).message);
       url.pathname = '/signin';
       return NextResponse.redirect(url);
     }
   }
 
-  // Logic for "/signin" access
+  // Logic kiểm tra cho "/signin"
   if (url.pathname === '/signin' && token) {
     try {
-      // Validate token if already signed in
+      // Nếu đã có token, xác thực token
       const response = await axios.get(apiConfig.users.getUserFromToken, {
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
       });
 
-      // Redirect to "/admin" if user is authenticated and role is 2
+      // Nếu user đã xác thực, điều hướng tới "/admin"
       if (response.status === 200) {
-        const userData = response.data;
-        const role = userData.role_id; // Get the role from user data
-
-        if (role === 2) { // Check if role is 2
-          // return NextResponse.redirect(new URL('/admin', req.url));
-        }
+        url.pathname = '/admin';
+        return NextResponse.redirect(url);
       }
     } catch (error) {
       console.error('Error validating token on /signin:', (error as Error).message);
-      // Allow access to "/signin" if token is invalid
+      // Nếu token không hợp lệ, tiếp tục cho phép truy cập "/signin"
     }
   }
 
-  // Default to continue processing the request
+  // Mặc định cho phép tiếp tục xử lý request
   return NextResponse.next();
 }

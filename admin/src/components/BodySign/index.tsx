@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'; // Ensure this import is present
+import { useEffect, useState } from 'react'; // Ensure this import is present
 import axios from 'axios'; // Add this import
 import apiConfig from '@/configs/api';
 import { toast } from 'react-toastify';
@@ -13,6 +13,28 @@ function BodySign() {
     const [email, setEmail] = useState(''); // State for email
     const [password, setPassword] = useState(''); // State for password
     const [loading, setLoading] = useState(false); // State for loading
+
+    const checkAdminAccess = async () => { // Function to check admin access
+        const token = Cookies.get('access_token_admin'); // Get access token from cookies
+        if (token) {
+            try {
+                const userProfile = await fetchUserProfile(); // Fetch user profile
+                if (userProfile.role_id === 2) { // Check if role is admin
+                    window.location.href = '/admin';
+                } else {
+                    throw new Error('Bạn không có quyền truy cập!'); // Throw error if not admin
+                }
+            } catch (error) {
+                console.error(error); // Log error
+            }
+        }
+    };
+
+    // Call checkAdminAccess on component mount
+    useEffect(() => {
+        checkAdminAccess(); // Check admin access when component mounts
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => { // Handle form submission
         e.preventDefault();
         setLoading(true); // Set loading to true
