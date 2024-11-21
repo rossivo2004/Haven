@@ -18,7 +18,6 @@ const Header: React.FC = () => {
     fetchUserProfileA();
   }, []);
 
-  console.log(userProfile);
 
   const handleLogout = () => {
     Cookies.remove('access_token_admin');
