@@ -35,7 +35,7 @@ export async function middleware(req: NextRequest) {
   // }
 
   if (url.pathname === '/signin') {
-    if (userData) {
+    if (token) {
       // Nếu user đã đăng nhập, chặn truy cập "/signin"
       return redirectToAdmin(req.url);
     }
