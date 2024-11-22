@@ -18,6 +18,8 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\ChatbotController;
 use App\Models\ProductImage;
+use App\Http\Middleware\CheckAdmin;
+
 
 //chatbot
 use BotMan\BotMan\BotMan;
@@ -53,21 +55,21 @@ Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin
 
 // Quản lý users
 Route::group(['prefix' => 'api/users'], function() {
-    Route::get('/', [UserController::class, 'index'])->name('users.index');
-    Route::post('/store', [UserController::class, 'store'])->name('users.store');
+    Route::get('/', [UserController::class, 'index'])->name('users.index')->middleware('check.admin');
+    Route::middleware([CheckAdmin::class])->post('/store', [UserController::class, 'store'])->name('users.store');
     Route::get('/show/{user}', [UserController::class, 'show'])->name('users.show');
     Route::put('/update/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.delete');
-    Route::put('/update/admin/{user}', [UserController::class, 'updateAdmin'])->name('users.updateAdmin');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{user}', [UserController::class, 'destroy'])->name('users.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/admin/{user}', [UserController::class, 'updateAdmin'])->name('users.updateAdmin');
 });
 
 // Role API routes
 Route::group(['prefix' => 'api/roles'], function () {
-    Route::get('/', [RoleController::class, 'index'])->name('Role.index');
-    Route::post('/store', [RoleController::class, 'store'])->name('Role.store');
-    Route::get('/show/{role}', [RoleController::class, 'show'])->name('Role.show');
-    Route::put('/update/{role}', [RoleController::class, 'update'])->name('Role.update');
-    Route::delete('/delete/{role}', [RoleController::class, 'destroy'])->name('Role.destroy');
+    Route::middleware([CheckAdmin::class])->get('/', [RoleController::class, 'index'])->name('Role.index');
+    Route::middleware([CheckAdmin::class])->post('/store', [RoleController::class, 'store'])->name('Role.store');
+    Route::middleware([CheckAdmin::class])->get('/show/{role}', [RoleController::class, 'show'])->name('Role.show');
+    Route::middleware([CheckAdmin::class])->put('/update/{role}', [RoleController::class, 'update'])->name('Role.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{role}', [RoleController::class, 'destroy'])->name('Role.destroy');
 });
 
 
@@ -100,12 +102,12 @@ route::group([
     Route::get('/', [ProductController::class, 'index'])->name('Product.index');
     Route::get('/home', [ProductController::class, 'home'])->name('Product.home');
     Route::get('/create', [ProductController::class, 'create'])->name('Product.create');
-    Route::post('/store', [ProductController::class, 'store'])->name('Product.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [ProductController::class, 'store'])->name('Product.store');
     Route::get('/detail/{productVariant}', [ProductController::class, 'detail'])->name('Product.detail');
     Route::get('/shop', [ProductController::class, 'shop'])->name('Product.shop');
     Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('Product.edit');
-    Route::put('/update/{product}', [ProductController::class, 'update'])->name('Product.update');
-    Route::delete('/delete/{product}', [ProductController::class, 'destroy'])->name('Product.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/{product}', [ProductController::class, 'update'])->name('Product.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{product}', [ProductController::class, 'destroy'])->name('Product.delete');
     Route::get('/show/{product}', [ProductController::class, 'show'])->name('Product.show');
     Route::get('/getproductvariants/{product}', [ProductController::class, 'getProductVariants'])->name('Product.getProductVariant');
 
@@ -115,11 +117,11 @@ route::group([
 ],function(){
     Route::get('/', [ProductVariantController::class, 'index'])->name('ProductVariant.index');
     Route::get('/create', [ProductVariantController::class, 'create'])->name('ProductVariant.create');
-    Route::post('/store', [ProductVariantController::class, 'store'])->name('ProductVariant.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [ProductVariantController::class, 'store'])->name('ProductVariant.store');
     Route::get('/show/{productVariant}', [ProductVariantController::class, 'show'])->name('ProductVariant.show');
     Route::get('/edit/{productVariant}', [ProductVariantController::class, 'edit'])->name('ProductVariant.edit');
-    Route::put('/update/{productVariant}', [ProductVariantController::class, 'update'])->name('ProductVariant.update');
-    Route::delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/{productVariant}', [ProductVariantController::class, 'update'])->name('ProductVariant.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{productVariant}', [ProductVariantController::class, 'destroy'])->name('ProductVariant.delete');
 
     Route::get('/getRelatedVariants/{productVariant}', [ProductVariantController::class, 'getRelatedVariants'])->name('ProductVariant.getRelatedVariants');
 });
@@ -127,8 +129,8 @@ route::group([
 route::group([
     'prefix' => 'api/productimage'
 ],function(){
-    Route::post('/store', [ProductImageController::class, 'store'])->name('ProductImage.store');
-    Route::delete('/delete/{productImage}', [ProductImageController::class, 'destroy'])->name('ProductImage.delete');
+    Route::middleware([CheckAdmin::class])->post('/store', [ProductImageController::class, 'store'])->name('ProductImage.store');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{productImage}', [ProductImageController::class, 'destroy'])->name('ProductImage.delete');
 });
 
 route::group([
@@ -136,10 +138,10 @@ route::group([
 ],function(){
     Route::get('/', [CategoryController::class, 'index'])->name('Category.index');
     Route::get('/create', [CategoryController::class, 'create'])->name('Category.create');
-    Route::post('/store', [CategoryController::class, 'store'])->name('Category.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [CategoryController::class, 'store'])->name('Category.store');
     Route::get('/edit/{category}', [CategoryController::class, 'edit'])->name('Category.edit');
-    Route::put('/update/{category}', [CategoryController::class, 'update'])->name('Category.update');
-    Route::delete('/delete/{category}', [CategoryController::class, 'destroy'])->name('Category.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/{category}', [CategoryController::class, 'update'])->name('Category.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{category}', [CategoryController::class, 'destroy'])->name('Category.delete');
     Route::get('/show/{category}', [CategoryController::class, 'show'])->name('Category.show');
     Route::get('/getproducts/{category}', [CategoryController::class, 'getProducts'])->name('Category.getProduct');
     Route::get('/getCategoryByTag/{tag}', [CategoryController::class, 'getCategoryByTag'])->name('Category.getProductByTag');
@@ -151,10 +153,10 @@ route::group([
 ],function(){
     Route::get('/', [BrandController::class, 'index'])->name('Brand.index');
     Route::get('/create', [BrandController::class, 'create'])->name('Brand.create');
-    Route::post('/store', [BrandController::class, 'store'])->name('Brand.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [BrandController::class, 'store'])->name('Brand.store');
     Route::get('/edit/{brand}', [BrandController::class, 'edit'])->name('Brand.edit');
-    Route::put('/update/{brand}', [BrandController::class, 'update'])->name('Brand.update');
-    Route::delete('/delete/{brand}', [BrandController::class, 'destroy'])->name('Brand.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/{brand}', [BrandController::class, 'update'])->name('Brand.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{brand}', [BrandController::class, 'destroy'])->name('Brand.delete');
     Route::get('/show/{brand}', [BrandController::class, 'show'])->name('Brand.show');
     Route::get('/getproducts/{brand}', [BrandController::class, 'getProducts'])->name('Brand.getProduct');
     Route::get('/getBrandByTag/{tag}', [BrandController::class, 'getBrandByTag'])->name('Brand.getProductByTag');
@@ -164,10 +166,10 @@ route::group([
 ],function(){
     Route::get('/', [FlashSaleController::class, 'index'])->name('FlashSale.index');
     Route::get('/create', [FlashSaleController::class, 'create'])->name('FlashSale.create');
-    Route::post('/store', [FlashSaleController::class, 'store'])->name('FlashSale.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [FlashSaleController::class, 'store'])->name('FlashSale.store');
     Route::get('/edit/{flashsale}', [FlashSaleController::class, 'edit'])->name('FlashSale.edit');
     Route::put('/update/{flashsale}', [FlashSaleController::class, 'update'])->name('FlashSale.update');
-    Route::delete('/delete/{flashsale}', [FlashSaleController::class, 'destroy'])->name('FlashSale.delete');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{flashsale}', [FlashSaleController::class, 'destroy'])->name('FlashSale.delete');
     Route::get('/show/{flashSale}', [FlashSaleController::class, 'show'])->name('FlashSale.show');
     Route::get('/getproductvariants/{flashSale}', [FlashSaleController::class, 'getProductVariants'])->name('Product.getProductVariants');
     Route::get('/getlistflashsale', [FlashSaleController::class, 'listFlashSale'])->name('FlashSale.listFlashSale');
@@ -177,10 +179,10 @@ route::group([
 route::group([
     'prefix' => 'api/flashsaleproduct',
 ],function(){
-    Route::post('/store', [FlashSaleProductController::class, 'store'])->name('FlashSale.store');
+    Route::middleware([CheckAdmin::class])->post('/store', [FlashSaleProductController::class, 'store'])->name('FlashSale.store');
     Route::get('/edit/{flashSaleProduct}', [FlashSaleProductController::class, 'edit'])->name('FlashSale.edit');
-    Route::put('/update/{flashSaleProduct}', [FlashSaleProductController::class, 'update'])->name('FlashSale.update');
-    Route::delete('/delete/{flashSaleProduct}', [FlashSaleProductController::class, 'destroy'])->name('FlashSale.delete');
+    Route::middleware([CheckAdmin::class])->put('/update/{flashSaleProduct}', [FlashSaleProductController::class, 'update'])->name('FlashSale.update');
+    Route::middleware([CheckAdmin::class])->delete('/delete/{flashSaleProduct}', [FlashSaleProductController::class, 'destroy'])->name('FlashSale.delete');
 
 
 });
@@ -220,7 +222,7 @@ route::group([
     Route::post('/orders/cancelorder/{orderId}', [OrderController::class, 'cancelOrder']); // Hủy đơn hàng
     Route::post('/orders/reorder/{orderId}', [OrderController::class, 'reorder']); // mua lại đơn hàng
     Route::post('/deduct-points', [OrderController::class, 'deductPoints']); // trừ điểm tích lũy của người dùng đã sử dụng
-    Route::put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
+    Route::middleware([CheckAdmin::class])->put('/orders/updatestatus/{orderId}', [OrderController::class, 'updateOrderStatus']); // cập nhật trạng thái đơn hàng
 });
 
 route::group([
@@ -250,7 +252,7 @@ route::group([
 ],function(){
     Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo
     Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc
-    Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
+    Route::middleware([CheckAdmin::class])->post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
 });
 
 
