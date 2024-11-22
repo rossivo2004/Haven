@@ -24,6 +24,40 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
     }
+    public function loginForAdminOnly()
+{
+    $credentials = request(['email', 'password']);
+
+    // Xác thực thông tin đăng nhập
+    if (! $token = auth('api')->attempt($credentials)) {
+        return response()->json(['error' => 'Thông tin đăng nhập không chính xác.'], 401);
+    }
+
+    // Lấy thông tin người dùng
+    $user = auth('api')->user();
+
+    // Kiểm tra trạng thái tài khoản
+    if ($user->status === 'banned') {
+        auth('api')->logout();
+        return response()->json([
+            'error' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+        ], 403);
+    }
+
+    // Kiểm tra vai trò người dùng
+    if ($user->role->name !== 'admin') {
+        auth('api')->logout();
+        return response()->json([
+            'error' => 'Chỉ admin mới được phép truy cập.'
+        ], 403);
+    }
+
+    // Tạo refresh token
+    $refreshToken = $this->createRefreshToken();
+
+    // Trả về token
+    return $this->respondWithToken($token, $refreshToken);
+}
 
     public function login()
     {
@@ -45,30 +79,7 @@ class AuthController extends Controller
         $refreshToken = $this->createRefreshToken();
         return $this->respondWithToken($token, $refreshToken);
     }
-    public function adminLogin(Request $request)
-    {
-        // Gọi hàm login cũ để xử lý đăng nhập
-        $response = $this->login($request);
-    
-        // Kiểm tra nếu đăng nhập thành công
-        if ($response instanceof JsonResponse && $response->status() === 200) {
-            $user = auth()->user();
-    
-            // Kiểm tra role của user
-            if ($user->role->name !== 'admin') {
-                auth()->logout(); // Đăng xuất nếu không phải admin
-                return response()->json([
-                    'message' => 'Chỉ admin mới được phép truy cập.'
-                ], 403);
-            }
-    
-            // Nếu là admin, trả về phản hồi thành công
-            return $response;
-        }
-    
-        // Nếu đăng nhập thất bại, trả về lỗi gốc
-        return $response;
-    }
+   
     
     public function logout()
     {
