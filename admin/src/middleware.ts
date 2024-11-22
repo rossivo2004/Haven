@@ -26,13 +26,13 @@ export async function middleware(req: NextRequest) {
     return redirectToAdmin(req.url);
   }
 
-  // if (url.pathname.startsWith('/admin')) {
-  //   if (!userData) {
-  //     // Nếu không có userData, chuyển hướng tới "/signin"
-  //     return redirectToSignin(req.url);
-  //   }
-  //   return NextResponse.next();
-  // }
+  if (url.pathname.startsWith('/admin')) {
+    if (!userData) {
+      // Nếu không có userData, chuyển hướng tới "/signin"
+      return redirectToSignin(req.url);
+    }
+    return NextResponse.next();
+  }
 
   if (url.pathname === '/signin') {
     if (token) {
