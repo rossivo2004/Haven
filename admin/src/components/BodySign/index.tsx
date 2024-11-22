@@ -36,6 +36,7 @@ function BodySign() {
             if (userProfile.role_id === 2) { // Check if role is 2
                 Cookies.set('access_token_admin', token, { expires: 1 }); // Set access_token in cookie for 7 days
                 Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
+                Cookies.set('user_data_admin', JSON.stringify(userProfile), { expires: 1 }); // Save user profile data in cookie
                 toast.success('Đăng nhập thành công!'); // Show success message
                 window.location.href = '/admin';
                 console.log(response.data);

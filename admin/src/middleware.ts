@@ -24,36 +24,16 @@ export async function middleware(req: NextRequest) {
   }
 
   // Kiểm tra userData từ token
-  const userData = await isA(req);
+  // const userData = await isA(req);
+  const userDataFromCookie = req.cookies.get('user_data_admin')?.value ? JSON.parse(req.cookies.get('user_data_admin')!.value) : null; // Get user data from cookie
 
-
-
-  // if (url.pathname.startsWith('/admin')) {
-
-  //   try {
-  //     const response = await axios.get(apiConfig.users.getUserFromToken, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  
-  //     // Check if role_id is 2 and return true
-  //     if (response.data.role_id === 2) {
-  //       return true; // Return true if role_id is 2
-  //     }
-  
-  //     return null; // Role không hợp lệ
-  //   } catch (error) {
-  //     console.error('Error validating token:', (error as Error).message);
-  //     return redirectToSignin(req.url);
-  //   }
-
-  //   // if (!userData) {
-  //   //   // Nếu không có userData, chuyển hướng tới "/signin"
-  //   //   return redirectToSignin(req.url);
-  //   // }
-  //   return NextResponse.next();
-  // }
+  if (url.pathname.startsWith('/admin')) {
+    if (userDataFromCookie && userDataFromCookie.role_id === 2) { // Check if role_id is 2
+      return NextResponse.next(); // Allow access to /admin
+    } else {
+      return redirectToSignin(req.url); // Redirect to /signin if role_id is not 2
+    }
+  }
 
   if (url.pathname === '/signin') {
     if (token) {
