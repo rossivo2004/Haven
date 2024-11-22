@@ -45,7 +45,31 @@ class AuthController extends Controller
         $refreshToken = $this->createRefreshToken();
         return $this->respondWithToken($token, $refreshToken);
     }
-
+    public function adminLogin(Request $request)
+    {
+        // Gọi hàm login cũ để xử lý đăng nhập
+        $response = $this->login($request);
+    
+        // Kiểm tra nếu đăng nhập thành công
+        if ($response instanceof JsonResponse && $response->status() === 200) {
+            $user = auth()->user();
+    
+            // Kiểm tra role của user
+            if ($user->role->name !== 'admin') {
+                auth()->logout(); // Đăng xuất nếu không phải admin
+                return response()->json([
+                    'message' => 'Chỉ admin mới được phép truy cập.'
+                ], 403);
+            }
+    
+            // Nếu là admin, trả về phản hồi thành công
+            return $response;
+        }
+    
+        // Nếu đăng nhập thất bại, trả về lỗi gốc
+        return $response;
+    }
+    
     public function logout()
     {
         auth('api')->logout();

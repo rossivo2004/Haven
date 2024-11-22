@@ -67,5 +67,7 @@ class Kernel extends HttpKernel
         // Các middleware khác
         'checkRole' => \App\Http\Middleware\CheckRole::class,
         'check.status' => \App\Http\Middleware\CheckUserStatus::class,
+        'check.admin' => \App\Http\Middleware\CheckAdmin::class,
+
     ];
 }
