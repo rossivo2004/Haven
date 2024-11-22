@@ -556,7 +556,7 @@ function BodyCheckout() {
                                             </>
                                         ) : (
                                             <div>
-                                                Vui lòng <Link href={'#'} className='underline'>Đăng nhập</Link> để sử dụng điểm.
+                                                Vui lòng <Link href='/signin' className='underline'>Đăng nhập</Link> để sử dụng điểm.
                                             </div>
                                         )}
 
