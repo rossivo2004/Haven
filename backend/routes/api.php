@@ -34,6 +34,6 @@ Route::group([
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::get('profile', [AuthController::class, 'profile']);
-    Route::post('admin-login', [AuthController::class, 'loginForAdminOnly']);
+    // Route::post('admin-login', [AuthController::class, 'loginForAdminOnly']);
 
 }); 

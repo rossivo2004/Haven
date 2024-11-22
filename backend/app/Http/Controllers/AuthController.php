@@ -59,7 +59,7 @@ class AuthController extends Controller
     return $this->respondWithToken($token, $refreshToken);
 }
 
-public function login()
+public function login(Request $req)
 {
     $credentials = request(['email', 'password']);
 
@@ -81,6 +81,14 @@ public function login()
 
     // Tạo refresh token
     $refreshToken = $this->createRefreshToken();
+
+    if($req->type && $req->type=='admin'){
+        if($user->role->name != 'admin'){
+            return response()->json([
+                'error' => 'Bạn không phải là Quản trị viên.'
+            ], 403);
+        }
+    }
 
     // Trả về token, refresh token và thông tin user
     return response()->json([
