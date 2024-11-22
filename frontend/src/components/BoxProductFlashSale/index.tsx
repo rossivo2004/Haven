@@ -27,7 +27,7 @@ function BoxProductFlashSale({ product }: { product: Variant }) {
         <Link href={`/product/${product.id}`} >
             <div className="w-full h-auto lg:h-[450px] flex flex-col group mb-2 pt-2 pb-3 rounded-lg relative px-2">
                 {product.flash_sales[0].pivot.stock <= 0 && (
-                    <div className="absolute inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center text-white text-lg z-20 rounded-lg">
+                    <div className="absolute inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center text-white text-lg z-10 rounded-lg">
                         <Image src={'/images/sold_out.png'} width={100} height={100} alt="Soldout"/>
                     </div>
                 )}

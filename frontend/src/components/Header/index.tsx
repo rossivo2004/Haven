@@ -45,11 +45,12 @@ import Image from 'next/image';
 import { fetchUserProfile } from '@/src/config/token';
 
 const menuItems = [
-    { href: '/store', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hệ thống cửa hàng' },
-    { href: '/', icon: <SellOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Đăng kí bán hàng' },
-    { href: '/', icon: <AutorenewOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Chính sách đổi trả' },
-    { href: '/', icon: <HeadsetOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Trung tâm hỗ trợ' },
-    { href: '/', icon: <InfoOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Hướng dẫn' },
+    { href: '/', icon: <LocationOnOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Trang chủ' },
+    { href: '/shop', icon: <SellOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Sản phẩm' },
+    { href: '/contact', icon: <AutorenewOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Liên hệ' },
+    { href: '/tracking', icon: <HeadsetOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Tra cứu' },
+    { href: '/about', icon: <InfoOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Về chúng tôi' },
+    { href: '/blog', icon: <InfoOutlinedIcon className="lg:w-4 lg:h-4" />, text: 'Bài viết' },
 ];
 
 function Header({ params }: { params: { lang: string } }) {
@@ -89,7 +90,6 @@ function Header({ params }: { params: { lang: string } }) {
     const cartItems = useSelector((state: RootState) => state.cart.items);
     const CartCount = cartItems.length; // Get the count of items in the cart
 
-    console.log(cartItems);
 
     const [userProducts, setUserProducts] = useState<Variant[]>([]); // State to hold user-specific products
 
@@ -334,7 +334,6 @@ function Header({ params }: { params: { lang: string } }) {
     }, [userData,cartItems]); // Update dependency to userData
 
 
-    console.log(cart);
 
 
     return (

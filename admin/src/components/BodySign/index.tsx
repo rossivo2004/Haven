@@ -6,7 +6,6 @@ import apiConfig from '@/configs/api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie'; // Import js-cookie for cookie management
-import { fetchUserProfile } from '@/configs/token';
 import { Spinner } from '@nextui-org/react';
 
 function BodySign() {
@@ -14,26 +13,7 @@ function BodySign() {
     const [password, setPassword] = useState(''); // State for password
     const [loading, setLoading] = useState(false); // State for loading
 
-    const checkAdminAccess = async () => { // Function to check admin access
-        const token = Cookies.get('access_token_admin'); // Get access token from cookies
-        if (token) {
-            try {
-                const userProfile = await fetchUserProfile(); // Fetch user profile
-                if (userProfile.role_id === 2) { // Check if role is admin
-                    window.location.href = '/admin';
-                } else {
-                    throw new Error('Bạn không có quyền truy cập!'); // Throw error if not admin
-                }
-            } catch (error) {
-                console.error(error); // Log error
-            }
-        }
-    };
 
-    // Call checkAdminAccess on component mount
-    useEffect(() => {
-        checkAdminAccess(); // Check admin access when component mounts
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => { // Handle form submission
         e.preventDefault();
@@ -44,20 +24,22 @@ function BodySign() {
                 password,
             });
 
+            const token = response.data.access_token; // Get the access token from the response
+            const userProfileResponse = await axios.get(apiConfig.users.getUserFromToken, { // Fetch user profile
+                headers: {
+                    Authorization: `Bearer ${token}`, // Set the Authorization header
+                },
+            });
 
-            Cookies.set('access_token_admin', response.data.access_token, { expires: 1 }); // Set access_token in cookie for 7 days
-            Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
-
-            const userProfile = await fetchUserProfile();
-
+            const userProfile = userProfileResponse.data; // Get user profile data
 
             if (userProfile.role_id === 2) { // Check if role is 2
+                Cookies.set('access_token_admin', token, { expires: 1 }); // Set access_token in cookie for 7 days
+                Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
                 toast.success('Đăng nhập thành công!'); // Show success message
-                // window.location.href = '/admin';
+                window.location.href = '/admin';
                 console.log(response.data);
             } else {
-                Cookies.remove('access_token_admin'); // Remove access_token from cookie if role is not 2
-                Cookies.remove('refresh_token_admin'); // Remove refresh_token from cookie if role is not 2
                 throw new Error('Bạn không có quyền truy cập!'); // Throw error if role is not 2
             }
 

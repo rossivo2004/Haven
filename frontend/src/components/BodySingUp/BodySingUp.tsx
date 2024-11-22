@@ -12,6 +12,8 @@ import { setUser } from '@/src/store/userSlice';
 import { useState } from "react";
 import { Spinner } from "@nextui-org/spinner";
 import Dashboard from "../Dashboard/Dashboard";
+import { EyeFilledIcon } from "@/src/assets/icon/EyeFilledIcon/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "@/src/assets/icon/EyeSlashFilledIcon/EyeSlashFilledIcon";
 
 interface SignUpValues {
     name: string;
@@ -23,6 +25,7 @@ function BodySingUp() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const dispatch = useDispatch();
+    const [showPassword, setShowPassword] = useState(false);
     const validationSchema = Yup.object({
         name: Yup.string()
             .required("Vui lòng nhập tên")
@@ -114,26 +117,32 @@ function BodySingUp() {
                                             className="text-red-500 text-sm mt-1"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="relative">
                                         <Field
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
                                             placeholder="Mật khẩu"
                                             className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
                                         />
+                                        <div className="absolute right-0 top-0 mt-4 mr-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                            {showPassword ? <EyeFilledIcon /> : <EyeSlashFilledIcon />}
+                                        </div>
                                         <ErrorMessage
                                             name="password"
                                             component="div"
                                             className="text-red-500 text-sm mt-1"
                                         />
                                     </div>
-                                    <div>
+                                    <div className="relative">
                                         <Field
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="repassword"
                                             placeholder="Xác nhận lại mật khẩu"
                                             className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full"
                                         />
+                                        <div className="absolute right-0 top-0 mt-4 mr-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                            {showPassword ? <EyeFilledIcon /> : <EyeSlashFilledIcon />}
+                                        </div>
                                         <ErrorMessage
                                             name="repassword"
                                             component="div"

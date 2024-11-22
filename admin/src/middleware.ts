@@ -1,39 +1,47 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { validateToken } from './middlewares/helpers/auth';
 import { redirectToSignin, redirectToAdmin } from './middlewares/helpers/redirects';
+import axios from 'axios';
+import apiConfig from './configs/api';
+import { isA } from './middlewares/helpers/auth';
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token_admin');
   const url = req.nextUrl.clone();
 
-  // Nếu user truy cập "/" => Điều hướng sang "/admin"
+  // Nếu không có token, đẩy user đến "/signin"
+  if (!token) {
+    if (url.pathname.startsWith('/admin')) {
+      return redirectToSignin(req.url);
+    }
+    return NextResponse.next();
+  }
+
+  // Kiểm tra userData từ token
+  const userData = await isA(req);
+
+  // Logic chuyển hướng
   if (url.pathname === '/') {
+    // Nếu truy cập "/", điều hướng tới "/admin"
     return redirectToAdmin(req.url);
   }
 
-  // Logic kiểm tra cho "/admin"
   if (url.pathname.startsWith('/admin')) {
-    if (!token) {
-      // Nếu không có token, điều hướng tới "/signin"
+    if (!userData) {
+      // Nếu không có userData, chuyển hướng tới "/signin"
       return redirectToSignin(req.url);
     }
-
-    const userData = await validateToken(token.value);
-    if (!userData || userData.role_id !== 2) {
-      // Nếu token không hợp lệ hoặc user không phải admin
-      return redirectToSignin(req.url);
-    }
+    return NextResponse.next();
   }
 
-  // Logic kiểm tra cho "/signin"
-  if (url.pathname === '/signin' && token) {
-    const userData = await validateToken(token.value);
+  if (url.pathname === '/signin') {
     if (userData) {
-      // Nếu token hợp lệ, điều hướng tới "/admin"
+      // Nếu user đã đăng nhập, chặn truy cập "/signin"
       return redirectToAdmin(req.url);
     }
+    return NextResponse.next();
   }
 
-  // Mặc định cho phép tiếp tục xử lý request
+  // Mặc định tiếp tục request
   return NextResponse.next();
 }

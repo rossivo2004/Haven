@@ -12,9 +12,9 @@ class CheckAdmin
     {
         // return 123;
         // Kiểm tra nếu người dùng chưa đăng nhập
-        if (!auth('api')->check()) {
-            return response()->json(['message' => 'Chưa đăng nhập'], 401);
-        }
+        // if (!auth('api')->check()) {
+        //     return response()->json(['message' => 'Chưa đăng nhập'], 401);
+        // }
 
         // Lấy user đã đăng nhập
         $user = auth('api')->user();

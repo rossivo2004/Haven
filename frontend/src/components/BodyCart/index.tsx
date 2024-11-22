@@ -78,7 +78,6 @@ const Body_Cart = () => {
             }
         }
     }, [userId]); // Depend on userId to fetch cart when it changes
-    console.log(cart);
 
     const handleCheckout = () => {
         const selectedItemsArray = Array.from(selectedItems);

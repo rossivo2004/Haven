@@ -14,6 +14,9 @@ import { Spinner } from "@nextui-org/react";
 import { useState } from "react";
 import Dashboard from "../Dashboard/Dashboard";
 
+import { EyeFilledIcon } from "@/src/assets/icon/EyeFilledIcon/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "@/src/assets/icon/EyeSlashFilledIcon/EyeSlashFilledIcon";
+
 interface SignInValues {
     email: string; // Change phone to email
 
@@ -23,6 +26,7 @@ interface SignInValues {
 function BodySignIn() {
     const dispatch = useDispatch(); // Initialize dispatch
 const [loading, setLoading] = useState(false);
+const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
     const validationSchema = Yup.object({
 
@@ -108,7 +112,7 @@ const [loading, setLoading] = useState(false);
                                             name="email" // Change name to email
                                             placeholder="Email" // Change placeholder to Email
 
-                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full px-2 rounded-lg"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full "
 
                                         />
 
@@ -122,18 +126,21 @@ const [loading, setLoading] = useState(false);
                                         />
 
                                     </div>
-                                    <div>
+                                    <div className="relative">
 
                                         <Field
                                         required
 
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
 
                                             name="password"
 
                                             placeholder="Mật khẩu"
-                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full px-2 rounded-lg"
+                                            className="border-b border-black dark:text-white py-2 text-base font-normal focus:outline-none w-full "
                                         />
+                                        <div className="absolute right-0 top-0 mt-4 mr-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                            {showPassword ? <EyeFilledIcon /> : <EyeSlashFilledIcon />} 
+                                        </div>
 
                                         <ErrorMessage
                                             name="password"

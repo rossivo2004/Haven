@@ -3,7 +3,7 @@ import { useState, useEffect, CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { Link } from "@nextui-org/link";
 import Image from "next/image";
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom'; 
 
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
@@ -101,7 +101,7 @@ function BodyHome() {
             try {
                 const response = await axios.get(`${apiConfig.flashsale.getAllFlashsale}`);
                 const flashSales = response.data.flashSales.data;
-
+                console.log(response.data.flashSales);
                 // Filter flash sales with status 1
                 const activeFlashSales = flashSales.filter((sale: any) => sale.status === 1);
 
@@ -109,6 +109,14 @@ function BodyHome() {
                 const productsPromises = activeFlashSales.map((sale: any) => fetchFlashSaleProducts(sale.id));
                 const products = await Promise.all(productsPromises);
                 setProductDataSale(products.flat() as Variant[]); // Flatten the array and cast to Variant[]
+
+                // Set countdown based on end_time of the first flash sale
+                if (activeFlashSales.length > 0) {
+                    const endTime = new Date(activeFlashSales[0].end_time).getTime();
+                    const now = Date.now();
+                    const timeLeft = Math.max(0, endTime - now);
+                    setCounter(Math.floor(timeLeft / 1000)); // Set counter in seconds
+                }
             } catch (error) {
                 console.error("Error fetching product data:", error);
             } finally {
@@ -122,7 +130,6 @@ function BodyHome() {
     useEffect(() => {
         const fetchProducts = async () => {
             const response = await axios.get(`${apiConfig.products.getAllProduct}`);
-            console.log(response.data);
             
             setProductDataHot(response.data.Featured);
             setProductDataNew(response.data.newProducts);
@@ -145,7 +152,6 @@ function BodyHome() {
         fetchProducts();
     }, [])
 
-    console.log(productData);
 
 
     useEffect(() => {
@@ -172,6 +178,7 @@ function BodyHome() {
     // }, []);
 
     //   console.log(productData);
+
 
 
     return (
@@ -271,7 +278,7 @@ function BodyHome() {
                         }}
                     >
                         <div className="max-w-screen-xl mx-auto  px-4 flex items-center justify-between mb-2 lg:mb-6 lg:mt-20 mt-10">
-                            <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
+                            <div className="text-black dark:text-white font-bold lg:block hidden lg:text-4xl text-2xl">Sản phẩm khuyến mãi</div>
                             {productDataSale.length > 0 && (
                                 <div className="flex items-center">
                                     <div className="font-semibold lg:text-lg text-xs mr-2 text-black dark:text-white">Kết thúc sau:</div>
@@ -279,35 +286,27 @@ function BodyHome() {
                                         <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                                 <span className="countdown font-mono text-sm">
-                                                    <span style={{ "--value": 15 } as CSSProperties}></span>
+                                                    <span style={{ "--value": Math.floor(counter / 86400) } as CSSProperties}></span> {/* Days */}
                                                 </span>
-                                                <div className="text-[10px]">
-                                                    Ngày
-                                                </div>
+                                                <div className="text-[10px]">Ngày</div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                                 <span className="countdown font-mono text-sm">
-                                                    <span style={{ "--value": 10 } as CSSProperties}></span>
+                                                    <span style={{ "--value": Math.floor((counter % 86400) / 3600) } as CSSProperties}></span> {/* Hours */}
                                                 </span>
-                                                <div className="text-[10px]">
-                                                    Giờ
-                                                </div>
+                                                <div className="text-[10px]">Giờ</div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                                 <span className="countdown font-mono text-sm">
-                                                    <span style={{ "--value": 24 } as CSSProperties}></span>
+                                                    <span style={{ "--value": Math.floor((counter % 3600) / 60) } as CSSProperties}></span> {/* Minutes */}
                                                 </span>
-                                                <div className="text-[10px]">
-                                                    Phút
-                                                </div>
+                                                <div className="text-[10px]">Phút</div>
                                             </div>
                                             <div className="flex flex-col p-2 items-center justify-center w-12 h-12 bg-main rounded-box text-white">
                                                 <span className="countdown font-mono text-sm">
-                                                    <span style={customStyle}></span>
+                                                    <span style={{ "--value": counter % 60 } as CSSProperties}></span> {/* Seconds */}
                                                 </span>
-                                                <div className="text-[10px]">
-                                                    Giây
-                                                </div>
+                                                <div className="text-[10px]">Giây</div>
                                             </div>
                                         </div>
                                     </div>
@@ -331,7 +330,7 @@ function BodyHome() {
 
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-20 ">
-                    <div className="text-black dark:text-white font-bold text-4xl mb-6">Phân loại sản phẩm</div>
+                    <div className="text-black dark:text-white font-bold lg:text-4xl text-2xl mb-6">Phân loại sản phẩm</div>
                     <div>
                         <Swiper
                             modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]}
