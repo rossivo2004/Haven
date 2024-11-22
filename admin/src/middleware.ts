@@ -28,32 +28,32 @@ export async function middleware(req: NextRequest) {
 
 
 
-  if (url.pathname.startsWith('/admin')) {
+  // if (url.pathname.startsWith('/admin')) {
 
-    try {
-      const response = await axios.get(apiConfig.users.getUserFromToken, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  //   try {
+  //     const response = await axios.get(apiConfig.users.getUserFromToken, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
   
-      // Check if role_id is 2 and return true
-      if (response.data.role_id === 2) {
-        return true; // Return true if role_id is 2
-      }
+  //     // Check if role_id is 2 and return true
+  //     if (response.data.role_id === 2) {
+  //       return true; // Return true if role_id is 2
+  //     }
   
-      return null; // Role không hợp lệ
-    } catch (error) {
-      console.error('Error validating token:', (error as Error).message);
-      return redirectToSignin(req.url);
-    }
+  //     return null; // Role không hợp lệ
+  //   } catch (error) {
+  //     console.error('Error validating token:', (error as Error).message);
+  //     return redirectToSignin(req.url);
+  //   }
 
-    // if (!userData) {
-    //   // Nếu không có userData, chuyển hướng tới "/signin"
-    //   return redirectToSignin(req.url);
-    // }
-    return NextResponse.next();
-  }
+  //   // if (!userData) {
+  //   //   // Nếu không có userData, chuyển hướng tới "/signin"
+  //   //   return redirectToSignin(req.url);
+  //   // }
+  //   return NextResponse.next();
+  // }
 
   if (url.pathname === '/signin') {
     if (token) {
