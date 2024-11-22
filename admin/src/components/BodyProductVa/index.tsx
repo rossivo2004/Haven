@@ -12,6 +12,7 @@ import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from 
 import Image from 'next/image';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import Cookies from 'js-cookie';
 
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
@@ -94,6 +95,24 @@ const BodyProductVa = () => {
     const [search, setSearch] = useState(""); // Thêm trạng thái tìm kiếm
     const [filteredProducts, setFilteredProducts] = useState<ProductVa[]>([]); // Trạng thái cho sản phẩm đã lọc
 
+    const resetNewVariant = () => {
+        setNewVariant({
+            name: '',
+            price: '',
+            stock: '',
+            variantValue: '',
+            discount: '',
+            image: [],
+            product_id: '',
+            id: ''
+        });
+    };
+
+    const handleOpenAddProductModal = () => {
+        resetNewVariant(); // Reset newVariant before opening the modal
+        onOpen(); // Open the modal
+    };
+
     const handleDelete = (Id: number) => {
         const productToDelete = products.find(product => product.id === Id);
 
@@ -110,12 +129,15 @@ const BodyProductVa = () => {
                     label: 'Yes',
                     onClick: async () => {
                         setLoading(true);
+                        const token = Cookies.get('access_token_admin'); // Get the token
                         try {
-                            await axios.delete(`${apiConfig.products.deletePr}${Id}`);
+                            await axios.delete(`${apiConfig.products.deletePr}${Id}`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`, // Add the Authorization header
+                                },
+                            });
                             fetchProducts(); // Refresh categories after deletion
                             toast.success('Xóa sản phẩm thành công');
-
-
                         } catch (error) {
                             console.error('Error deleting category:', error);
                             toast.error('Error deleting category');
@@ -167,7 +189,6 @@ const BodyProductVa = () => {
         return Object.keys(newErrors).length === 0; // Return true if no errors
     };
 
-    console.log(products);
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -176,16 +197,28 @@ const BodyProductVa = () => {
         // Validate the form
         if (!validateForm()) return; // Exit if validation fails
 
+        // Check for valid image file types
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/svg+xml'];
+        const mainImages = (e.currentTarget.querySelector('#image') as HTMLInputElement).files;
+
+        if (mainImages) {
+            for (let i = 0; i < mainImages.length; i++) {
+                if (!validImageTypes.includes(mainImages[i].type)) {
+                    toast.error('Hình ảnh phải có định dạng jpeg, png, jpg, hoặc svg.');
+                    return; // Exit if an invalid image type is found
+                }
+            }
+        }
 
         setLoading(true); // Start loading
         const formElement = e.currentTarget as HTMLFormElement;
         const formData = new FormData(formElement);
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         // Append main product fields
-        const mainImages = (formElement.querySelector('#image') as HTMLInputElement).files;
         if (mainImages) {
             Array.from(mainImages).forEach((image) => {
-                formData.append('image[]', image); // Append each image file
+                formData.append('image', image); // Append each image file
             });
         }
 
@@ -197,38 +230,12 @@ const BodyProductVa = () => {
             return;
         }
 
-        // Append variant fields
-        // variants.forEach((variant, index) => {
-        //     formData.append('product_id', selectedProductId); // Append product_id for each variant
-        //     formData.append(`variants[${index}][name]`, variant.name);
-        //     formData.append(`variants[${index}][price]`, variant.price);
-        //     formData.append(`variants[${index}][stock]`, variant.stock);
-        //     formData.append(`variants[${index}][variant_value]`, variant.variantValue);
-        //     formData.append(`variants[${index}][discount]`, variant.discount);
-
-        //     // Append variant images if they exist
-        //     if (variant.image.length > 0) {
-        //         variant.image.forEach((img) => {
-        //             formData.append(`variants[${index}][image][]`, img); // Append each variant image
-        //         });
-        //     }
-        // });
-
         try {
-            const formData = new FormData();
-            formData.append('product_id', newVariant.product_id.toString());
-            formData.append('name', newVariant.name);
-            formData.append('price', newVariant.price);
-            formData.append('stock', newVariant.stock);
-            formData.append('variant_value', newVariant.variantValue);
-            formData.append('discount', newVariant.discount);
-
-            if (newVariant.image.length > 0) {
-                formData.append('image', newVariant.image[0]);
-            }
-
             const response = await axios.post(`${apiConfig.productsva.createproductvariants}`, formData, {
-                headers: { accept: 'application/json' },
+                headers: {
+                    accept: 'application/json',
+                    Authorization: `Bearer ${token}`, // Add the Authorization header
+                },
             });
 
             setNewVariant({
@@ -241,6 +248,7 @@ const BodyProductVa = () => {
                 discount: '',
                 image: []
             });
+            fetchProductsVa();
             toast.success('Thêm sản phẩm thành công');
             setShowVariantForm(false);
             setVariants([]);
@@ -260,31 +268,26 @@ const BodyProductVa = () => {
         console.log("Product ID:", newVariant); // Kiểm tra ID sản phẩm
 
         setLoading(true);
-
         const formElement = e.currentTarget as HTMLFormElement;
         const formData = new FormData(formElement);
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         formData.append("_method", "PUT");
-
-        // Update the form data to include the new structure
         formData.append('product_id', newVariant.product_id.toString());
-        // formData.append('name', newVariant.name);
-        // formData.append('price', newVariant.price);
-        // formData.append('stock', newVariant.stock);
-        // formData.append('variant_value', newVariant.variantValue);
-        // formData.append('discount', newVariant.discount);
-        
+
         if (newVariant.image.length > 0) {
             formData.append('image', newVariant.image[0]); // Assuming you want to send only the first image
         }
-console.log(newVariant);
 
         try {
-          
             const response = await axios.post(`${apiConfig.productsva.updateproductvariants}${newVariant.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`, // Add the Authorization header
+                },
             });
             toast.success('Cập nhật sản phẩm thành công');
+            fetchProductsVa();
             onClose();
             clo();
         } catch (error) {
@@ -427,7 +430,7 @@ console.log(newVariant);
                 input.value = ''; // Clear the input value
             }
 
-            toast.success('Thêm ảnh thành công');
+            toast.success('Thm ảnh thành công');
         } catch (error) {
             console.error('Error adding product images:', error);
             toast.error('Thêm ảnh thất bại');
@@ -483,7 +486,6 @@ console.log(newVariant);
         });
     };
 
-    console.log(selectedImages);
 
     const handleDeleteProduct = async (productId: number) => {
         confirmAlert({
@@ -494,8 +496,13 @@ console.log(newVariant);
                     label: 'Có',
                     onClick: async () => {
                         setLoading(true);
+                        const token = Cookies.get('access_token_admin'); // Get the tokenFc
                         try {
-                            await axios.delete(`${apiConfig.productsva.deleteproductvariants}${productId}`);
+                            await axios.delete(`${apiConfig.productsva.deleteproductvariants}${productId}`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`, // Add the Authorization header
+                                },
+                            });
                             toast.success('Xóa sản phẩm thành công');
                             fetchProducts(); // Refresh the product list after deletion
                             fetchProductsVa();
@@ -572,7 +579,7 @@ console.log(newVariant);
                         value={search}
                         onChange={(e) => setSearch(e.target.value)} // Cập nhật giá trị tìm kiếm
                     />
-                    <Button className='bg-[#696CFF] text-white' onPress={onOpen}>
+                    <Button className='bg-[#696CFF] text-white !w-48' onPress={handleOpenAddProductModal}>
                         Thêm sản phẩm
                     </Button>
                 </div>
@@ -594,7 +601,7 @@ console.log(newVariant);
                                         id="name"
                                         name="name"
                                         required
-                                        placeholder='Tên sản phẩm'
+                                        placeholder='Tn sản phẩm'
                                         className={errors.name ? 'border-red-500' : ''}
                                         value={newVariant.name}
                                         onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
@@ -713,6 +720,7 @@ console.log(newVariant);
                                         id='image'
                                         className='mb-2'
                                         type="file"
+                                        accept="image/png, image/jpeg, image/jpg, image/svg+xml"
                                         onChange={(e) => {
                                             const files = e.target.files;
                                             if (files) {
@@ -1014,6 +1022,7 @@ console.log(newVariant);
                                                     id='image'
                                                     className='mb-2'
                                                     type="file"
+                                                    accept="image/png, image/jpeg, image/jpg, image/svg+xml"
                                                     onChange={(e) => {
                                                         const files = e.target.files;
                                                         if (files) {

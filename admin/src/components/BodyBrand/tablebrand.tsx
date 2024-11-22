@@ -23,6 +23,7 @@ import apiConfig from "@/configs/api";
 import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 interface BrandTableProps {
     brands: Brand[];
@@ -87,10 +88,13 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
         const formData = new FormData();
         formData.append("file", file);
 
+        const token = Cookies.get('access_token_admin'); // Retrieve the token
+
         try {
             const response = await axios.put(apiConfig.brands.updateBr, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`, // Add the Authorization header
                 },
             });
             return response.data.url; // Adjust based on your API response structure
@@ -117,9 +121,11 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
             formData.append("_method", "PUT");
 
             try {
+                const token = Cookies.get('access_token_admin'); // Retrieve the token
                 const response = await axios.post(`${apiConfig.brands.updateBr}${editingBrand.id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`, // Add the Authorization header
                     },
                 });
 

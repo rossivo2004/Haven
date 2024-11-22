@@ -46,6 +46,7 @@ function CreatePostForm() {
                 }
             });
             toast.success("Bài viết đã được lưu thành công!");
+            window.location.reload();
             console.log('Post saved:', response.data);
         } catch (error) {
             console.error('Error saving post:', error);

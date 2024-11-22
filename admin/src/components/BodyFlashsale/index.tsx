@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { Checkbox } from "@nextui-org/react";
 import Image from "next/image";
+import Cookies from 'js-cookie'; 
 
 interface Variant {
     name: string;
@@ -92,7 +93,8 @@ function BodyFlashsale() {
     const fetchProducts = async () => {
         try {
             const response = await axios.get(apiConfig.products.getallproductvariants, { withCredentials: true });
-            setProducts(response.data.productvariants.data);
+            setProducts(response.data.productvariants
+            );
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -129,49 +131,43 @@ function BodyFlashsale() {
     };
 
     const handleAddProductToFlashSale = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Ensure the default form submission is prevented
+        e.preventDefault();
         if (newProductId) {
             const product = products.find(p => p.id === newProductId);
             if (product) {
-                const flash_sale_id = editingFlashsale?.id; // Ensure this is set correctly
-                const product_variant_ids = [product.id]; // Array of product variant IDs
-                const stocks = [selectedProducts[product.id]?.stock || 0]; // Array of stocks
-                const discount_percents = [selectedProducts[product.id]?.discount || 0]; // Array of discount percents
-
-                // Prepare the data to send
+                const flash_sale_id = editingFlashsale?.id;
+                const product_variant_ids = [product.id];
+                const stocks = [selectedProducts[product.id]?.stock || 0];
+                const discount_percents = [selectedProducts[product.id]?.discount || 0];
+    
                 const data = {
                     flash_sale_id,
                     product_variant_ids,
                     stocks,
                     discount_percents
                 };
-
-                console.log('Data to send:', data); // Log the data being sent
-
+    
                 try {
                     setLoading(true);
                     const response = await axios.post(apiConfig.flashsale.addProductToFlashSale, data, {
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
                         }
                     });
                     toast.success('Thêm sản phẩm thành công');
-                    if (flash_sale_id !== undefined) { // Check if flash_sale_id is defined
+                    if (flash_sale_id !== undefined) {
                         fetchProductsNotInFlashsale(flash_sale_id);
-                    } else {
-                        console.error('flash_sale_id is undefined'); // Handle the case where it is undefined
-                    }
-                    if (flash_sale_id !== undefined) { // Ensure flash_sale_id is defined
-                        fetchFlashsaleProducts(flash_sale_id); // Call only if defined
+                        fetchFlashsaleProducts(flash_sale_id);
                     }
                 } catch (error) {
                     console.error('Error adding product to flash sale:', error);
                 } finally {
-                    setLoading(false)
+                    setLoading(false);
                 }
             }
         } else {
-            console.error('No product ID selected.'); // Log if no product ID is set
+            console.error('No product ID selected.');
         }
     };
 
@@ -180,7 +176,6 @@ function BodyFlashsale() {
         fetchFlashsale();
     }, []);
 
-    console.log(flashsaleProducts);
 
     const handleProductChange = (productId: string | number) => {
         setSelectedProducts(prev => {
@@ -205,12 +200,11 @@ function BodyFlashsale() {
 
     const handleDelete = async (flashsaleId: number) => {
         const flashsaleToDelete = flashsale.find(flashsale => flashsale.id === flashsaleId);
-
         if (!flashsaleToDelete) {
             setErrorMessage("Category not found.");
             return;
         }
-
+    
         confirmAlert({
             title: 'Xóa phân loại',
             message: `Bạn có muốn xóa phân loại ${flashsaleToDelete.id}?`,
@@ -220,8 +214,12 @@ function BodyFlashsale() {
                     onClick: async () => {
                         setLoading(true);
                         try {
-                            await axios.delete(`${apiConfig.flashsale.deleteflashsale}${flashsaleId}`);
-                            fetchFlashsale(); // Refresh categories after deletion
+                            await axios.delete(`${apiConfig.flashsale.deleteflashsale}${flashsaleId}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
+                                }
+                            });
+                            fetchFlashsale();
                             toast.success('Xóa khuyến mãi thành công');
                         } catch (error) {
                             console.error('Error deleting category:', error);
@@ -233,9 +231,6 @@ function BodyFlashsale() {
                 },
                 {
                     label: 'No',
-                    onClick: () => {
-                        // Do nothing to keep the modal open
-                    }
                 }
             ]
         });
@@ -258,7 +253,11 @@ function BodyFlashsale() {
                     onClick: async () => {
                         setLoading(true);
                         try {
-                            await axios.delete(`${apiConfig.flashsale.deleteProductFlashSale}${prId}`);
+                            await axios.delete(`${apiConfig.flashsale.deleteProductFlashSale}${prId}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
+                                }
+                            });
                             fetchFlashsale(); // Refresh categories after deletion
                             toast.success('Xóa sản phẩm thành công');
                         } catch (error) {
@@ -301,14 +300,17 @@ function BodyFlashsale() {
                 discount_percents
             }, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
                 }
             });
-            console.log('Flash sale added:', response.data);
+            
+            toast.success('Thêm khuyến mãi thành công');
+            fetchFlashsale();
         } catch (error) {
-            console.error('Error adding flash sale:', error);
+            toast.error('Thêm khuyến mãi thất bại');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
     const openEditModal = (flashsale: FlashSale) => {
@@ -328,28 +330,27 @@ function BodyFlashsale() {
     };
 
     const handleSubmitEditTime = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevent default form submission
-
-        // Validate start_time and end_time
+        e.preventDefault();
         if (!startTime || !endTime) {
-            toast.error('Thời gian bắt đầu và kết thúc là bắt buộc.'); // Show error message
+            toast.error('Thời gian bắt đầu và kết thúc là bắt buộc.');
             return;
         }
-
+    
         const updatedFlashSale = {
             start_time: startTime,
             end_time: endTime,
         };
-
+    
         try {
             await axios.put(`${apiConfig.flashsale.editTimeFlashSale}${editingFlashsale?.id}`, updatedFlashSale, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
                 }
             });
             toast.success('Cập thời gian nhật khuyến mãi thành công');
-            fetchFlashsale(); // Refresh the flash sale list
-            closeEditModal(); // Close the modal after saving
+            fetchFlashsale();
+            closeEditModal();
         } catch (error) {
             console.error('Error updating flash sale:', error);
             toast.error('Cập nhật khuyến mãi thất bại');
@@ -687,9 +688,11 @@ function BodyFlashsale() {
                                                                         const flashSalePivot = Array.isArray(product.flash_sales) && product.flash_sales.length > 0 ? product.flash_sales[0].pivot.id : null;
                                                                         await axios.put(`${apiConfig.flashsale.editProductFlashSale}${flashSalePivot}`, updatedData, {
                                                                             headers: {
-                                                                                'Content-Type': 'application/json'
+                                                                                'Content-Type': 'application/json',
+                                                                                'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add token here
                                                                             }
                                                                         });
+                                                                        fetchFlashsale();
                                                                         toast.success('Cập nhật sản phẩm thành công');
                                                                         setEditingProductId(null); // Reset editing state
                                                                     } catch (error) {

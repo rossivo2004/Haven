@@ -17,6 +17,7 @@ import CategoryTable from "./CategoryTable";
 import SearchIcon from '@mui/icons-material/Search';
 import useDebounce from "@/un/useDebounce";
 import CloseIcon from '@mui/icons-material/Close';
+import Cookies from 'js-cookie';
 
 function BodyCategories() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -43,6 +44,9 @@ function BodyCategories() {
         try {
             const response = await axios.get(apiConfig.categories.getAll, {
                 params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`,
+                },
                 withCredentials: true,
             });
             console.log("API Response:", response.data.categories.data); // Kiểm tra phản hồi từ API
@@ -95,6 +99,7 @@ function BodyCategories() {
             const response = await axios.post(apiConfig.categories.createCt, formData, {
                 headers: {
                     accept: 'application/json',
+                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`,
                 },
             });
             setCategoryName('');
@@ -149,7 +154,11 @@ const handleDelete = async (categoryId: string) => {
                 onClick: async () => {
                     setLoading(true);
                     try {
-                        await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`);
+                        await axios.delete(`${apiConfig.categories.deleteCt}${categoryId}`, {
+                            headers: {
+                                Authorization: `Bearer ${Cookies.get('access_token_admin')}`,
+                            },
+                        });
                         fetchCategories(); // Refresh categories after deletion
                         toast.success('Xóa phân loại thành công');
                     } catch (error) {

@@ -36,35 +36,30 @@ class UserController extends Controller
         return response()->json($user, 200);
     }
 
-    public function store(Request $request)
+    public function updateAdmin(Request $request, $id)
     {
+        // Find the user by ID
+        $user = User::findOrFail($id);
+
+        // Validate the input, making both fields optional
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role_id' => 'required|integer',
-            'phone' => 'nullable|string',
-            'address' => 'nullable|string',
-            'status' => 'nullable',
-            'image' => 'nullable',
-            'province' => 'nullable|string|max:255',
-            'district' => 'nullable|string|max:255',
-            'ward' => 'nullable|string|max:255',
+            'status' => 'nullable|in:active,banned', // `status` is optional
+            'point' => 'nullable|integer|min:0',    // `point` is optional
         ]);
 
-        if ($request->hasFile('image')) {
-            try {
-                $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-                $data['image'] = $uploadedFileUrl;
-            } catch (Exception $e) {
-                return response()->json(['error' => 'Failed to upload image to Cloudinary'], 500);
-            }
+        // Update the fields if they are present in the request
+        if (isset($data['status'])) {
+            $user->status = $data['status'];
         }
 
-        $data['password'] = Hash::make($data['password']);
-        $user = User::create($data);
+        if (isset($data['point'])) {
+            $user->point = $data['point'];
+        }
 
-        return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
+        // Save the updated user
+        $user->save();
+
+        return response()->json(['message' => 'User updated successfully', 'user' => $user], 200);
     }
 
     public function update(Request $request, $id)
@@ -222,7 +217,7 @@ class UserController extends Controller
     }
 
 
-    
+
     // Hiển thị form đăng ký
     public function showRegisterForm()
     {

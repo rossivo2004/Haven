@@ -17,6 +17,7 @@ import BrandTable from "./tablebrand";
 import SearchIcon from '@mui/icons-material/Search';
 import useDebounce from "@/un/useDebounce";
 import CloseIcon from '@mui/icons-material/Close';
+import Cookies from 'js-cookie';
 
 function BodyBrand() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -89,12 +90,15 @@ function BodyBrand() {
             formData.append('image', image);
         }
 
+        const token = Cookies.get('access_token_admin'); // Retrieve the token
+
         try {
             onClose();
 
             const response = await axios.post(apiConfig.brands.createBr, formData, {
                 headers: {
                     accept: 'application/json',
+                    Authorization: `Bearer ${token}`, // Add the Authorization header
                 },
             });
             setBrandName('');
@@ -146,12 +150,15 @@ function BodyBrand() {
                     label: 'Yes',
                     onClick: async () => {
                         setLoading(true);
+                        const token = Cookies.get('access_token_admin'); // Retrieve the token
                         try {
-                            await axios.delete(`${apiConfig.brands.deleteBr}${brandId}`);
+                            await axios.delete(`${apiConfig.brands.deleteBr}${brandId}`, {
+                                headers: {
+                                    Authorization: `Bearer ${token}`, // Add the Authorization header
+                                },
+                            });
                             fetchBrands(); // Refresh categories after deletion
                             toast.success('Xóa thương hiệu thành công');
-
-
                         } catch (error) {
                             console.error('Error deleting brands:', error);
                             setErrorMessage('Failed to delete brands. Please try again.');

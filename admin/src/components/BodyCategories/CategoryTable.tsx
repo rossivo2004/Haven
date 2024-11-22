@@ -23,6 +23,7 @@ import apiConfig from "@/configs/api";
 import axios from "axios";
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 interface CategoryTableProps {
     categories: Category[];
@@ -94,6 +95,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
             const response = await axios.put(apiConfig.categories.updateCt, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`,
                 },
             });
             return response.data.url; // Adjust based on your API response structure
@@ -123,6 +125,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }: CategoryTableProps) => 
                 const response = await axios.post(`${apiConfig.categories.updateCt}${editingCategory.id}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${Cookies.get('access_token_admin')}`,
                     },
                 });
 

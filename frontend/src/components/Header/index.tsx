@@ -759,7 +759,7 @@ function Header({ params }: { params: { lang: string } }) {
                                         color={
                                             index === 2 ? "warning" : index === menuItems.length - 1 ? "danger" : "foreground"
                                         }
-                                        href="#"
+                                        href={item.href}
                                     >
                                         {item.text}
                                     </Link>

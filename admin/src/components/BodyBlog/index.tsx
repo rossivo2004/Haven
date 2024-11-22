@@ -184,7 +184,7 @@ function BodyBlog() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Button color="primary" onClick={handleOpenAddPostModal}>
+                <Button className="bg-[#696bff] text-white font-medium !w-48" onClick={handleOpenAddPostModal}>
                         Viết bài mới
                     </Button>
 </div>

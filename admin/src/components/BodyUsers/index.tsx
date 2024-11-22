@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from "react-confirm-alert";
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import Cookies from 'js-cookie'; // Added import for Cookies
 
 function BodyUsers() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -39,6 +40,7 @@ function BodyUsers() {
     };
 
     const handleAddUser = () => {
+        console.log("Add User button clicked"); // Debugging line
         setSelectedUser(null); // Clear selected user for adding a new user
         setIsAddModalOpen(true); // Open the add modal
         setIsEditModalOpen(false); // Ensure edit modal is closed
@@ -90,7 +92,8 @@ function BodyUsers() {
             const response = await axios.put(`${apiConfig.users.updateUserAdmin}${id}`, payload, {
                 headers: {
                     'Content-Type': 'application/json', // Set content type to JSON
-                    accept: 'application/json'
+                    accept: 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add access token
                 },
             });
             toast.success('Cập nhật user thành công');
@@ -136,7 +139,11 @@ function BodyUsers() {
                     onClick: async () => {
                         try {
                             setIsLoading(true);
-                            const response = await axios.delete(`${apiConfig.users.deleteUser}${id}`);
+                            const response = await axios.delete(`${apiConfig.users.deleteUser}${id}`, {
+                                headers: {
+                                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add access token
+                                },
+                            });
                             toast.success('Xóa user thành công');
                             fetchUser();
                             setIsLoading(false);
@@ -156,7 +163,11 @@ function BodyUsers() {
 
 
     const fetchUser = async () => {
-        const response = await axios.get(apiConfig.users.getAll); // Use Axios to make the GET request
+        const response = await axios.get(apiConfig.users.getAll, {
+            headers: {
+                'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add access token
+            }
+        }); // Use Axios to make the GET request
         setUser(response.data);
     };
     useEffect(() => {
@@ -165,7 +176,11 @@ function BodyUsers() {
 
     useEffect(() => {
         const fetchRole = async () => {
-            const response = await axios.get(apiConfig.roles.getAll);
+            const response = await axios.get(apiConfig.roles.getAll, {
+                headers: {
+                    'Authorization': `Bearer ${Cookies.get('access_token_admin')}` // Add access token
+                }
+            });
             setRole(response.data);
         };
         fetchRole();
@@ -202,19 +217,20 @@ function BodyUsers() {
                         <div className='font-semibold text-xl'>
                             Quản lý người dùng
                         </div>
-                        <Button onPress={handleAddUser} className="bg-[#696bff] text-white font-medium">Thêm user</Button>
+                        {/* <Button onPress={handleAddUser} className="bg-[#696bff] text-white font-medium">Thêm user</Button> */}
                     </div>
                     <Modal size="5xl" scrollBehavior="inside" isOpen={isAddModalOpen} onOpenChange={() => setIsAddModalOpen(false)} isDismissable={false} isKeyboardDismissDisabled={true}>
                         <ModalContent>
                             <Formik
                                 initialValues={initialValues}
                                 validationSchema={validationSchema}
-                                onSubmit={async (values: typeof initialValues) => { // Specify the type of values
+                                onSubmit={async (values: typeof initialValues) => {
+                                    console.log("Form submitted with values:", values); // Check if this logs
                                     const formData = new FormData();
                                     Object.keys(values).forEach(key => {
                                         const value = values[key as keyof typeof initialValues];
-                                        if (value !== null) { // Check for null
-                                            formData.append(key, value); // Append only if not null
+                                        if (value !== null) {
+                                            formData.append(key, value);
                                         }
                                     });
 
@@ -222,17 +238,19 @@ function BodyUsers() {
                                         setIsLoading(true);
                                         const response = await axios.post(apiConfig.users.createUser, formData, {
                                             headers: {
-                                                'Content-Type': 'multipart/form-data', // Important for file uploads
-                                                accept: 'application/json'
+                                                'Content-Type': 'multipart/form-data',
+                                                accept: 'application/json',
+                                                'Authorization': `Bearer ${Cookies.get('access_token_admin')}`
                                             },
                                         });
+                                        console.log("Response from API:", response); // Log the response
                                         toast.success('Thêm user thành công');
                                         onOpenChange();
                                         setIsAddModalOpen(false);
-                                        setIsLoading(false);
                                     } catch (error) {
                                         console.error('Error submitting form:', error);
                                         toast.error('Thêm user thất bại');
+                                    } finally {
                                         setIsLoading(false);
                                     }
                                 }}
@@ -288,7 +306,7 @@ function BodyUsers() {
                                                 <Field name="address" as={Textarea} variant="bordered" placeholder="Enter your description" disableAnimation disableAutosize classNames={{ base: "w-full", input: "resize-y min-h-[40px]", }} aria-label="Địa chỉ" />
                                                 <ErrorMessage name="address" component="div" className="text-red-500" />
                                             </div>
-                                            <div>
+                                            {/* <div>
                                                 <label htmlFor="image" aria-label="Hình ảnh">Hình ảnh</label>
                                                 <Input
                                                     type="file"
@@ -299,7 +317,7 @@ function BodyUsers() {
                                                     aria-label="Hình ảnh"
                                                 />
                                                 <ErrorMessage name="image" component="div" className="text-red-500" />
-                                            </div>
+                                            </div> */}
                                             <div>
                                                 <label htmlFor="password" aria-label="Mật khẩu">Mật khẩu</label>
                                                 <Field name="password" as={Input} type="password" placeholder="Mật khẩu" aria-label="Mật khẩu" />

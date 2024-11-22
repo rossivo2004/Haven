@@ -16,6 +16,7 @@ import axios from 'axios';
 import apiConfig from '@/configs/api';
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -105,7 +106,11 @@ function BodyOrders() {
     const fecthOrder = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(apiConfig.order.getAll);
+            const response = await axios.get(apiConfig.order.getAll, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`
+                }
+            });
             const data = response.data;
             setOrder(data);
             setTotalPages(Math.ceil(data.length / productsPerPage));
@@ -143,23 +148,23 @@ function BodyOrders() {
     };
 
 
-    const handleDelete = (userId: number) => {
-        confirmAlert({
-            title: "Xóa sản phẩm",
-            message: "Bạn có chắc muốn xóa sản phẩm?",
-            buttons: [
-                {
-                    label: "Yes",
-                    onClick: () => {
-                        console.log("Deleted user with id:", userId);
-                    },
-                },
-                {
-                    label: "No",
-                },
-            ],
-        });
-    }
+    // const handleDelete = (userId: number) => {
+    //     confirmAlert({
+    //         title: "Xóa sản phẩm",
+    //         message: "Bạn có chắc muốn xóa sản phẩm?",
+    //         buttons: [
+    //             {
+    //                 label: "Yes",
+    //                 onClick: () => {
+    //                     console.log("Deleted user with id:", userId);
+    //                 },
+    //             },
+    //             {
+    //                 label: "No",
+    //             },
+    //         ],
+    //     });
+    // }
 
     const cancelOrder = (idOrrder: number) => {
         confirmAlert({
@@ -170,12 +175,17 @@ function BodyOrders() {
                     label: "Yes",
                     onClick: async () => {
                         try {
-                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`);
+                            const response = await axios.post(`${apiConfig.order.cancelOrder}${idOrrder}`, {}, {
+                                headers: {
+                                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`
+                                }
+                            });
                             if (response.status === 400) {
                                 toast.error("Lỗi: Không thể hủy đơn hàng");
                                 return;
                             }
                             toast.success("Hủy đơn thành công");
+                            fecthOrder();
                         } catch (error) {
                             toast.error("Lỗi khi hủy đơn hàng");
                         }
@@ -197,7 +207,11 @@ function BodyOrders() {
 
     const updateOrderStatus = async (idOrder: number, status: string) => {
         try {
-            await axios.put(`${apiConfig.order.updateOrderStatus}${idOrder}`, { status });
+            await axios.put(`${apiConfig.order.updateOrderStatus}${idOrder}`, { status }, {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get('access_token_admin')}`
+                }
+            });
             toast.success("Cập nhật trạng thái đơn hàng thành công");
             fecthOrder();
         } catch (error) {
@@ -260,14 +274,14 @@ function BodyOrders() {
                                                     <EditIcon />
                                                 </span>
                                             </Tooltip>
-                                            <Tooltip color="danger" content="Delete order">
+                                            {/* <Tooltip color="danger" content="Delete order">
                                                 <span
                                                     className="text-lg text-danger cursor-pointer active:opacity-50"
                                                     onClick={() => handleDelete(item.id)}
                                                 >
                                                     <DeleteIcon />
                                                 </span>
-                                            </Tooltip>
+                                            </Tooltip> */}
                                         </div>
                                     </TableCell>
                                 </TableRow>

@@ -70,7 +70,7 @@ function BodyBlog() {
 
 	if (!mounted) return null;
 	return (
-		<div className="container mx-auto my-8 px-4">
+		<div className="max-w-7xl mx-auto py-6 px-4">
 			{/* Tin mới nhất */}
 			<h2 className="text-3xl font-bold mb-6">TIN MỚI NHẤT</h2>
 

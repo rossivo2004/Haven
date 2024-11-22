@@ -19,6 +19,7 @@ import { DeleteIcon } from "./DeleteIcon";
 import { EyeIcon } from "./EyeIcon";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import BreadcrumbNav from '../Breadcrumb/Breadcrumb';
+import Cookies from 'js-cookie'; // Import js-cookie for cookie management
 
 interface Variant {
     name: string;
@@ -31,6 +32,7 @@ interface Variant {
 }
 
 const CreateProduct = () => {
+    const token = Cookies.get('access_token_admin');
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -109,6 +111,7 @@ const CreateProduct = () => {
 
     const handleDelete = (Id: number) => {
         const productToDelete = products.find(product => product.id === Id);
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         if (!productToDelete) {
             toast.error('Không tìm thấy sản phẩm để xóa');
@@ -116,22 +119,22 @@ const CreateProduct = () => {
         }
 
         confirmAlert({
-            title: 'Xóa phân loại',
-            message: `Bạn có muốn xóa phân loại ${productToDelete.name}?`,
+            title: 'Xóa sản phẩm',
+            message: `Bạn có muốn xóa sản phẩm ${productToDelete.name}?`,
             buttons: [
                 {
                     label: 'Yes',
                     onClick: async () => {
                         setLoading(true);
                         try {
-                            await axios.delete(`${apiConfig.products.deletePr}${Id}`);
+                            await axios.delete(`${apiConfig.products.deletePr}${Id}`, {
+                                headers: { Authorization: `Bearer ${token}` } // Add the Authorization header
+                            });
                             fetchProducts(); // Refresh categories after deletion
                             toast.success('Xóa sản phẩm thành công');
-
-
                         } catch (error) {
-                            console.error('Error deleting category:', error);
-                            toast.error('Error deleting category');
+                            console.error('Lỗi xóa sản phẩm:', error);
+                            toast.error('Lỗi xóa sản phẩm');
                         } finally {
                             setLoading(false);
                         }
@@ -152,9 +155,9 @@ const CreateProduct = () => {
     const handleUpdateVariant = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Ngăn chặn hành vi mặc định của form
         if (!editingVariant || !selectedProduct) return; // Kiểm tra xem có biến thể đang chỉnh sửa và sản phẩm chính
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         setLoading(true);
-
         const formData = new FormData(e.currentTarget);
         formData.append("_method", "PUT");
         formData.append("product_id", selectedProduct.id.toString()); // Thêm product_id vào formData
@@ -168,10 +171,12 @@ const CreateProduct = () => {
 
         try {
             const response = await axios.post(`${apiConfig.products.updateproductvariants}${editingVariant.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}` // Add the Authorization header
+                },
             });
 
-            // console.log('Response:', response.data);
             toast.success('Cập nhật biến thể thành công');
             fetchProductsVa(selectedProduct.id); // Cập nhật danh sách biến thể
             setEditingVariant(null); // Đặt lại biến thể đang chỉnh sửa
@@ -200,8 +205,11 @@ const CreateProduct = () => {
                     label: 'Có',
                     onClick: async () => {
                         setLoading(true);
+                        const token = Cookies.get('access_token_admin'); // Get the token
                         try {
-                            await axios.delete(`${apiConfig.products.deleteproductvariants}${variantId}`);
+                            await axios.delete(`${apiConfig.products.deleteproductvariants}${variantId}`, {
+                                headers: { Authorization: `Bearer ${token}` } // Add the Authorization header
+                            });
                             if (selectedProduct) {
                                 fetchProductsVa(selectedProduct.id);
                             }
@@ -225,6 +233,7 @@ const CreateProduct = () => {
     const handleAddNewVariant = async (Id: number) => {
         if (!selectedProduct) return;
         setLoading(true); // Start loading
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         try {
             const formData = new FormData();
@@ -239,14 +248,13 @@ const CreateProduct = () => {
                 formData.append('image', newVariant.image[0]);
             }
 
-            const productToDelete = products.find(product => product.id === Id);
-
             await axios.post(`${apiConfig.products.createproductvariants}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}` // Add the Authorization header
+                },
             });
 
-            // Refresh the variants list
-            // fetchProductsVa(selectedProduct.id);
             setNewVariant({
                 ...newVariant,
                 product_id: Id,
@@ -297,7 +305,6 @@ const CreateProduct = () => {
         // Validate the form
         if (!validateForm()) return; // Exit if validation fails
 
-
         setLoading(true); // Start loading
 
         const formElement = e.currentTarget as HTMLFormElement;
@@ -323,10 +330,14 @@ const CreateProduct = () => {
             formData.append(`variants[${index}][discount]`, variant.discount);
         });
 
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/product/store', formData, {
-                headers: { accept: 'application/json' },
+                headers: { 
+                    accept: 'application/json',
+                    Authorization: `Bearer ${token}` // Add the Authorization header
+                },
             });
             // console.log('Response:', response.data);
             toast.success('Thêm sản phẩm thành công');
@@ -358,13 +369,17 @@ const CreateProduct = () => {
 
         formData.append("_method", "PUT");
 
+        const token = Cookies.get('access_token_admin'); // Get the token
 
         try {
             if (!selectedProduct) {
                 throw new Error('No product selected');
             }
             const response = await axios.post(`http://127.0.0.1:8000/api/product/update/${selectedProduct.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}` // Add the Authorization header
+                },
             });
             // console.log('Response:', response.data);
             toast.success('Cập nhật sản phẩm thành công');
@@ -486,9 +501,13 @@ const CreateProduct = () => {
             formData.append('product_images[]', image); // Thêm ảnh mới vào formData
         });
         setLoading(true);
+        const token = Cookies.get('access_token_admin'); // Get the token
         try {
             await axios.post(`${apiConfig.products.addproductimage}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}` // Add the Authorization header
+                },
             });
             if (selectedProduct) {
                 // Fetch updated product variants to refresh images
@@ -534,8 +553,11 @@ const CreateProduct = () => {
                     label: 'Có',
                     onClick: async () => {
                         setLoading(true);
+                        const token = Cookies.get('access_token_admin'); // Get the token
                         try {
-                            await axios.delete(`${apiConfig.products.deleteproductimage}${imageId}`);
+                            await axios.delete(`${apiConfig.products.deleteproductimage}${imageId}`, {
+                                headers: { Authorization: `Bearer ${token}` } // Add the Authorization header
+                            });
                             if (selectedProduct) {
                                 // Fetch updated product variants to refresh images
                                 await fetchProductsVa(selectedProduct.id); // Refresh product variants
@@ -597,7 +619,7 @@ const CreateProduct = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)} // Cập nhật giá trị tìm kiếm
                     />
-                    <Button className='bg-[#696CFF] text-white px-4 w-32' onPress={onOpen}>
+                    <Button className='bg-[#696CFF] text-white !w-48' onPress={onOpen}>
                         Thêm sản phẩm
                     </Button>
                     {/* <div>
@@ -681,7 +703,7 @@ const CreateProduct = () => {
                                         Mô tả sản phẩm
                                     </label>
                                     <Textarea
-                                        placeholder='Mô tả sản phẩm'
+                                        placeholder='Mô tả sản phm'
                                         id="description"
                                         name="description"
                                         rows={3}
