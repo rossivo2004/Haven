@@ -9,7 +9,6 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token_admin');
   const url = req.nextUrl.clone();
 
-  const userData = await isA(req);
   // Nếu không có token, đẩy user đến "/signin"
   if (!token) {
     if (url.pathname.startsWith('/admin')) {
@@ -19,6 +18,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Kiểm tra userData từ token
+  const userData = await isA(req);
 
   // Logic chuyển hướng
   if (url.pathname === '/') {
@@ -26,13 +26,13 @@ export async function middleware(req: NextRequest) {
     return redirectToAdmin(req.url);
   }
 
-  if (url.pathname.startsWith('/admin')) {
-    if (!userData) {
-      // Nếu không có userData, chuyển hướng tới "/signin"
-      return redirectToSignin(req.url);
-    }
-    return NextResponse.next();
-  }
+  // if (url.pathname.startsWith('/admin')) {
+  //   if (!userData) {
+  //     // Nếu không có userData, chuyển hướng tới "/signin"
+  //     return redirectToSignin(req.url);
+  //   }
+  //   return NextResponse.next();
+  // }
 
   if (url.pathname === '/signin') {
     if (token) {
