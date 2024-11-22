@@ -5,7 +5,7 @@ import apiConfig from './api';
 // ... existing imports ...
 
 const refreshToken = async () => {
-    const refreshToken = Cookies.get('refresh_token'); // Retrieve the refresh token from cookies
+    const refreshToken = Cookies.get('refresh_token_admin'); // Retrieve the refresh token from cookies
 
     if (!refreshToken) {
         throw new Error('No refresh token found');
@@ -14,7 +14,7 @@ const refreshToken = async () => {
     try {
         const response = await axios.post(apiConfig.users.refreshToken, { refresh_token: refreshToken });
         const { access_token } = response.data; // Assuming the new token is returned in this format
-        Cookies.set('access_token', access_token); // Update the access token in cookies
+        Cookies.set('access_token_admin', access_token); // Update the access token in cookies
     } catch (error: any) {
         console.error('Refresh token error:', error); // Log the error for debugging
         throw new Error('Error refreshing token: ' + error.message);
@@ -24,7 +24,7 @@ const refreshToken = async () => {
 // ... existing fetchUserProfile function ...
 
 export const fetchUserProfile = async (): Promise<any> => {
-    let token = Cookies.get('access_token'); // Retrieve the token from cookies
+    let token = Cookies.get('access_token_admin'); // Retrieve the token from cookies
 
     if (!token) {
         throw new Error('No token found');

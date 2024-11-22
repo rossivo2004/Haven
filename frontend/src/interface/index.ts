@@ -132,20 +132,22 @@ export interface IUser {
 }
 
 
+export interface Post {
 
-// export interface ItemCart {
-//   product: ProductProps,
-//   quantity: number,
-//   selected?: boolean,
-// }
+  content: string;
+  description: string;
+  created_at: string;
 
-// export interface IOrders {
-//   code?: string,
-//   products: ItemCart[],
-//   totalPayment: number,
-//   status: "Chưa xác nhận" | "Đã xác nhận",
-// }
+  id: number | string;
 
+  id_user: number | null;
+
+  image: string | null;
+
+  title: string;
+  updated_at: string;
+
+}
 export interface Params {
   id: string;
 }

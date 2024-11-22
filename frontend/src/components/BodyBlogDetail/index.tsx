@@ -11,24 +11,9 @@ import { useParams } from "next/navigation";
 import BreadcrumbNav from "../Breadcrum";
 import Loading from "../ui/Loading";
 
+import { Post } from "@/src/interface";
 
 
-interface Post {
-
-    content: string;
-
-    created_at: string;
-
-    id: number | string;
-
-    id_user: number | null;
-
-    image: string | null;
-
-    title: string;
-    updated_at: string;
-
-}
 
 
 function BodyBlogDetail() {

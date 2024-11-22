@@ -32,7 +32,6 @@ type DataItem = {
 
 const StackedLineChart: React.FC<{ dataO: DataItem[] }> = ({ dataO }) => {
 
-  console.log(dataO);
   const data = {
     labels: dataO.map((item: DataItem) => item.month),
     datasets: [

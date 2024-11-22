@@ -67,7 +67,6 @@ const BodyDashboard: React.FC = () => {
         setLoading(false)
     }, []);
 
-    console.log(productMLM);
 
 
     return (

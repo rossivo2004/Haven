@@ -26,8 +26,6 @@ const CreateHalfDoughnutChart: React.FC<HalfDoughnutChartProps> = ({
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-    console.log(percentage);
-
     useEffect(() => {
         if (!canvasRef.current) return;
 

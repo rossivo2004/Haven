@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { Button, Input } from "@nextui-org/react";
@@ -17,6 +17,12 @@ function CreatePostForm() {
     const [content, setContent] = useState("");
     // const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [description, setDescription] = useState("");
+    const [isClient, setIsClient] = useState(false);
+
+    // Set isClient to true when the component mounts
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,7 +79,9 @@ function CreatePostForm() {
 
             <div className="my-4">
                 <label>Nội dung:</label>
-                <ReactQuill value={content} onChange={setContent} modules={modules} placeholder="Nhập nội dung bài viết..." />
+                {isClient && (
+                    <ReactQuill value={content} onChange={setContent} modules={modules} placeholder="Nhập nội dung bài viết..." />
+                )}
             </div>
 
             {/* <div className="my-4">
