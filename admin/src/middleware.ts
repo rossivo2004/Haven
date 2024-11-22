@@ -9,6 +9,7 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get('access_token_admin');
   const url = req.nextUrl.clone();
 
+  const userData = await isA(req);
   // Nếu không có token, đẩy user đến "/signin"
   if (!token) {
     if (url.pathname.startsWith('/admin')) {
@@ -18,7 +19,6 @@ export async function middleware(req: NextRequest) {
   }
 
   // Kiểm tra userData từ token
-  const userData = await isA(req);
 
   // Logic chuyển hướng
   if (url.pathname === '/') {
