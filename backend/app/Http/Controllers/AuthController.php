@@ -59,26 +59,45 @@ class AuthController extends Controller
     return $this->respondWithToken($token, $refreshToken);
 }
 
-    public function login()
-    {
-        $credentials = request(['email', 'password']);
+public function login()
+{
+    $credentials = request(['email', 'password']);
 
-        if (! $token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Thông tin đăng nhập không chính xác.'], 401);
-        }
-
-        $user = auth('api')->user();
-
-        if ($user->status === 'banned') {
-            auth('api')->logout();
-            return response()->json([
-                'error' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
-            ], 403);
-        }
-
-        $refreshToken = $this->createRefreshToken();
-        return $this->respondWithToken($token, $refreshToken);
+    // Xác thực thông tin đăng nhập
+    if (! $token = auth('api')->attempt($credentials)) {
+        return response()->json(['error' => 'Thông tin đăng nhập không chính xác.'], 401);
     }
+
+    // Lấy thông tin người dùng
+    $user = auth('api')->user();
+
+    // Kiểm tra trạng thái tài khoản
+    if ($user->status === 'banned') {
+        auth('api')->logout();
+        return response()->json([
+            'error' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+        ], 403);
+    }
+
+    // Tạo refresh token
+    $refreshToken = $this->createRefreshToken();
+
+    // Trả về token, refresh token và thông tin user
+    return response()->json([
+        'access_token' => $token,
+        'refresh_token' => $refreshToken,
+        'token_type' => 'bearer',
+        'expires_in' => auth('api')->factory()->getTTL() * 60,
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role->name, // Đảm bảo bạn có quan hệ `role` trong model User
+            'status' => $user->status,
+        ]
+    ]);
+}
+
    
     
     public function logout()

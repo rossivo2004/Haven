@@ -46,7 +46,7 @@ Route::group(['prefix' => 'api/users', 'middleware' => ['auth', 'checkRole:admin
 
 });
 
-// Route::middleware(['check.status'])->group(function () {
+// Route::  (['check.status'])->group(function () {
 //     // Đăng nhập - đăng xuất
 //     Route::post('/api/login', [UserController::class, 'login'])->name('api.login');
 //     Route::post('/api/logout', [UserController::class, 'logout'])->name('api.logout');
