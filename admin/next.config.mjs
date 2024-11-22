@@ -9,7 +9,11 @@ const nextConfig = {
           fallback: [
             {
               source: '/signin',
-              destination: '/admin',
+              destination: 'https://foodhavenadmin.vercel.app/signin',
+            },
+            {
+              source: '/admin',
+              destination: 'https://foodhavenadmin.vercel.app/admin',
             },
           ],
         }
