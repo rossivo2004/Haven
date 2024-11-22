@@ -45,7 +45,7 @@ export async function middleware(req: NextRequest) {
       return null; // Role không hợp lệ
     } catch (error) {
       console.error('Error validating token:', (error as Error).message);
-      window.location.href = '/signin';
+      return redirectToSignin(req.url);
     }
 
     // if (!userData) {
