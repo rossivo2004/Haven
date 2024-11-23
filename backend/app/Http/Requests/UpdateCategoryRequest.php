@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
-
+use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
@@ -26,7 +26,7 @@ class UpdateCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'tag' => 'required|string|max:255|unique:categories,tag',
+            'tag' => 'required|string|max:255|',Rule::unique('categories', 'tag')->ignore($this->route('id')),
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ];
     }
