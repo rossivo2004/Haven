@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
+
 class UpdateBrandRequest extends FormRequest
 {
     /**
@@ -24,7 +26,7 @@ class UpdateBrandRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'tag' => 'required|string|max:255|unique:brands,tag',
+            'tag' => 'required|string|max:255|',Rule::unique('brands', 'tag')->ignore($this->route('id')),
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ];
     }
