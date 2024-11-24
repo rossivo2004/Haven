@@ -65,11 +65,11 @@ class ProductController extends Controller
         $productVariants = ProductVariant::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%');
         })->when($categoriesOption, function ($query, $categoriesOption) {
-            return  $query->whereHas('product', function ($q) use ($categoriesOption) {
+            return  $query->orWhereHas('product', function ($q) use ($categoriesOption) {
                 $q->whereIn('category_id', $categoriesOption);
             });
         })->when($brandsOption, function ($query, $brandsOption) {
-            return  $query->whereHas('product', function ($q) use ($brandsOption) {
+            return  $query->orWhereHas('product', function ($q) use ($brandsOption) {
                 $q->whereIn('brand_id', $brandsOption);
             });
         })->when($priceRangesOption, function ($query, $priceRangesOption) {
