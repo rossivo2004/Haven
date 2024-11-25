@@ -184,7 +184,7 @@ function BodyHome() {
     return (
         <div className="">
               {isPopupVisible && <Popup onClose={closePopup} />}
-            <div className="banner-container relative w-full h-[260px] md:h-[400px] lg:h-[500px] ">
+            <div className="banner-container relative w-full h-[130px] md:h-[400px] lg:h-[500px] ">
                 <>
                     <Swiper modules={[Navigation, Pagination, Scrollbar, A11y, Mousewheel, Autoplay]} className="mySwiper w-full h-full" loop autoplay={{ delay: 3000, disableOnInteraction: false }}>
                         <SwiperSlide>
@@ -603,7 +603,7 @@ function BodyHome() {
                                 viewport={{ once: true }} // Chỉ chạy hiệu ứng một lần khi cuộn tới
                                 transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }} // Thêm độ trễ
                             >
-                                Korean Abalone Products
+                                Thực Phẩm Tươi Sống
                             </motion.h1>
 
                             {/* <motion.button

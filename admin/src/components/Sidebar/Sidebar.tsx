@@ -49,7 +49,9 @@ const Sidebar: React.FC = () => {
         className={`fixed z-50 h-screen inset-y-0 left-0 top-0 w-64 bg-white text-[#384551] transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0`}
       >
         <div className="py-4 px-2">
-          <h1 className="text-2xl font-bold pl-4">Admin Dashboard</h1>
+          <div className="bg-[#e0e1ff] px-2 rounded-lg">
+          <img src="/image/FoodHaven.png" alt="logo" />
+          </div>
           <nav className="mt-6">
             <ul>
               <li>

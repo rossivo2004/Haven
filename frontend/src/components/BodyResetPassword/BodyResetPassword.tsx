@@ -6,8 +6,12 @@ import axios from 'axios';
 import Cookies from 'js-cookie'; // Add this import
 import apiConfig from "@/src/config/api";
 import { toast } from "react-toastify";
+import { useRouter } from 'next/navigation';
+
 
 function BodyResetPassword() {
+    const router = useRouter();
+
     const validationSchema = Yup.object({
         password: Yup.string()
             .required("Vui lòng nhập mật khẩu")
@@ -62,6 +66,8 @@ function BodyResetPassword() {
                                         // Cookies.set('email', email, { expires: 7 }); // Store email in cookies for 7 days
                                         // Cookies.set('otp_code', otp, { expires: 7 }); // Store OTP in cookies for 7 days
                                         toast.success("Cập nhật thành công!")
+                                        router.push("/signin")
+                                        Cookies.remove('user');
                                     }
                                 } catch (error) {
                                     console.error("Error updating password:", error);

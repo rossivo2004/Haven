@@ -133,7 +133,7 @@ public function vnpayReturn(Request $request, $orderID)
 
     // Cập nhật trạng thái đơn hàng
     if($payment->p_vnp_reponse_code == 00){
-        $order->payment_status = 'paid'; 
+        $order->payment_status = 'paid';
     }
 
     $order->save();
@@ -142,12 +142,12 @@ public function vnpayReturn(Request $request, $orderID)
         // Nếu thành công
         // Gửi email xác nhận đơn hàng
         Mail::to($order->email)->send(new OrderConfirmationMail($order));
-        return redirect()->to('http://localhost:3000/thankorder');
+        return redirect()->to('https://haven-gold.vercel.app/thankorder');
     } else {
         // Nếu thất bại, chuyển hướng đến trang thất bại (tuỳ chọn)
-        return redirect()->to('http://localhost:3000/failure');
+        return redirect()->to('https://haven-gold.vercel.app/failure');
 
-    } 
+    }
 
     // return response()->json(['status' => true, 'message' => 'Payment successful', 'data' => $responseData]);
 }
