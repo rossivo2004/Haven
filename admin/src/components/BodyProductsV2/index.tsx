@@ -55,8 +55,6 @@ const BodyProducts: React.FC = () => {
             images: []
         },
         onSubmit: (values) => {
-            console.log("Form Data Submitted:", values); // Log the form data
-            console.log("Images:", image); // Optional: Log uploaded images if needed
             onClose(); // Close the modal after submission
         }
     });

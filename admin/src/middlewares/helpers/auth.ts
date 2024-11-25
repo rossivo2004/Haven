@@ -30,7 +30,7 @@ export async function isA (req: NextRequest) {
   const token = req.cookies.get('access_token_admin')?.value;
   
   if (!token) {
-    console.log("Không có token");
+    // console.log("Không có token");
     return null; // Return early if there's no token
   }
 

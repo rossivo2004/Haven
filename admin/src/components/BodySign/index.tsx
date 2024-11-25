@@ -39,7 +39,6 @@ function BodySign() {
                 Cookies.set('user_data_admin', JSON.stringify(userProfile), { expires: 1 }); // Save user profile data in cookie
                 toast.success('Đăng nhập thành công!'); // Show success message
                 window.location.href = '/admin';
-                console.log(response.data);
             } else {
                 throw new Error('Bạn không có quyền truy cập!'); // Throw error if role is not 2
             }

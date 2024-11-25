@@ -57,7 +57,6 @@ function BodyBlogDetail() {
 
     }
 
-    console.log(blog);
 
     
 
@@ -85,11 +84,11 @@ function BodyBlogDetail() {
 
             <div>
 
-                <h1 className="text-2xl font-bold">{blog?.title}</h1>
+                <h1 className="text-2xl font-bold dark:text-white">{blog?.title}</h1>
 
                 <p className="text-gray-500 text-sm mb-6">Xuất bản:  {new Date(blog?.created_at || '').toLocaleString('en-GB')}</p>
 
-                <div className="">
+                <div className="dark:text-white">
 
                 <p dangerouslySetInnerHTML={{ __html: blog?.content || '' }} />
 

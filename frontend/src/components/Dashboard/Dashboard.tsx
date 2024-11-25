@@ -63,7 +63,7 @@ const Dashboard = () => {
 
           
           Cookies.set("user_id", response.data.user_id, { expires: 7 });
-          console.log(response.data); // Log phản hồi từ API
+          // console.log(response.data); // Log phản hồi từ API
 
           
           toast.success("Đăng nhập thành công");

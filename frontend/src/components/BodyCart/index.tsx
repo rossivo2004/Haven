@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Checkbox, Spinner } from "@nextui-org/react";
 import { useDispatch, useSelector } from 'react-redux';
-import { CartItem } from '@/src/interface';
+import { CartItem, Variant } from '@/src/interface';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BreadcrumbNav from '../Breadcrum';
 import Link from 'next/link';
@@ -26,12 +26,29 @@ const Body_Cart = () => {
     const dispatch = useDispatch();
     const [userId, setUserId] = useState<string | null>(null); // State to hold user ID
     const [cart, setCart] = useState<CartItem[]>([]);
+    const [product, setProduct] = useState<Variant[]>([]);
 
     const [totalAmount, setTotalAmount] = useState<number>(0); // State to hold total amount
     const [loyaltyPoints, setLoyaltyPoints] = useState<number>(0);
 
     const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
     const [loading, setLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`${apiConfig.products.getallproductvariants}`, { withCredentials: true });
+                setProduct(response.data.productvariants);
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProduct();
+    }, []);
+
 
     useEffect(() => {
         const getUserId = async () => {
@@ -46,7 +63,6 @@ const Body_Cart = () => {
         getUserId(); // Call the function to get user ID
     }, []); // Ensure this useEffect runs only once
 
-    console.log(userId);
 
     useEffect(() => {
         if (userId) {
@@ -55,9 +71,10 @@ const Body_Cart = () => {
                 setLoading(true);
                 try {
                     const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
+                    // console.log('Fetched cart data:', response.data); // Log the fetched cart data
                     if (response.data && response.data) { // Check if cart_items exists
                         setCart(response.data); // Adjust according to your API response structure
+                        
                     } else {
                         console.warn('No cart items found in response');
                     }
@@ -116,6 +133,16 @@ const Body_Cart = () => {
                 ]
             });
             return; // Stop the function if quantity is invalid
+        }
+
+        // Find the product in the product state
+        const productInState = product.find(p => p.id === item.product_variant.id);
+        const productStock = productInState ? productInState.stock : 0; // Get stock from product state
+
+        // Check stock availability
+        if (newQuantity > productStock) {
+            toast.error(`Số lượng không thể vượt quá ${productStock} sản phẩm trong kho.`);
+            return; // Stop the function if quantity exceeds stock
         }
 
         // Optimistically update the cart state immediately
@@ -220,7 +247,6 @@ const Body_Cart = () => {
         }, [cart, selectedItems]);
     }
 
-    console.log(totalAmount, loyaltyPoints);
 
 
 
@@ -257,13 +283,15 @@ const Body_Cart = () => {
             </div>
             <h1 className="text-4xl font-bold mb-6 text-center dark:text-white">Giỏ Hàng</h1>
 
-            <Checkbox
-                isSelected={cart.length > 0 && cart.length === selectedItems.size} // Check if all items are selected
-                onChange={handleSelectAllChange} // Handle select all change
-                className='pl-42 mb-4'
-            >
-                Chọn tất cả
-            </Checkbox>
+            {cart.length > 0 && ( // Only render Checkbox if cart has items
+                <Checkbox
+                    isSelected={cart.length > 0 && cart.length === selectedItems.size} // Check if all items are selected
+                    onChange={handleSelectAllChange} // Handle select all change
+                    className='pl-42 mb-4'
+                >
+                    Chọn tất cả
+                </Checkbox>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

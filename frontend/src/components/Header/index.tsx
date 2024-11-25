@@ -123,7 +123,7 @@ function Header({ params }: { params: { lang: string } }) {
             const fetchUserCart = async () => {
                 try {
                     const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`, { withCredentials: true });
-                    console.log('Fetched cart data:', response.data); // Log the fetched cart data
+                    // console.log('Fetched cart data:', response.data); // Log the fetched cart data
                     if (response.data && response.data) { // Check if cart_items exists
                         setCart(response.data); // Adjust according to your API response structure
                         setCartCount(response.data.length);
@@ -141,7 +141,7 @@ function Header({ params }: { params: { lang: string } }) {
             if (existingCartItems.cart_items && existingCartItems.cart_items.length > 0) {
                 setCart(existingCartItems.cart_items); // Set cart state from cookies
                 setCartCount(existingCartItems.cart_items.length);
-                console.log(1);
+                // console.log(1);
                 
             } else {
                 console.warn('No cart items found in cookies');
@@ -184,7 +184,7 @@ function Header({ params }: { params: { lang: string } }) {
             const params = new URLSearchParams();
             const response = await axios.get(`${apiConfig.products.getallproductvariants}`, { withCredentials: true });
 
-            setProducts(response.data.productvariants.data);
+            setProducts(response.data.productvariants);
         } catch (error) {
             console.error('Error fetching products:', error);
         } finally {
@@ -441,7 +441,7 @@ function Header({ params }: { params: { lang: string } }) {
                                             </DropdownTrigger>
                                             <DropdownMenu aria-label="Profile Actions" variant="flat">
                                                 <DropdownItem key="profile" className="h-14 gap-2 dark:text-white">
-                                                    <p className="font-semibold">Signed in as</p>
+                                                    <p className="font-semibold">Chào mừng:</p>
                                                     <p className="font-semibold">{userData.email}</p> {/* Display user email */}
                                                 </DropdownItem>
                                                 <DropdownItem key="settings">
@@ -634,14 +634,14 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 <div className='text-black text-lg font-semibold'>Phân loại</div>
                                                                 <div className='grid grid-cols-2 items-start'>
                                                                     {categories.map((item, index) => (
-                                                                        <Link key={index} href={`/shop?category[]=${item.name}`}>
+                                                                        <a key={index} href={`/shop?category[]=${item.name}`}>
                                                                             <div className="flex flex-col py-1 pr-10 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
-                                                                        </Link>
+                                                                        </a>
                                                                     ))}
                                                                 </div>
 
@@ -650,14 +650,14 @@ function Header({ params }: { params: { lang: string } }) {
                                                                 <div className='text-black text-lg font-semibold'>Thương hiệu</div>
                                                                 <div className='grid grid-cols-3  items-start pl-2'>
                                                                     {brands.map((item, index) => (
-                                                                        <Link key={index} href={`/shop?brand[]=${item.name}`}>
+                                                                        <a key={index} href={`/shop?brand[]=${item.name}`}>
                                                                             <div className="flex flex-col py-1 pr-2 px-1 text-black cursor-pointer rounded-lg hover:bg-slate-200 items-start">
                                                                                 {/* <div className='mr-2'>
                                                                                     <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-lg" />
                                                                                 </div> */}
                                                                                 <div>{item.name}</div>
                                                                             </div>
-                                                                        </Link>
+                                                                        </a>
                                                                     ))}
                                                                 </div>
                                                             </div>
@@ -794,7 +794,7 @@ function Header({ params }: { params: { lang: string } }) {
                                     </DropdownTrigger>
                                     <DropdownMenu aria-label="Profile Actions" variant="flat">
                                         <DropdownItem key="profile" className="h-14 gap-2">
-                                            <p className="font-semibold">Signed in as</p>
+                                            <p className="font-semibold">Chào mừng</p>
                                             <p className="font-semibold">zoey@example.com</p>
                                         </DropdownItem>
                                         <DropdownItem key="settings">

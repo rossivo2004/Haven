@@ -50,7 +50,7 @@ const [showPassword, setShowPassword] = useState(false); // State to toggle pass
 
             toast.success('Đăng nhập thành công!'); // Show success message
 
-            console.log(response.data);
+            // console.log(response.data);
 
             Cookies.set('access_token', response.data.access_token, { expires: 1 }); // Set access_token in cookie for 7 days
             Cookies.set('refresh_token', response.data.refresh_token, { expires: 1 }); // Set refresh_token in cookie for 7 days

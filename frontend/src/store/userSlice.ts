@@ -58,6 +58,7 @@ const userSlice = createSlice({
             Cookies.remove('user_id'); // Remove user_id from cookies
             Cookies.remove('otp_code'); // Remove otp_code from cookies
             Cookies.remove('cookieExpiration'); // Remove cookieExpiration
+            Cookies.remove('userDataCode'); // Remove userDataCode
         },
     },
 });

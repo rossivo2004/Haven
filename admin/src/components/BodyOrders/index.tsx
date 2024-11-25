@@ -98,7 +98,7 @@ function BodyOrders() {
 
     const handleEditStatus = (status: string, idOrder: number) => {
         setSelectedStatus(status);
-        console.log("Selected Status:", status);
+        // console.log("Selected Status:", status);
         setIdOrrder(String(idOrder));
         onOpen();
     };
@@ -121,11 +121,11 @@ function BodyOrders() {
         }
     }
 
+
     useEffect(() => {
         fecthOrder();
     }, []);
 
-    console.log(order);
 
 
     const CustomRadio = (props: any) => {
@@ -200,7 +200,7 @@ function BodyOrders() {
 
     const handleConfirmUpdate = () => {
         if (idOrrder) {
-            console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus);
+            // console.log("Updating Order ID:", idOrrder, "with Status:", selectedStatus);
             updateOrderStatus(Number(idOrrder), selectedStatus);
         }
     };
@@ -223,6 +223,24 @@ function BodyOrders() {
         setCurrentPage(page);
     };
 
+    const countOrdersByStatus = () => {
+        const counts = {
+            pending: 0,
+            preparing: 0,
+            transport: 0,
+            complete: 0,
+            canceled: 0,
+        };
+
+        order.forEach(item => {
+            counts[item.status as keyof typeof counts]++;
+        });
+
+        return counts;
+    };
+
+    const orderCounts = countOrdersByStatus();
+
     return (
         <div>
             <div className="flex justify-between items-center">
@@ -235,6 +253,8 @@ function BodyOrders() {
                     />
                 </div>
             </div>
+
+
             <div className='flex justify-between mb-4'>
                 <div className='font-semibold text-xl'>
                     Quản lý đơn hàng
@@ -246,6 +266,15 @@ function BodyOrders() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
+
+<div className='mb-4 bg-white rounded-lg p-4 shadow-md grid grid-cols-5 gap-2'>
+    <div><span className='text-yellow-500'>Đang chờ: <span className='font-semibold'>{orderCounts.pending}</span></span></div>
+    <div><span className='text-blue-500'>Đang chuẩn bị: <span className='font-semibold'>{orderCounts.preparing}</span></span></div>
+    <div><span className='text-purple-500'>Đang vận chuyển: <span className='font-semibold'>{orderCounts.transport}</span></span></div>
+    <div><span className='text-green-500'>Hoàn thành: <span className='font-semibold'>{orderCounts.complete}</span></span></div>
+    <div><span className='text-red-500'>Hủy: <span className='font-semibold'>{orderCounts.canceled}</span></span></div>
+</div>
+
 
             <div>
                 <div className="mb-4">

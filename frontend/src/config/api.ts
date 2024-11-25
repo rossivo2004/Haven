@@ -78,6 +78,8 @@ const apiConfig = {
     login: `${baseUrl}/api/login`,
     logout: `${baseUrl}/api/logout`,
     register: `${baseUrl}/api/register`,
+    register_sendcode: `${baseUrl}/api/register/send-code`,
+    register_verifycode: `${baseUrl}/api/register/verify-code`,
     verify: `${baseUrl}/api/register/verify-code`,
 
     loginToken: `${baseUrl}/api/auth/login`,

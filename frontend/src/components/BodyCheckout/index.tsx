@@ -92,6 +92,8 @@ function BodyCheckout() {
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [pointCart, setPointCart] = useState<number>(0);
     const [checkoutItemsId, setCheckoutItemsId] = useState<any[]>([]); // State to hold checkout items
+    const [phoneError, setPhoneError] = useState<string>(''); // State for phone error message
+    const [emailError, setEmailError] = useState<string>(''); // State for email error message
 
 
     // const priceDisscount = useSelector((state: { cart: { priceDisscount: number } }) => state.cart.priceDisscount);
@@ -110,7 +112,6 @@ function BodyCheckout() {
         getUserId(); // Call the function to get user ID
     }, []);
 
-    console.log(userId);
 
     useEffect(() => {
         if (cartData) {
@@ -132,7 +133,6 @@ function BodyCheckout() {
     }, [cartData]);
 
     // console.log(totalAmount);
-    console.log(checkoutItemsId);
     
 
 
@@ -245,6 +245,30 @@ function BodyCheckout() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevent default form submission behavior
 
+        // Reset error messages
+        setPhoneError('');
+        setEmailError('');
+
+        // Validate inputs
+        if (!userName || !userPhone || !userEmail || !userAddress || !selectedProvince || !selectedDistrict || !selectedWard) {
+            alert("Please fill in all required fields."); // Alert user if validation fails
+            return; // Stop the submission if validation fails
+        }
+
+        // Validate phone number (example: must be 10 digits)
+        const phonePattern = /^\d{10}$/; // Adjust pattern as needed
+        if (!phonePattern.test(userPhone)) {
+            setPhoneError("Số điện thoại không hợp lệ!"); // Set error message
+            return; // Stop the submission if validation fails
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(userEmail)) {
+            setEmailError("Email không hợp lệ!"); // Set error message
+            return; // Stop the submission if validation fails
+        }
+
         // Find the name for province, district, and ward
         const provinceName = provinces.find(province => province.id === selectedProvince)?.full_name || '';
         const districtName = districts.find(district => district.id === selectedDistrict)?.full_name || '';
@@ -273,14 +297,12 @@ function BodyCheckout() {
             payment_method: payMethod,
         };
 
-        console.log('Order Data:', formData); // Log the order data
 
         try {
             setLoading(true);
             // Gọi API để tạo đơn hàng
             const orderResponse = await axios.post(apiConfig.order.createOrder, formData);
             const orderId = orderResponse.data.order.id; // Giả sử API trả về id của đơn hàng
-            console.log(orderResponse);
 
             Cookies.remove('checkout_data');
             Cookies.remove('cart_items');
@@ -291,8 +313,6 @@ function BodyCheckout() {
             // Kiểm tra phương thức thanh toán
             if (formData.payment_method == '2') { // Nếu payment_method = 2
                 const pay = await axios.post(apiConfig.payment.createPayment, { order_id: orderId });
-                console.log('Payment initiated for order ID:', orderId);
-                console.log('Payment Response:', pay);
                 window.location.href = pay.data.data; // Chuyển hướng đến trang thanh toán
             } else {
                 // Redirect to thank you page for other payment methods
@@ -314,10 +334,10 @@ function BodyCheckout() {
         setDiscount(applicableDiscount);
 
         // Log values for debugging
-        console.log('usePoints:', usePoints);
-        console.log('User Points:', user?.point);
-        console.log('Max Discount:', maxDiscount);
-        console.log('Applicable Discount:', applicableDiscount);
+        // console.log('usePoints:', usePoints);
+        // console.log('User Points:', user?.point);
+        // console.log('Max Discount:', maxDiscount);
+        // console.log('Applicable Discount:', applicableDiscount);
     }, [totalAmount, usePoints, user, user?.point]);
 
     useEffect(() => {
@@ -371,11 +391,29 @@ function BodyCheckout() {
                                 <div className='flex gap-5'>
                                     <div className='w-1/2'>
                                         <label htmlFor="phone-user">Số điện thoại</label>
-                                        <Input required id='phone-user' size='lg' variant='bordered' placeholder='Số điện thoại' value={userPhone} onChange={(e) => setUserPhone(e.target.value)} />
+                                        <Input 
+                                            required 
+                                            id='phone-user' 
+                                            size='lg' 
+                                            variant='bordered' 
+                                            placeholder='Số điện thoại' 
+                                            value={userPhone} 
+                                            onChange={(e) => setUserPhone(e.target.value)} 
+                                        />
+                                        {phoneError && <p className="text-red-600">{phoneError}</p>} {/* Display phone error message */}
                                     </div>
                                     <div className='flex-1'>
                                         <label htmlFor="email-user">Email</label>
-                                        <Input required id='email-user' size='lg' variant='bordered' placeholder='Email' value={userEmail} onChange={(e) => setUserEmail(e.target.value)} />
+                                        <Input 
+                                            required 
+                                            id='email-user' 
+                                            size='lg' 
+                                            variant='bordered' 
+                                            placeholder='Email' 
+                                            value={userEmail} 
+                                            onChange={(e) => setUserEmail(e.target.value)} 
+                                        />
+                                        {emailError && <p className="text-red-600">{emailError}</p>} {/* Display email error message */}
                                     </div>
                                 </div>
 

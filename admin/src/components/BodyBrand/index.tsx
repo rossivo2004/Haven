@@ -40,13 +40,11 @@ function BodyBrand() {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const fetchBrands = async (searchTerm = "") => {
-        console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
             const response = await axios.get(apiConfig.brands.getAll, {
                 params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
                 withCredentials: true,
             });
-            console.log("API Response:", response.data.brands.data); // Kiểm tra phản hồi từ API
             setBrands(response.data.brands.data);
         } catch (error) {
             console.error('Error fetching brands:', error);

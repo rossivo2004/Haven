@@ -40,7 +40,6 @@ function BodyCategories() {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const fetchCategories = async (searchTerm = "") => {
-        console.log("Searching for:", searchTerm); // Kiểm tra giá trị tìm kiếm
         try {
             const response = await axios.get(apiConfig.categories.getAll, {
                 params: { name: searchTerm }, // Chỉ tìm kiếm theo tên của danh mục
@@ -49,7 +48,6 @@ function BodyCategories() {
                 },
                 withCredentials: true,
             });
-            console.log("API Response:", response.data.categories.data); // Kiểm tra phản hồi từ API
             setCategories(response.data.categories.data);
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -107,7 +105,6 @@ function BodyCategories() {
             setImage(null);
             fetchCategories();
             toast.success('Thêm phân loại thành công');
-console.log(formData);
 
             // Close the modal after successfully adding the category
         } catch (error) {

@@ -44,17 +44,18 @@ function BodySingUp() {
     const handleCheckSignup = async (values: SignUpValues) => {
         setLoading(true);
         try {
-            const response = await axios.post(apiConfig.user.register, values, {
+            const response = await axios.post(apiConfig.user.register_sendcode, values, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            if (response.status === 201) {
+            if (response.status === 200) {
                 // Save user data to cookies
+                Cookies.set('userDataCode', JSON.stringify(values), { expires: 10 / (24 * 60) });
                 dispatch(setUser(values));
-                toast.success('Đăng kí thành công!');
-                router.push('/signin');
+                toast.success('Gửi mã xác nhận thành công!');
+                router.push('/verifysignup');
             } else {
                 toast.error('Đăng kí thất bại! Vui lòng thử lại.');
             }
@@ -154,7 +155,7 @@ function BodySingUp() {
                                         className={`w-full bg-main text-white py-4 rounded mb-4 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={loading} // Disable button when loading
                                     >
-                                        {loading ? <Spinner /> : 'Đăng kí ngay'}
+                                        {loading ? <Spinner size="sm"/> : 'Đăng kí ngay'}
                                     </button>
                                 </Form>
                             )}

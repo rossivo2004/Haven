@@ -75,7 +75,11 @@ Route::group(['prefix' => 'api/roles'], function () {
 
 
 // Đăng ký
-Route::post('api/register', [UserController::class, 'register']);
+// Route::post('api/register', [UserController::class, 'register']);
+Route::group(['prefix' => 'api/register'], function() {
+    Route::post('/send-code', [UserController::class, 'sendRegisterCode'])->name('api.register.sendCode');
+    Route::post('/verify-code', [UserController::class, 'verifyRegisterCode'])->name('api.register.verifyCode');
+});
 
 
 // Quên mật khẩu
@@ -252,7 +256,7 @@ route::group([
 ],function(){
     Route::get('/view', [OrderController::class, 'watchnotify']); // Xem thông báo
     Route::get('/unread', [OrderController::class, 'countUnread']); // Số lượng thông báo chưa đọc
-    Route::middleware([CheckAdmin::class])->post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
+    Route::post('/mark-as-read/{order}', [OrderController::class, 'markAsRead']); // Admin kích vào thì đã đọc
 });
 
 

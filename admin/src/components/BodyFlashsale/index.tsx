@@ -288,7 +288,7 @@ function BodyFlashsale() {
         }
 
         // Log the data to check for issues
-        console.log({ start_time, end_time, product_variant_ids, stocks, discount_percents });
+        // console.log({ start_time, end_time, product_variant_ids, stocks, discount_percents });
 
         try {
             setLoading(true);
@@ -443,7 +443,7 @@ function BodyFlashsale() {
                                         <Button color="danger" variant="light" onPress={onClose}>Hủy</Button>
                                         <Button color="primary" onPress={async () => {
                                             await addFlashSale(); // Call addFlashSale on form submission
-                                            console.log({ startTime, endTime, selectedProducts });
+                                            // console.log({ startTime, endTime, selectedProducts });
                                             onClose();
                                         }}>
                                             Thêm
@@ -682,7 +682,7 @@ function BodyFlashsale() {
                                                                         discount_percent: selectedProducts[product.id]?.discount || 0,
                                                                     };
 
-                                                                    console.log(updatedData);
+                                                                    // console.log(updatedData);
 
                                                                     try {
                                                                         const flashSalePivot = Array.isArray(product.flash_sales) && product.flash_sales.length > 0 ? product.flash_sales[0].pivot.id : null;

@@ -265,7 +265,6 @@ const BodyProductVa = () => {
 
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Product ID:", newVariant); // Kiểm tra ID sản phẩm
 
         setLoading(true);
         const formElement = e.currentTarget as HTMLFormElement;
@@ -387,7 +386,6 @@ const BodyProductVa = () => {
             console.error('Không tìm thấy sản phẩm chính cho biến thể này.');
         }
 
-        console.log(product);
     };
 
     const handleCloseEditProductModal = () => {

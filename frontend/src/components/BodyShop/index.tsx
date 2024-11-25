@@ -56,9 +56,8 @@ function BodyShop() {
             params.append('priceRanges[]', `${priceRange[0]}-${priceRange[1]}`); // Add price range to params
 
             const response = await axios.get(`${apiConfig.products.getallproductvariants}?${params.toString()}`, { withCredentials: true });
-
-
             // console.log(response.data);
+
             let fetchedVariants = response.data.productvariants;
 
             // Apply sorting based on sortOrder
@@ -185,7 +184,7 @@ function BodyShop() {
 
         const combinedFilter = [...priceFilter, ...cateFilter, ...brandFilter, order]; // Include sort order in filters
         setFilter(combinedFilter); // Update filter state
-        console.log(combinedFilter);
+        // console.log(combinedFilter);
     }
 
     const handlePriceRangeChange = (event: Event, value: number | number[], activeThumb: number) => {
@@ -350,12 +349,12 @@ function BodyShop() {
                                     <ModalContent className="z-50">
                                         {(onClose) => (
                                             <>
-                                                <ModalHeader className="flex flex-col gap-1">Lọc</ModalHeader>
+                                                <ModalHeader className="flex flex-col gap-1 dark:text-white">Lọc</ModalHeader>
                                                 <ModalBody>
                                                 <Accordion
                         selectionMode="multiple"
                         className="px-0 sticky top-[130px]"
-                        defaultExpandedKeys={["category", "price", "brand"]}
+                        // defaultExpandedKeys={["category", "price", "brand"]}
                     >
                         <AccordionItem
                             key="category"
@@ -375,6 +374,8 @@ function BodyShop() {
                             indicator={<ChevronLeftIcon />}
                             aria-label="brand"
                             title="Thương hiệu sản phẩm"
+                            className='dropdown-menu'
+
                         >
                             <CheckboxGroup value={brandFilter} onChange={handleBrandFilterChange}>
                                 {brands.map((item, index) => (

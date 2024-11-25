@@ -106,7 +106,7 @@ export const OrderSession: React.FC = () => {
         });
     };
 
-    console.log(order);
+    // console.log(order);
 
 
     return ( // Use return statement to render JSX

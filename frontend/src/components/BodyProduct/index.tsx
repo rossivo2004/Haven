@@ -107,7 +107,7 @@ function BodyProduct() {
 
                     // Check if the response data is empty
                     if (response.data && response.data.length > 0) {
-                        console.log(response.data);
+                        // console.log(response.data);
                         const favorites = response.data; // Assuming this returns an array of favorite products
                         const isProductFavorited = favorites.some((fav: Variant) => fav.id === product?.id); // Check if current product is in favorites
                         setIsFavorited(isProductFavorited); // Update state
@@ -574,7 +574,7 @@ const fetchUpdatedCart = async (userId: string) => {
                             <Link href={`/shop?category%5B%5D=${product?.product?.category?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400 dark:text-white">{product?.product?.category?.name}</span>
                             </Link>
-                            <Link href={`/  shop?category%5B%5D=${product?.product?.brand?.name}`}>
+                            <Link href={`/shop?brand%5B%5D=${product?.product?.brand?.name}`}>
                                 <span className="flex p-[2px] lg:text-sm text-xs lg:py-[2px] lg:px-1 items-center justify-center w-fit rounded-lg border border-gray-400 dark:text-white">{product?.product?.brand?.name}</span>
                             </Link>
                         </div>

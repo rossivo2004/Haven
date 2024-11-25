@@ -43,7 +43,7 @@ function BodyResetPassword() {
                                     const user = userCookie ? JSON.parse(userCookie) : null; // Parse user cookie
                                     const email = user ? user.email : null; // Extract email
 
-                                    console.log("Email from cookies:", email); // Debugging line
+                                    // console.log("Email from cookies:", email); // Debugging line
 
                                     if (!email) {
                                         toast.error("Không thể cập nhật!!!")

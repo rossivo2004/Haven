@@ -5,7 +5,7 @@ export default function middleware(request: NextRequest) {
   const checkoutData = request.cookies.get('checkout_data'); // Get checkout_data cookie
   const userFor = request.cookies.get('user'); // Get checkout_data cookie
   const otp_code = request.cookies.get('otp_code'); // Get checkout_data cookie
-
+  const userDataCode = request.cookies.get('userDataCode'); // Get userDataCode cookie
   // Check if user_id exists and if the request is for login or register
   if (userId && (request.nextUrl.pathname === '/signin' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/forgotpassword' || request.nextUrl.pathname === '/resetpassword' || request.nextUrl.pathname === '/verify')) {
     return NextResponse.redirect(new URL('/', request.url)); // Redirect to home
@@ -22,6 +22,10 @@ export default function middleware(request: NextRequest) {
 
   if (!otp_code && (request.nextUrl.pathname === '/verify'  )) {
     return NextResponse.redirect(new URL('/signin', request.url)); // Redirect to signin
+  }
+
+  if (!userDataCode && (request.nextUrl.pathname === '/verifysignup')) {
+    return NextResponse.redirect(new URL('/signup', request.url)); // Redirect to signin
   }
 
   // Check if checkout_data is missing or empty and block access to /checkout

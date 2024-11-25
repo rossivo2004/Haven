@@ -71,7 +71,6 @@ const BodyProductsV2: React.FC = () => {
 
             };
 
-            console.log("Form Data Submitted:", formData); // Log the data being sent
 
             const add = async () => {
                 setLoading(true);
@@ -79,7 +78,6 @@ const BodyProductsV2: React.FC = () => {
                     const response = await axios.post(apiConfig.products.createPr, formData, {
                         headers: { accept: 'application/json' },
                     });
-                    console.log(response);
                     toast.success('Thêm sản phẩm thành công');
                     formik.resetForm();
                 } catch (error: any) {

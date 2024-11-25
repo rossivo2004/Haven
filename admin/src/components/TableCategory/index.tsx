@@ -24,7 +24,7 @@ const TableCategory: React.FC<TableCategoryProps> = ({ categories }) => {
                     label: 'Yes',
                     onClick: async () => {
                         setLoading(true); // Start loading
-                        console.log('Deleted category with id:', categoryId);
+                        // console.log('Deleted category with id:', categoryId);
                         // Implement delete logic here
                         // After deletion logic
                         setLoading(false); // End loading

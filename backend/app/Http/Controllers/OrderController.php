@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\OrderRequest;
+// use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\Cart;
 use App\Models\User;
@@ -13,16 +15,19 @@ use App\Models\FlashSaleProduct;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmationMail;
 
+
+
 class OrderController extends Controller
 
 {
-        public function checkout(Request $request)
+        public function checkout(OrderRequest $request)
     {
         $user_id = $request->input('user_id', null);
         $orderData = $request->only([
             'invoice_code', 'full_name', 'phone', 'email', 'total',
             'province', 'district', 'ward', 'address', 'payment_transpot', 'payment_method'
         ]);
+        // $token = $user_id ? null : Str::random(64); // Tạo token nếu chưa đăng nhập
         $paymentStatus = 'unpaid';
 
         // Lấy danh sách sản phẩm từ yêu cầu
@@ -40,7 +45,8 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'status' => 'pending',
             'payment_status' => $paymentStatus,
-            'is_read' => false
+            'is_read' => false,
+            // 'token' => $token,
         ]));
 
 
@@ -113,16 +119,6 @@ class OrderController extends Controller
             }
         }
 
-        // Cộng điểm thưởng nếu là người dùng đã đăng nhập
-        $loyaltyPoints = 0;
-        if ($user_id) {
-            $user = User::find($user_id);
-            if ($user) {
-                $loyaltyPoints = $orderData['total'] * 0.01;
-                $user->point += $loyaltyPoints;
-                $user->save();
-            }
-
         // Xóa sản phẩm trong giỏ hàng nếu là người dùng đã đăng nhập
         if ($user_id) {
             Cart::where('user_id', $user_id)
@@ -133,11 +129,9 @@ class OrderController extends Controller
         return response()->json([
             'message' => 'Order created successfully!',
             'order' => $order,
-            'loyalty_points_added' => $loyaltyPoints
         ], 201);
     }
 
-}
 
 
     public function showOrder($userId){
@@ -229,9 +223,18 @@ class OrderController extends Controller
 
     $order->status = $newStatus;
 
-    // Kiểm tra nếu đơn hàng đã hoàn thành thì cho payment_status là paid
+    // Nếu trạng thái là 'complete', cộng điểm thưởng và đánh dấu thanh toán
     if ($newStatus === 'complete') {
         $order->payment_status = 'paid';
+
+        if ($order->user_id) {
+            $user = User::find($order->user_id);
+            if ($user) {
+                $loyaltyPoints = $order->total * 0.01; // 1% tổng tiền
+                $user->point += $loyaltyPoints;
+                $user->save();
+            }
+        }
     }
 
     $order->save();

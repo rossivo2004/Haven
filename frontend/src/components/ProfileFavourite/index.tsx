@@ -36,6 +36,10 @@ function ProfileFavourite() {
         try {
             const res = await axios.get(`${apiConfig.favourite.getFavouriteById}${userId}`);
             setFavourite(res.data);
+            // Check if no favorites and do not show error
+            if (res.data.length === 0) {
+                return; // No favorites, exit without error
+            }
         } catch (error) {
             console.error('Error fetching favorites:', error);
             toast.error('Có lỗi xảy ra khi lấy danh sách yêu thích.'); // Notify error
@@ -47,6 +51,8 @@ function ProfileFavourite() {
     useEffect(() => {
         getFavourite();
     }, [userId]);
+
+    // console.log(favourite)
 
     const handleAddToFavorites = async (productVariantId: number) => {
         
@@ -84,7 +90,7 @@ function ProfileFavourite() {
         }
     };
 
-    console.log(favourite)
+    // console.log(userId)
 
     return (
         <div>
@@ -93,6 +99,11 @@ function ProfileFavourite() {
                 {loading && (
                     <div className="flex justify-center items-center h-full col-span-3 top-[160px] relative">
                         <Loading />
+                    </div>
+                )}
+                {!loading && favourite.length === 0 && (
+                    <div className="text-center text-lg font-semibold dark:text-white col-span-3 py-20">
+                        Không có sản phẩm yêu thích
                     </div>
                 )}
                 {!loading && favourite.map((item) => (

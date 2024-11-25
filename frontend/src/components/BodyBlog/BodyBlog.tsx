@@ -72,7 +72,7 @@ function BodyBlog() {
 	return (
 		<div className="max-w-7xl mx-auto py-6 px-4">
 			{/* Tin mới nhất */}
-			<h2 className="text-3xl font-bold mb-6">TIN MỚI NHẤT</h2>
+			<h2 className="text-3xl font-bold mb-6 dark:text-white">TIN MỚI NHẤT</h2>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 				{recentPosts && (
@@ -85,15 +85,15 @@ function BodyBlog() {
 					/>
 				</div>
 				<div className="flex flex-col justify-center">
-					<h3 className="text-xl font-bold mb-4">{recentPosts.title}</h3>
+					<h3 className="text-xl font-bold mb-4 dark:text-white">{recentPosts.title}</h3>
 					<p className="text-sm text-gray-600">{recentPosts.description}</p>
-					<Link href={`/blog/${recentPosts.id}`} className="self-start hover:underline underline">Xem Thêm</Link>
+					<Link href={`/blog/${recentPosts.id}`} className="self-start hover:underline underline dark:text-main">Xem Thêm</Link>
 						</div>
 					</>
 				)}
 			</div>
 
-			<h3 className="text-2xl font-bold mb-4">Tin Xem Nhiều Nhất</h3>
+			<h3 className="text-2xl font-bold mb-4 dark:text-white">Tin Xem Nhiều Nhất</h3>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 			{popularPosts.slice(0, 3).map((item, index) => (
 					<div key={index}>
@@ -101,10 +101,9 @@ function BodyBlog() {
 							<img src={item.content.match(/<img src="([^"]+)"/)?.[1]} alt={item.title} className="w-full h-48 object-cover" />
 						</div>
 						<div>
-							<h4 className="font-bold mb-2">{item.title}</h4>
+							<h4 className="font-bold mb-2 dark:text-white">{item.title}</h4>
 							<p className="text-sm text-gray-600">
-								Đảm bảo vệ sinh an toàn vệ sinh thực phẩm là một trong những ưu tiên hàng đầu của các cơ sở sản xuất, chế biến thực
-								phẩm...
+								{item.description}
 							</p>
 						</div>
 						<div>
@@ -153,7 +152,7 @@ function BodyBlog() {
 			</div> */}
 			{/*  Các tin khác */}
 
-			<h3 className="text-2xl font-bold mb-4">Các tin khác</h3>
+			<h3 className="text-2xl font-bold mb-4 dark:text-white">Các tin khác</h3>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 				{post.map((item, index) => (
 					<div key={index}>
@@ -161,10 +160,9 @@ function BodyBlog() {
 							<img src={item.content.match(/<img src="([^"]+)"/)?.[1]} alt={item.title} className="w-full h-48 object-cover" />
 						</div>
 						<div>
-							<h4 className="font-bold mb-2">{item.title}</h4>
+							<h4 className="font-bold mb-2 dark:text-white">{item.title}</h4>
 							<p className="text-sm text-gray-600">
-								Đảm bảo vệ sinh an toàn vệ sinh thực phẩm là một trong những ưu tiên hàng đầu của các cơ sở sản xuất, chế biến thực
-								phẩm...
+								{item.description}
 							</p>
 						</div>
 						<div>

@@ -74,7 +74,7 @@ function BodyBlog() {
         fetchPosts();
     }, []);
 
-    console.log(posts);
+    // console.log(posts);
 
     const handleOpenAddBrandModal = () => {
         setIsAddBrandModalOpen(true);

@@ -8,3 +8,7 @@
     height: 0;
   }
   
+  .dropdown-menu {
+    max-height: 300px; /* Giới hạn chiều cao tối đa */
+    overflow-y: auto; /* Thêm thanh cuộn dọc */
+}

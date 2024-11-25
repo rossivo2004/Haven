@@ -31,7 +31,7 @@ function BodyTrackingorder() {
         fetchOrder();
     }, [])
 
-    console.log(order);
+    // console.log(order);
 
 
     return (

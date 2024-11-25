@@ -69,7 +69,7 @@ export default function TableProduct() {
                 ...values,
                 variants: variants,
             };
-            console.log("Form Data Submitted:", formData);
+            // console.log("Form Data Submitted:", formData);
             onClose();
         },
     });

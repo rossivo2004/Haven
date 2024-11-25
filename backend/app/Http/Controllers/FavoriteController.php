@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
 {
-    
+
     public function index($userId)
 {
     if (!$userId) {
@@ -18,17 +18,13 @@ class FavoriteController extends Controller
 
     // Lấy danh sách productVariant của các sản phẩm yêu thích của user
     $favorites = Favorite::where('user_id', $userId)->with('productVariant')->paginate(20);
-    
-    if ($favorites->isEmpty()) {
-        return response()->json(['message' => 'No favorite products'], null); 
-    }
 
     // Trả về danh sách productVariant từ các yêu thích
     $productVariants = $favorites->map(function($favorite) {
         return $favorite->productVariant; // Chỉ trả về thông tin productVariant
     });
 
-    return response()->json($productVariants);
+    return response()->json($productVariants->isEmpty() ? [] : $productVariants);
 }
 
 
@@ -59,13 +55,13 @@ class FavoriteController extends Controller
         return response()->json($favorite, 201); // Created (success)
     }
     } catch (\Exception $e) {
-        return response()->json([   
+        return response()->json([
             'success' => false,
             'message' => 'Xảy ra lỗi trong quá trình yêu thích',
             'error' => $e->getMessage()
         ], 500);
     }
-    
+
 }
 
 }

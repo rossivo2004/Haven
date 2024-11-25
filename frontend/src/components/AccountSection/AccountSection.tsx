@@ -88,7 +88,7 @@ const Security = () => {
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
-                        console.log("values", values);
+                        // console.log("values", values);
                     }}
                 >
                     {({ errors, touched, handleChange }) => (
@@ -170,7 +170,8 @@ const AccountSection = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
     const [selectedWard, setSelectedWard] = useState<string>('');
-
+    const [phoneError, setPhoneError] = useState<string>(''); // State for phone error message
+    const [emailError, setEmailError] = useState<string>(''); // State for email error message
 
     // ... existing code ...
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -264,6 +265,23 @@ const AccountSection = () => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setPhoneError(''); // Reset phone error
+        setEmailError(''); // Reset email error
+
+        // Validate phone number (example: must be 10 digits)
+        const phonePattern = /^\d{10}$/; // Adjust pattern as needed
+        if (!phonePattern.test(user?.phone || '')) {
+            setPhoneError("Số điện thoại không hợp lệ!"); // Set error message
+            return; // Stop the submission if validation fails
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(user?.email || '')) {
+            setEmailError("Email không hợp lệ!"); // Set error message
+            return; // Stop the submission if validation fails
+        }
+
         const values = {
             name: user?.name,
             email: user?.email,
@@ -394,6 +412,7 @@ const AccountSection = () => {
                                                 onChange={handleChange}
                                                 disabled
                                             />
+                                            {emailError && <p className="text-red-600">{emailError}</p>} {/* Display email error message */}
                                         </div>
                                     </div>
                                     <div className="flex gap-5">
@@ -405,6 +424,7 @@ const AccountSection = () => {
                                                 value={user?.phone || ""}
                                                 onChange={handleChange}
                                             />
+                                            {phoneError && <p className="text-red-600">{phoneError}</p>} {/* Display phone error message */}
                                         </div>
                                     </div>
                                     <div className='grid lg:grid-cols-3 grid-cols-1 gap-4'>

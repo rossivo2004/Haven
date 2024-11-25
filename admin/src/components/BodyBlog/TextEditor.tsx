@@ -26,10 +26,10 @@ function CreatePostForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Title:", title);
-        console.log("Content:", content);
+        // console.log("Title:", title);
+        // console.log("Content:", content);
         // console.log("Thumbnail:", thumbnail);
-        console.log("Description:", description);
+        // console.log("Description:", description);
 
         const formData = new FormData();
         formData.append("title", title);
@@ -47,7 +47,7 @@ function CreatePostForm() {
             });
             toast.success("Bài viết đã được lưu thành công!");
             window.location.reload();
-            console.log('Post saved:', response.data);
+            // console.log('Post saved:', response.data);
         } catch (error) {
             console.error('Error saving post:', error);
         }

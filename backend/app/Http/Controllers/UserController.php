@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
 {
@@ -230,94 +231,165 @@ class UserController extends Controller
         return view('verify');
     }
 
-    public function register(Request $request)
+    // public function register(Request $request)
+    // {
+    //     // Xác thực dữ liệu đầu vào
+    //     $data = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'email' => 'required|email|unique:users,email',
+    //         'password' => 'required|string|min:8',
+    //     ]);
+
+    //     // Tìm role "user"
+    //     $role = Role::where('name', 'user')->first();
+
+    //     if (!$role) {
+    //         return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
+    //     }
+
+    //     // Tạo tài khoản mới
+    //     $user = User::create([
+    //         'name' => $data['name'],
+    //         'email' => $data['email'],
+    //         'password' => Hash::make($data['password']),
+    //         'role_id' => $role->id,
+    //         'status' => 'active', // Đặt trạng thái mặc định là active
+    //     ]);
+
+    //     return response()->json([
+    //         'message' => 'Đăng ký thành công',
+    //         'user' => $user,
+    //     ], 201);
+    // }
+
+    public function sendRegisterCode(Request $request)
     {
-        // Xác thực dữ liệu đầu vào
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
+        $request->validate([
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'name' => 'required',
+            'password' => 'required|min:6',
         ]);
 
-        // Tìm role "user"
-        $role = Role::where('name', 'user')->first();
+        $code = rand(10000, 99999);
+        PasswordReset::updateOrCreate(['email' => $request->email], ['token' => $code, 'created_at' => Carbon::now()]);
 
-        if (!$role) {
-            return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
+        Mail::send('register-code', ['code' => $code], function ($message) use ($request) {
+            $message->to($request->email);
+            $message->subject('Mã xác thực đăng ký tài khoản');
+        });
+
+        return response()->json(['message' => 'Mã xác thực đã được gửi'], 200);
+    }
+
+    // Xác minh mã xác thực và tạo tài khoản mới
+    public function verifyRegisterCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:password_resets,email',
+            'code' => 'required|numeric|digits:5',
+        ]);
+
+        $reset = PasswordReset::where('email', $request->email)
+                            ->where('token', $request->code)
+                            ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+                            ->first();
+
+        if (!$reset) {
+            return response()->json(['error' => 'Mã xác thực không đúng hoặc đã hết hạn'], 400);
         }
 
-        // Tạo tài khoản mới
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role_id' => $role->id,
-            'status' => 'active', // Đặt trạng thái mặc định là active
-        ]);
+        // Tìm role có tên là "user"
+        $role = Role::where('name', 'user')->first();
 
-        return response()->json([
-            'message' => 'Đăng ký thành công',
-            'user' => $user,
-        ], 201);
+        if ($role) {
+            // Tạo người dùng mới với role "user"
+            $newUser = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role_id' => $role->id, // Gán role_id
+            ]);
+
+            // Xóa thông tin đặt lại mật khẩu sau khi tạo tài khoản
+            PasswordReset::where('email', $request->email)->delete();
+
+            return response()->json(['message' => 'Tài khoản đã được tạo thành công'], 200);
+        } else {
+            return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
+        }
     }
 
 
 
-
     public function saveGoogleUser(Request $request)
-    {
-        // Xác thực dữ liệu từ request
-        $validator = Validator::make($request->all(), [
-            'name'      => 'required|string|max:255',
-            'email'     => 'required|email',
+{
+    // Validate request data
+    $validator = Validator::make($request->all(), [
+        'name'  => 'required|string|max:255',
+        'email' => 'required|email',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+
+    // Check if email exists
+    $existingUser = User::where('email', $request->email)->first();
+
+    // Nếu email tồn tại
+    if ($existingUser) {
+        if ($existingUser->status === 'banned') {
+            return response()->json([
+                'error' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
+            ], 403);
+        }
+
+        // Nếu không bị ban, tạo token cho user hiện tại
+        $accessToken = auth('api')->login($existingUser);
+        $refreshToken = $this->createRefreshToken();
+
+        return response()->json([
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        ]);
+    }
+
+    // Nếu email không tồn tại, tạo user mới
+    $role = Role::where('name', 'user')->first();
+
+    if ($role) {
+        $newUser = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make('123456dummy'), // Mật khẩu ngẫu nhiên
+            'role_id'  => $role->id,
+            'status'   => 'active' // Trạng thái mặc định
         ]);
 
-        // Kiểm tra nếu có lỗi xác thực
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
+        // Tự động đăng nhập người dùng mới
+        $accessToken = auth('api')->login($newUser);
+        $refreshToken = $this->createRefreshToken();
 
-        // Kiểm tra xem email đã tồn tại chưa
-        $existingUser = User::where('email', $request->email)->first();
-
-        if ($existingUser) {
-            // Kiểm tra nếu người dùng có trạng thái bị banned
-            if ($existingUser->status === 'banned') {
-                return response()->json([
-                    'message' => 'Tài khoản của bạn đã bị ban. Xin hãy liên hệ để được hỗ trợ.'
-                ], 403);
-            }
-
-            // Email đã tồn tại và không bị banned, trả về ID của người dùng hiện có
-            return response()->json([
-                'user_id' => $existingUser->id,
-            ], 200);
-        }
-
-        // Nếu email chưa tồn tại, tiếp tục tạo người dùng mới
-        $role = Role::where('name', 'user')->first();
-
-        if ($role) {
-            $newUser = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make('123456dummy'), // Mật khẩu ngẫu nhiên
-                'role_id' => $role->id,
-                'status' => 'active' // Set status mặc định là active khi tạo mới
-            ]);
-
-            // Đăng nhập người dùng mới
-            Auth::login($newUser);
-
-            // Lưu ID của user vào session
-            session(['user_id' => $newUser->id]);
-
-            return response()->json([
-                'user_id' => $newUser->id,
-            ], 200);
-        } else {
-            return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
-        }
+        return response()->json([
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        ]);
+    } else {
+        return response()->json(['error' => 'Vai trò "user" không tồn tại'], 400);
+    }
+    }
+    private function createRefreshToken() {
+    $data = [
+        'user_id' => auth('api')->user()->id,
+        'random' => rand() . time(),
+        'exp' => time() + config('jwt.refresh_ttl')
+    ];
+    $refreshToken = JWTAuth::getJWTProvider()->encode($data);
+    return $refreshToken;
     }
 
 }

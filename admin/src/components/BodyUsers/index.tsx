@@ -85,7 +85,7 @@ function BodyUsers() {
             status: updatedStatus, // Set status as a string ('active' or 'banned')
             point: point, // Include point in the request body
         };
-        console.log('Payload being sent:', payload); // Log the payload
+        // console.log('Payload being sent:', payload); // Log the payload
 
         try {
             setIsLoading(true);
@@ -186,7 +186,6 @@ function BodyUsers() {
         fetchRole();
     }, []);
 
-    console.log(user);
 
     const totalItems = user.length; // Total number of users
     const indexOfLastItem = currentPage * itemsPerPage; // Index of last item on current page
@@ -225,7 +224,7 @@ function BodyUsers() {
                                 initialValues={initialValues}
                                 validationSchema={validationSchema}
                                 onSubmit={async (values: typeof initialValues) => {
-                                    console.log("Form submitted with values:", values); // Check if this logs
+                                    // console.log("Form submitted with values:", values); // Check if this logs
                                     const formData = new FormData();
                                     Object.keys(values).forEach(key => {
                                         const value = values[key as keyof typeof initialValues];
@@ -243,7 +242,6 @@ function BodyUsers() {
                                                 'Authorization': `Bearer ${Cookies.get('access_token_admin')}`
                                             },
                                         });
-                                        console.log("Response from API:", response); // Log the response
                                         toast.success('Thêm user thành công');
                                         onOpenChange();
                                         setIsAddModalOpen(false);

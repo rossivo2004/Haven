@@ -34,13 +34,13 @@ function Profile_SideMenu() {
         getUserId(); // Call the function to get user ID
     }, []);
 
-    console.log(userId);
+    // console.log(userId);
 
     const fetchUser = async () => {
         if (!userId) return; // Ensure userId is not null before making the request
         try {
             const response = await axios.get(`${apiConfig.user.getUserById}${userId}`, { withCredentials: true });
-            console.log('Fetched cart data:', response.data);
+            // console.log('Fetched cart data:', response.data);
             if (response.data) {
                 setUser(response.data);
             } else {
