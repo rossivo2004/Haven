@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('p_note')->nullable();
             $table->string('p_vnp_reponse_code')->nullable();
             $table->string('p_code_vnpay')->nullable();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

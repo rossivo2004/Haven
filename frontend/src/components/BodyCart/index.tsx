@@ -61,7 +61,7 @@ const Body_Cart = () => {
         };
 
         getUserId(); // Call the function to get user ID
-    }, []); // Ensure this useEffect runs only once
+    }, [userId]); // Ensure this useEffect runs only once
 
 
     useEffect(() => {
@@ -421,9 +421,9 @@ const Body_Cart = () => {
                         </div>
 
                         {selectedItems.size > 0 ? (
-                            <Link href={'/checkout'} onClick={handleCheckout}>
+                            <a href={'/checkout'} onClick={handleCheckout}>
                                 <button className="w-full bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600">Thanh toán</button>
-                            </Link>
+                            </a>
                         ) : (
                             <div className="w-full text-center">
                                 <p className="bg-gray-200 p-2 rounded-lg">Vui lòng chọn ít nhất một sản phẩm <br /> để thanh toán</p>

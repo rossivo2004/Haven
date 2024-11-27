@@ -28,8 +28,9 @@ return new class extends Migration
             $table->string('payment_method'); // Phương thức thanh toán (VD: 'VNPay', 'Credit Card')
             $table->string('payment_status')->default('unpaid'); // Trạng thái thanh toán (VD: 'unpaid', 'paid')
             $table->boolean('is_read')->default(false);   // Trạng thái đơn hàng thông báo
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');// Khóa ngoại tới bảng users
-            $table->timestamps(); 
+            $table->string('token', 64)->nullable()->unique();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');// Khóa ngoại tới bảng users
+            $table->timestamps();
         });
     }
 
