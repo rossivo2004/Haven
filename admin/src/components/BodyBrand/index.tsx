@@ -126,7 +126,7 @@ function BodyBrand() {
         }
 
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/api/brand/getproducts/${brandId}`);
+            const response = await axios.get(`${apiConfig.brands.getproducts}${brandId}`);
             if (response.data.products.total > 0) {
             toast.error('Phân loại đang có sản phẩm, không thể xóa !!!');
                 setErrorMessage("Cannot delete category with existing products.");

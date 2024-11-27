@@ -362,7 +362,6 @@ const BodyProductVa = () => {
         onClose();
         setVariants([])
         setNewImages([]); // Clear new images after successful addition
-        // setSelectedImages([]); // Clear selected images for the main product
     }
 
     const handleOpenEditProductModal = (product: ProductVa) => {
@@ -888,7 +887,7 @@ const BodyProductVa = () => {
                     isDismissable={false}
                 >
                     <ModalContent>
-                        {(onClose) => (
+                        {(onClose) => ( 
                             <>
                                 <ModalHeader>Bạn đang xem sản phẩm {selectedProduct?.name}</ModalHeader>
                                 <ModalBody className='!max-h-[70vh] overflow-y-auto'>

@@ -580,7 +580,7 @@ function BodyHome() {
 
                 <div className="max-w-screen-xl mx-auto px-4 mb-16">
                     <div className="relative w-full lg:h-[500px] h-auto">
-                        <img src={`/images/bn-8.png`} alt="A cat sitting on a chair" className="object-cover w-full h-full rounded-lg" />
+                        <img src={`/images/h-9.jpg`} alt="A cat sitting on a chair" className="object-cover w-full h-full rounded-lg" />
 
                         <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
 

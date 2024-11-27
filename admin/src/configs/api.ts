@@ -40,6 +40,7 @@ const apiConfig = {
     createCt: `${baseUrl}/api/category/store/`,
     updateCt: `${baseUrl}/api/category/update/`,
     deleteCt: `${baseUrl}/api/category/delete/`,
+    getproducts : `${baseUrl}/api/category/getproducts/`,
   },
 
   brands: {
@@ -47,6 +48,7 @@ const apiConfig = {
     createBr: `${baseUrl}/api/brand/store/`,
     updateBr: `${baseUrl}/api/brand/update/`,
     deleteBr: `${baseUrl}/api/brand/delete/`,
+    getproducts : `${baseUrl}/api/brand/getproducts/`,
   },
 
   flashsale : {

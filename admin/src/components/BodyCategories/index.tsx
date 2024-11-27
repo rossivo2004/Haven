@@ -129,7 +129,7 @@ const handleDelete = async (categoryId: string) => {
 
     // Check if the category has products
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/category/getproducts/${categoryId}`);
+        const response = await axios.get(`${apiConfig.categories.getproducts}${categoryId}`);
         if (response.data.products.total > 0) {
         toast.error('Thương hiệu đang có sản phẩm, không thể xóa !!!');
             setErrorMessage("Cannot delete category with existing products.");

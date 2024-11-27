@@ -333,7 +333,7 @@ const CreateProduct = () => {
         const token = Cookies.get('access_token_admin'); // Get the token
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/product/store', formData, {
+            const response = await axios.post(`${apiConfig.products.createPr}`, formData, {
                 headers: { 
                     accept: 'application/json',
                     Authorization: `Bearer ${token}` // Add the Authorization header
@@ -375,7 +375,7 @@ const CreateProduct = () => {
             if (!selectedProduct) {
                 throw new Error('No product selected');
             }
-            const response = await axios.post(`http://127.0.0.1:8000/api/product/update/${selectedProduct.id}`, formData, {
+            const response = await axios.post(`${apiConfig.products.updatepr}${selectedProduct.id}`, formData, {
                 headers: { 
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}` // Add the Authorization header
