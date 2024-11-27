@@ -12,7 +12,7 @@ function BodySign() {
     const [email, setEmail] = useState(''); // State for email
     const [password, setPassword] = useState(''); // State for password
     const [loading, setLoading] = useState(false); // State for loading
-
+    const [type, setType] = useState('admin');
 
 
     const handleSubmit = async (e: React.FormEvent) => { // Handle form submission
@@ -22,6 +22,7 @@ function BodySign() {
             const response = await axios.post(apiConfig.users.loginToken, { // Use axios to make the POST request
                 email,
                 password,
+                type,
             });
 
             const token = response.data.access_token; // Get the access token from the response
@@ -32,8 +33,8 @@ function BodySign() {
             });
 
             const userProfile = userProfileResponse.data; // Get user profile data
-
-            if (userProfile.role_id === 2) { // Check if role is 2
+            console.log(userProfile.role_id);
+            if (userProfile.role_id === "2") { // Check if role is 2
                 Cookies.set('access_token_admin', token, { expires: 1 }); // Set access_token in cookie for 7 days
                 Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
                 Cookies.set('user_data_admin', JSON.stringify(userProfile), { expires: 1 }); // Save user profile data in cookie
