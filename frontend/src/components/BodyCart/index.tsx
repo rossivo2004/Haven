@@ -112,7 +112,7 @@ const Body_Cart = () => {
             totalAmount: totalAmount, // Save total amount
             pointCart: loyaltyPoints, // Save point
         };
-        Cookies.set('checkout_data', JSON.stringify(checkoutData)); // Save selected items and total amount to cookies
+        Cookies.set('checkout_data', JSON.stringify(checkoutData), { expires: 10 / (24 * 60) }); // 10 minutes
     };
 
     const updateQuantity = async (item: CartItem, newQuantity: number) => {
