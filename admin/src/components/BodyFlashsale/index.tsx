@@ -493,7 +493,7 @@ function BodyFlashsale() {
                                     <TableCell>
                                         <div className="flex items-center justify-center">
                                             <div className="w-28 flex items-center justify-center">
-                                                {item.status === 0 ? <div className="bg-red-600 text-white font-bold p-1 rounded-lg">Chưa bắt đầu</div> : item.status === 1 ? <div className="bg-green-600 text-white font-bold p-1 rounded-lg">Đang diễn ra</div> : item.status}
+                                                {item.status == 0 ? <div className="bg-red-600 text-white font-bold p-1 rounded-lg">Chưa bắt đầu</div> : item.status == 1 ? <div className="bg-green-600 text-white font-bold p-1 rounded-lg">Đang diễn ra</div> : item.status}
                                             </div>
                                         </div>
                                     </TableCell>

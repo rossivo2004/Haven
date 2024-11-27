@@ -103,7 +103,7 @@ function BodyHome() {
                 const flashSales = response.data.flashSales.data;
                 // console.log(response.data.flashSales);
                 // Filter flash sales with status 1
-                const activeFlashSales = flashSales.filter((sale: any) => sale.status === 1);
+                const activeFlashSales = flashSales.filter((sale: any) => sale.status == 1);
 
                 // Fetch products for each active flash sale
                 const productsPromises = activeFlashSales.map((sale: any) => fetchFlashSaleProducts(sale.id));
