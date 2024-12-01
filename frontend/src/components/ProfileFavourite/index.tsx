@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { Spinner } from "@nextui-org/react";
 import Loading from "../ui/Loading";
 import { fetchUserProfile } from "@/src/config/token";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function ProfileFavourite() {
     const [userId, setUserId] = useState<string | null>(null); 
@@ -94,7 +95,16 @@ function ProfileFavourite() {
 
     return (
         <div>
-            <div className="text-2xl font-bold mb-4 dark:text-white">Danh sách yêu thích</div>
+            <div className="flex flex-row items-center w-full relative">
+                        <div className="absolute top-0 left-0 flex sm:hidden">
+                            <Link href={'/profile'}>
+                                <ArrowBackIcon />
+                            </Link>
+                        </div>
+                        <div className="flex flex-1 justify-center sm:justify-start text-lg sm:text-4xl font-medium pb-[1vw] capitalize">
+                            Sản phẩm yêu thích
+                        </div>
+                    </div>
             <div className="grid grid-cols-3 gap-4 relative">
                 {loading && (
                     <div className="flex justify-center items-center h-full col-span-3 top-[160px] relative">

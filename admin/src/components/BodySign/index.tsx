@@ -34,7 +34,7 @@ function BodySign() {
 
             const userProfile = userProfileResponse.data; // Get user profile data
             console.log(userProfile.role_id);
-            if (userProfile.role_id === "2") { // Check if role is 2
+            if (userProfile.role_id == 2) { // Check if role is 2
                 Cookies.set('access_token_admin', token, { expires: 1 }); // Set access_token in cookie for 7 days
                 Cookies.set('refresh_token_admin', response.data.refresh_token, { expires: 1 });
                 Cookies.set('user_data_admin', JSON.stringify(userProfile), { expires: 1 }); // Save user profile data in cookie
@@ -46,7 +46,7 @@ function BodySign() {
 
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || 'Đăng nhập thất bại! Vui lòng thử lại.'; // Get error message from response
-            toast.error(errorMessage); // Show error message
+            toast.error('Đăng nhập thất bại! Vui lòng thử lại.'); 
         } finally {
             setLoading(false); // Set loading to false
         }

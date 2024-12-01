@@ -28,7 +28,7 @@ export async function middleware(req: NextRequest) {
   const userDataFromCookie = req.cookies.get('user_data_admin')?.value ? JSON.parse(req.cookies.get('user_data_admin')!.value) : null; // Get user data from cookie
 
   if (url.pathname.startsWith('/admin')) {
-    if (userDataFromCookie && userDataFromCookie.role_id === "2") { // Check if role_id is 2
+    if (userDataFromCookie && userDataFromCookie.role_id == 2) { // Check if role_id is 2
       return NextResponse.next(); // Allow access to /admin
     } else {
       return redirectToSignin(req.url); // Redirect to /signin if role_id is not 2

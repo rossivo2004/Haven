@@ -12,7 +12,8 @@ import { toast } from "react-toastify";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { fetchUserProfile } from "@/src/config/token";
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import Link from "next/link";
 export const OrderSession: React.FC = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [order, setOrder] = useState<Order[]>([]);
@@ -111,6 +112,16 @@ export const OrderSession: React.FC = () => {
 
     return ( // Use return statement to render JSX
         <div>
+             <div className="flex flex-row items-center w-full relative">
+                        <div className="absolute top-0 left-0 flex sm:hidden">
+                            <Link href={'/profile'}>
+                                <ArrowBackIcon />
+                            </Link>
+                        </div>
+                        <div className="flex flex-1 justify-center sm:justify-start text-lg sm:text-4xl font-medium pb-[1vw] capitalize">
+                            Quản lí đơn hàng
+                        </div>
+                    </div>
             {order.length === 0 ? ( // Check if there are no orders
                 <div className="text-center py-4 pt-28">Chưa có đơn hàng</div> // Message for no orders
             ) : (

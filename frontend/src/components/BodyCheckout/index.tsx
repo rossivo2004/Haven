@@ -132,7 +132,6 @@ function BodyCheckout() {
         }
     }, [cartData]);
 
-    // console.log(totalAmount);
     
 
 
@@ -357,6 +356,7 @@ function BodyCheckout() {
     useEffect(() => {
         // Calculate the initial sum when the component mounts
         setSum(totalAmount + ship - discount);
+        setPointCart(totalAmount * 0.01); // Tính điểm tích lũy là 1% tổng đơn hàng
     }, [totalAmount, ship, discount]); // Add dependencies to recalculate when they change
     // ... existing code ...
 
@@ -424,14 +424,10 @@ function BodyCheckout() {
                                             </div>
                                             <select
                                                 className="bg-[#F4F4F5] w-full p-3 rounded-xl"
-                                                // isRequired
-                                                // placeholder='Tỉnh/Thành phố'
-                                                aria-label="Tỉnh/Thành phố"
-                                                // size='lg'
-                                                // variant='bordered'
-                                                value={selectedProvince}
+                                                value={selectedProvince || ''}
                                                 onChange={(e) => setSelectedProvince(e.target.value)}
                                             >
+                                                <option value="" disabled>Tỉnh/Thành phố</option>
                                                 {provinces.map((province) => (
                                                     <option key={province.id} value={province.id}>
                                                         {province.full_name}
@@ -446,17 +442,12 @@ function BodyCheckout() {
                                             </div>
                                             <select
                                                 className="bg-[#F4F4F5] w-full p-3 rounded-xl"
-                                                // isRequired
                                                 required
-                                                // placeholder='Quận/Huyện'
-                                                aria-label="Quận/Huyện"
-                                                // size='lg'
-                                                // variant='bordered'
-                                                value={selectedDistrict}
+                                                value={selectedDistrict || ''}
                                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                                // isDisabled={!selectedProvince} // Disable if no province is selected
                                                 disabled={!selectedProvince}
                                             >
+                                                <option value="" disabled>Quận/Huyện</option>
                                                 {districts.map((district) => (
                                                     <option key={district.id} value={district.id}>
                                                         {district.full_name}
@@ -471,17 +462,11 @@ function BodyCheckout() {
                                             </div>
                                             <select
                                                 className="bg-[#F4F4F5] w-full p-3 rounded-xl"
-                                                // isRequired
                                                 required
-                                                // placeholder='Phường/Xã'
-                                                aria-label="Phường/Xã"
-                                                // size='lg'
-                                                // variant='bordered'
-                                                value={selectedWard}
+                                                value={selectedWard || ''}
                                                 onChange={(e) => setSelectedWard(e.target.value)}
-                                            // isDisabled={!selectedDistrict} // Disable if no district is selected
-                                            // disabled={!selectedDistrict}
                                             >
+                                                <option value="" disabled>Phường/Xã</option>
                                                 {wards.map((ward) => (
                                                     <option key={ward.id} value={ward.id}>
                                                         {ward.full_name}

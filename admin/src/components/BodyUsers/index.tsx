@@ -190,7 +190,9 @@ function BodyUsers() {
     const totalItems = user.length; // Total number of users
     const indexOfLastItem = currentPage * itemsPerPage; // Index of last item on current page
     const indexOfFirstItem = indexOfLastItem - itemsPerPage; // Index of first item on current page
-    const currentItems = user.slice(indexOfFirstItem, indexOfLastItem); // Get current items for the page
+    const currentItems = user
+        .slice(indexOfFirstItem, indexOfLastItem) // Get current items for the page
+        .filter(item => item.role_id !== 2); // Filter out users with role_id 2
 
     const totalPages = Math.ceil(totalItems / itemsPerPage); // Calculate total pages
 
@@ -206,7 +208,7 @@ function BodyUsers() {
                     <BreadcrumbNav
                         items={[
                             { name: 'Trang chủ', link: '/' },
-                            { name: 'Sản phẩm chính', link: '#' },
+                            { name: 'Quản lý người dùng', link: '#' },
                         ]}
                     />
                 </div>
@@ -380,7 +382,7 @@ function BodyUsers() {
                     <div className="mr-4">
                         <span>{`${indexOfFirstItem + 1}-${Math.min(indexOfLastItem, totalItems)} của ${totalItems} người dùng`}</span>
                     </div>
-                    <div className="flex justify-center mt-4">
+                    <div className="flex justify-center mt-4 gap-2">
                         {Array.from({ length: totalPages }, (_, index) => (
                             <div
                                 className={`cursor-pointer w-10 h-10 flex items-center justify-center rounded-md border-2 

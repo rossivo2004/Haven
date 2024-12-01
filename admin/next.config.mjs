@@ -4,6 +4,7 @@ const nextConfig = {
     domains: ['res.cloudinary.com', 'foodhavenadmin.vercel.app'],
   },
   reactStrictMode: false,
+  poweredByHeader: false,
   // async rewrites() {
   //   return [
   //     {

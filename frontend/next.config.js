@@ -8,6 +8,7 @@ const nextConfig = {
         domains:['th.bing.com', 'res.cloudinary.com'],
       },
       reactStrictMode: false,
+      poweredByHeader: false,
 }
 
 module.exports = withNextIntl(nextConfig);

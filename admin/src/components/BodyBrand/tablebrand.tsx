@@ -14,6 +14,7 @@ import {
     TableRow,
     TableCell,
     Tooltip,
+    Spinner,
 } from "@nextui-org/react";
 import Image from "next/image";
 import { EditIcon } from "./EditIcon";
@@ -295,7 +296,7 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
                                             className="px-4 py-2 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
                                             onClick={() => fileInputRef.current?.click()}
                                         >
-                                            { "Change Image"}
+                                            { "Thay đổi hình ảnh"}
                                         </button>
 
                                         {/* Input file ẩn hoàn toàn */}
@@ -337,13 +338,19 @@ const BrandTable = ({ brands, onEdit, onDelete }: BrandTableProps) => {
                                         </label>
                                     </div>
                                 </div>
+                                {isLoading && (
+                <div className="fixed z-[9999] inset-0 bg-gray-800 bg-opacity-75 flex gap-3 justify-center items-center w-screen h-screen ">
+                    <Spinner size="lg" color="white" />
+                    <p className="text-white text-lg">Đang xử lý...</p>
+                </div>
+            )}
                             </div>
 
                         </ModalBody>
                         <ModalFooter>
-                            <Button onClick={closeEditModal}>Cancel</Button>
+                            <Button onClick={closeEditModal} color="danger">Hủy</Button>
                             <Button onClick={handleSubmitEdit} disabled={isLoading} className="bg-primary-400 text-white font-semibold">
-                                {isLoading ? "Saving..." : "Save"}
+                                {isLoading ? "Saving..." : "Lưu"}
                             </Button>
                         </ModalFooter>
                     </ModalContent>
