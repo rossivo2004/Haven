@@ -18,16 +18,16 @@ function Footer() {
                         <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Sản phẩm</h2>
                         <ul className="text-gray-500 dark:text-gray-400 font-medium">
                             <li className="mb-4">
-                                <a href="https://flowbite.com/" className="hover:underline">Combo</a>
+                                <a href="/" className="hover:underline">Combo</a>
                             </li>
                             <li className="mb-4">
-                                <a href="https://flowbite.com/" className="hover:underline">Khuyến mãi</a>
+                                <a href="/" className="hover:underline">Khuyến mãi</a>
                             </li>
                             <li className="mb-4">
-                                <a href="https://flowbite.com/" className="hover:underline">Sản phẩm mới</a>
+                                <a href="/" className="hover:underline">Sản phẩm mới</a>
                             </li>
                             <li>
-                                <a href="https://tailwindcss.com/" className="hover:underline">Bán chạy</a>
+                                <a href="/" className="hover:underline">Bán chạy</a>
                             </li>
                         </ul>
                     </div>
@@ -35,13 +35,13 @@ function Footer() {
                         <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Chính sách</h2>
                         <ul className="text-gray-500 dark:text-gray-400 font-medium">
                             <li className="mb-4">
-                                <a href="https://github.com/themesberg/flowbite" className="hover:underline ">Giao hàng</a>
+                                <a href="?" className="hover:underline ">Giao hàng</a>
                             </li>
                             <li className="mb-4"> 
-                                <a href="https://discord.gg/4eeurUVvTy" className="hover:underline">Thanh toán</a>
+                                <a href="/" className="hover:underline">Thanh toán</a>
                             </li>
                             <li>
-                                <a href="https://discord.gg/4eeurUVvTy" className="hover:underline">Đổi trả</a>
+                                <a href="/" className="hover:underline">Đổi trả</a>
                             </li>
                         </ul>
                     </div>
@@ -49,7 +49,7 @@ function Footer() {
                         <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Về FoodHaven</h2>
                         <ul className="text-gray-500 dark:text-gray-400 font-medium">
                             <li className="mb-4">
-                                <a href="#" className="hover:underline">Giới thiệu</a>
+                                <a href="/about" className="hover:underline">Giới thiệu</a>
                             </li>
                            
                         </ul>

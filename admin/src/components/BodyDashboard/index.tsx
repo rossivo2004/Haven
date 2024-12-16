@@ -61,6 +61,8 @@ const BodyDashboard: React.FC = () => {
         });
 
         axios.get(`${apiConfig.static.getMostLeast}`).then(res => {
+            console.log(res.data);
+            
             setProductMLM(res.data.products_by_month.most_sold);
             setProductMLL(res.data.products_by_month.least_sold);
         });

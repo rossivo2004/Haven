@@ -17,6 +17,7 @@ import apiConfig from '@/configs/api';
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
+import Link from 'next/link';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -268,11 +269,11 @@ function BodyOrders() {
             </div>
 
 <div className='mb-4 bg-white rounded-lg p-4 shadow-md grid grid-cols-5 gap-2'>
-    <div><span className='text-yellow-500'>Đang chờ: <span className='font-semibold'>{orderCounts.pending}</span></span></div>
-    <div><span className='text-blue-500'>Đang chuẩn bị: <span className='font-semibold'>{orderCounts.preparing}</span></span></div>
-    <div><span className='text-purple-500'>Đang vận chuyển: <span className='font-semibold'>{orderCounts.transport}</span></span></div>
-    <div><span className='text-green-500'>Hoàn thành: <span className='font-semibold'>{orderCounts.complete}</span></span></div>
-    <div><span className='text-red-500'>Hủy: <span className='font-semibold'>{orderCounts.canceled}</span></span></div>
+    <div><span className='flex items-center justify-center text-yellow-500'>Đang chờ: <span className='font-semibold'>{orderCounts.pending}</span></span></div>
+    <div><span className='flex items-center justify-center text-blue-500'>Đang chuẩn bị: <span className='font-semibold'>{orderCounts.preparing}</span></span></div>
+    <div><span className='flex items-center justify-center text-purple-500'>Đang vận chuyển: <span className='font-semibold'>{orderCounts.transport}</span></span></div>
+    <div><span className='flex items-center justify-center text-green-500'>Hoàn thành: <span className='font-semibold'>{orderCounts.complete}</span></span></div>
+    <div><span className='flex items-center justify-center text-red-500'>Hủy: <span className='font-semibold'>{orderCounts.canceled}</span></span></div>
 </div>
 
 
@@ -294,9 +295,9 @@ function BodyOrders() {
                                     <TableCell>
                                         <div className="relative flex items-center gap-2 justify-center">
                                             <Tooltip content="Details">
-                                                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                                <Link href={`/admin/orders/${item.invoice_code}`} className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                                     <EyeIcon />
-                                                </span>
+                                                </Link>
                                             </Tooltip>
                                             <Tooltip content="Edit status">
                                                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50" onClick={() => handleEditStatus(item.status, item.id)}>

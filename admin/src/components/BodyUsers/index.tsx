@@ -349,7 +349,11 @@ function BodyUsers() {
                             <TableColumn>Điểm</TableColumn>
                             <TableColumn>Vai trò</TableColumn>
                             <TableColumn>Trạng thái</TableColumn>
-                            <TableColumn>Thao tác</TableColumn>
+                            <TableColumn>
+                                <div className="flex justify-center">
+                                Thao tác
+                                </div>
+                            </TableColumn>
                         </TableHeader>
                         <TableBody>
                             {currentItems?.map((item, ind) => (
@@ -368,9 +372,9 @@ function BodyUsers() {
                                     </TableCell>
                                     <TableCell>{item.status === 'active' ? <div className="bg-green-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-green-600 border-2 border-green-600">Active</div> : <div className="bg-red-200  flex items-center justify-center w-[80px] py-[2px] rounded-lg text-red-600 border-2 border-red-600">Banned</div>}</TableCell>
                                     <TableCell>
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-2 justify-center">
                                             <EditIcon className="w-5 h-5 cursor-pointer text-blue-500" onClick={() => handleEditUser(item)} />
-                                            <DeleteIcon className="w-5 h-5 cursor-pointer text-red-500" onClick={() => deleteUser(item.id)} />
+                                            {/* <DeleteIcon className="w-5 h-5 cursor-pointer text-red-500" onClick={() => deleteUser(item.id)} /> */}
                                         </div>
                                     </TableCell>
                                 </TableRow>

@@ -62,7 +62,7 @@ const Dashboard = () => {
           window.location.href = '/';
 
           
-          Cookies.set("user_id", response.data.user_id, { expires: 7 });
+          Cookies.set("access_token", response.data.access_token, { expires: 7 });
           // console.log(response.data); // Log phản hồi từ API
 
           

@@ -107,6 +107,7 @@ export interface Role {
 }
 
 export interface Order {
+  // order_details
   id: number;
   invoice_code: string;
   refunded_stock: number;
@@ -125,4 +126,14 @@ export interface Order {
   user_id: number;
   created_at: string; // Consider using Date type if you will handle dates
   updated_at: string; // Consider using Date type if you will handle dates
+  order_details: {
+      id: number;
+      product_name: string;
+      price: number;
+      quantity: number;
+      product_variant: {
+        image: string;
+        name: string;
+      }
+  }[];
 }
