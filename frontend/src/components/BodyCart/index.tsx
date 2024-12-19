@@ -309,7 +309,7 @@ const Body_Cart = () => {
                                             />
                                             <img src={item.product_variant.image} alt={'âffff'} className="w-24 h-24 mr-4 rounded" />
                                             <div>
-                                                <p className="text-xl font-semibold dark:text-white">{item.product_variant.name}</p>
+                                                <p className="text-xl font-semibold dark:text-white"><a href={`/product/${item.product_variant.id}`}>{item.product_variant.name}</a></p>
                                                 {/* <p className="text-sm text-gray-600">fssdf</p> */}
                                                 <div className="flex items-center mt-2 dark:text-white">
                                                     <button onClick={() => updateQuantity(item, item.quantity - 1)} className="px-3 py-1 border rounded h-[34px]">-</button>

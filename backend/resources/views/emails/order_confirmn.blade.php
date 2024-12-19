@@ -78,7 +78,7 @@
         color: #333;
     }
 
-    
+
 .order-item {
     display: block; /* Đảm bảo mỗi .order-row sẽ xuống dòng */
 }
@@ -121,7 +121,7 @@
         border-radius: 8px;
         text-decoration: none;
         font-weight: bold;
-        
+
     }
 
     .footer {
@@ -174,12 +174,12 @@
         </div>
 
         <!-- Track Order Button -->
-        <a style="color: #ffffff; font-size: 20px;" href="https://haven-gold.vercel.app/trackingorder/{{ $order->invoice_code }}" class="btn-track-order">Theo dõi đơn hàng của bạn</a>
+        <a style="color: #ffffff; font-size: 20px;" href="/trackingorder/{{ $order->invoice_code }}" class="btn-track-order">Theo dõi đơn hàng của bạn</a>
     </div>
 
     <!-- Footer Section -->
     <div class="footer">
-        <p>Nếu bạn có câu hỏi gì, vui lòng liên hệ <a href="https://haven-gold.vercel.app/contact">Haven</a>.</p>
+        <p>Nếu bạn có câu hỏi gì, vui lòng liên hệ <a href="/contact">Haven</a>.</p>
         <p>&copy; {{ date('Y') }} FOODHAVEN. All rights reserved.</p>
     </div>
     </div>

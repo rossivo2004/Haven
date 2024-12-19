@@ -85,6 +85,8 @@ function BodyProduct() {
     const [loading, setLoading] = useState(true);
     const [isFavorited, setIsFavorited] = useState<boolean>(false);
     const [mainPrice, setMainPrice] = useState<number | null>(null);
+    const [qtyPr, setQtyPr] = useState(0);
+    const [qtyPrCo, setQtyPrCo] = useState(0);
 
     useEffect(() => {
         const getUserId = async () => {
@@ -92,7 +94,7 @@ function BodyProduct() {
                 const userProfile = await fetchUserProfile(); // Fetch user profile using token
                 setUserId(userProfile.id); // Set user ID from the fetched profile
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                // console.error('Error fetching user profile:', error);
             }
         };
 
@@ -131,8 +133,10 @@ function BodyProduct() {
     // const { flatProducts } = useProducts(); // Use updated hook without filters
 
     const handleQuantityChange = (value: number) => {
-        if (value > 0) {
+        if (value > 0 && (!product?.stock || value <= product.stock)) { // Kiểm tra không vượt quá stock
             setQuantity(value);
+        } else {
+             toast.error('Số lượng vượt quá số lượng trong kho!');
         }
     };
 
@@ -145,8 +149,25 @@ function BodyProduct() {
     }, [id]);
 
 
-   
+    useEffect(() => {
+        if(!userId){
+              const cartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        console.log(cartItems);
 
+        const productInCart = cartItems.cart_items.find((item: any) => item.product_variant.id == id);
+    
+        if (productInCart) {
+            setQtyPrCo(productInCart.quantity); // Update quantity based on the product ID
+        } else {
+            setQtyPrCo(0); // Set to 0 if the product is not in the cart
+        }
+        }
+      
+     
+        }, []);
+
+        console.log(qtyPrCo);
+        
 
     // ... existing code ...
 
@@ -233,6 +254,32 @@ function BodyProduct() {
         }
     }, [product]);
 
+    useEffect(() => {
+        const fetchProductPromotion = async () => {
+            if (!userId) return; // Ensure userId is available
+    
+            try {
+                const response = await axios.get(`${apiConfig.cart.getCartByUserId}${userId}`);
+    
+                console.log(response.data);
+                // Assuming response.data contains an array of products in the cart
+                const productInCart = response.data.find((item: any) => item.product_variant.id == id);
+    
+                if (productInCart) {
+                    setQtyPr(productInCart.quantity); // Update quantity based on the product ID
+                } else {
+                    setQtyPr(0); // Set to 0 if the product is not in the cart
+                }
+            } catch (error) {
+                console.log("Error fetching cart data:", error);
+            }
+        };
+    
+        fetchProductPromotion();
+    }, [userId, id]); // Add id to the dependency array
+
+
+    
 
 
     if (loading) {
@@ -291,9 +338,16 @@ function BodyProduct() {
         }
     };
 
-// ... existing code ...
+
+
 
 const handleAddToCart = async () => {
+    const totalQuantity = (qtyPr || 0) + (qtyPrCo || 0) + quantity; // Tính tổng số lượng sản phẩm
+    if (product?.stock !== undefined && totalQuantity > product.stock) {
+        toast.error('Số lượng vượt quá số lượng trong kho!'); // Thông báo lỗi nếu vượt quá tồn kho
+        return; // Dừng hàm nếu vượt quá
+    }
+
     const body = {
         user_id: userId ? parseInt(userId) : null, // Parse user ID if it exists
         product_variant_id: product?.id, // Ensure product ID is used
@@ -303,6 +357,8 @@ const handleAddToCart = async () => {
     if (!userId) {
         // If user is not logged in, store in cookie
         const cartItems = JSON.parse(Cookies.get('cart_items') || '{"cart_items": []}');
+        console.log(cartItems);
+        
         
         // Check if the product is already in the cart
         const existingItemIndex = cartItems.cart_items.findIndex((item: CartItem) => item.product_variant_id === body.product_variant_id);
@@ -426,6 +482,8 @@ const fetchUpdatedCart = async (userId: string) => {
         console.error('Error fetching updated cart:', error);
     }
 };
+// console.log(product);
+
 
 // ... existing code ...
 

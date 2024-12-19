@@ -142,10 +142,10 @@ public function vnpayReturn(Request $request, $orderID)
         // Nếu thành công
         // Gửi email xác nhận đơn hàng
         Mail::to($order->email)->send(new OrderConfirmationMail($order));
-        return redirect()->to('https://haven-gold.vercel.app/thankorder');
+        return redirect()->to('/thankorder');
     } else {
         // Nếu thất bại, chuyển hướng đến trang thất bại (tuỳ chọn)
-        return redirect()->to('https://haven-gold.vercel.app/failure');
+        return redirect()->to('/failure');
 
     }
 

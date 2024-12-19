@@ -334,6 +334,7 @@ function Header({ params }: { params: { lang: string } }) {
     }, [userData,cartItems]); // Update dependency to userData
 
 
+console.log(filteredProducts);
 
 
     return (
@@ -399,8 +400,8 @@ function Header({ params }: { params: { lang: string } }) {
                                                 ) : filteredProducts.length > 0 ? (
                                                     <ul className='overflow-scroll h-[400px]'>
                                                         {filteredProducts.map((product) => (
-                                                            <li key={product.product_id} className="p-2 border-b hover:bg-gray-100">
-                                                                <a href={`/product/${product.product_id}`} className="flex gap-4 items-center">
+                                                            <li key={product.id} className="p-2 border-b hover:bg-gray-100">
+                                                                <a href={`/product/${product.id}`} className="flex gap-4 items-center">
                                                                     <div className='w-14 h-14'>
                                                                         <img className='w-full h-full min-w-14 object-cover' src={product.image} alt={product.name} />
                                                                     </div>
