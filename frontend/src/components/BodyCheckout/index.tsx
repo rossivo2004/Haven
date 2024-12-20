@@ -105,7 +105,7 @@ function BodyCheckout() {
                 const userProfile = await fetchUserProfile(); // Fetch user profile using token
                 setUserId(userProfile.id); // Set user ID from the fetched profile
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                // console.error('Error fetching user profile:', error);
             }
         };
 

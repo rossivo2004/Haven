@@ -56,7 +56,7 @@ const Body_Cart = () => {
                 const userProfile = await fetchUserProfile(); // Fetch user profile using token
                 setUserId(userProfile.id); // Set user ID from the fetched profile
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                // console.error('Error fetching user profile:', error);
             }
         };
 
@@ -115,6 +115,9 @@ const Body_Cart = () => {
         Cookies.set('checkout_data', JSON.stringify(checkoutData), { expires: 10 / (24 * 60) }); // 10 minutes
     };
 
+    console.log(cart);
+    
+
     const updateQuantity = async (item: CartItem, newQuantity: number) => {
         // Ensure quantity does not go below 1
         if (newQuantity < 1) {
@@ -139,9 +142,13 @@ const Body_Cart = () => {
         const productInState = product.find(p => p.id === item.product_variant.id);
         const productStock = productInState ? productInState.stock : 0; // Get stock from product state
 
+        // Check if the product is on flash sale
+        const isFlashSale = Array.isArray(item.product_variant.flash_sales) && item.product_variant.flash_sales.length > 0;
+        const flashSaleStock = isFlashSale ? item.product_variant.flash_sales[0].pivot.stock : productStock; // Get flash sale stock
+
         // Check stock availability
-        if (newQuantity > productStock) {
-            toast.error(`Số lượng không thể vượt quá ${productStock} sản phẩm trong kho.`);
+        if (newQuantity > flashSaleStock) {
+            toast.error(`Số lượng không thể vượt quá ${flashSaleStock} sản phẩm trong kho.`);
             return; // Stop the function if quantity exceeds stock
         }
 
@@ -331,14 +338,14 @@ const Body_Cart = () => {
                                                         ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN')
                                                             : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
-                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')} đ
+                                                        : item.product_variant.FlashSalePrice.toLocaleString('vi-VN')} đ
                                                 </span>
                                                 <div className='text-2xl text-price font-bold'>
                                                     {userId
                                                         ? (item.product_variant.flash_sales.length > 0 && item.product_variant.flash_sales[0].pivot.stock > 0
                                                             ? (Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice) * item.quantity).toLocaleString('vi-VN')
                                                             : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')) // Use discounted price if flash sale stock is 0
-                                                        : (item.product_variant.DiscountedPrice * item.quantity).toLocaleString('vi-VN')} đ
+                                                        : (item.product_variant.FlashSalePrice * item.quantity).toLocaleString('vi-VN')} đ
                                                 </div>
                                             </div>
                                             <div className='flex items-center justify-end' >

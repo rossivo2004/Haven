@@ -343,9 +343,13 @@ function BodyProduct() {
 
 const handleAddToCart = async () => {
     const totalQuantity = (qtyPr || 0) + (qtyPrCo || 0) + quantity; // Tính tổng số lượng sản phẩm
-    if (product?.stock !== undefined && totalQuantity > product.stock) {
-        toast.error('Số lượng vượt quá số lượng trong kho!'); // Thông báo lỗi nếu vượt quá tồn kho
-        return; // Dừng hàm nếu vượt quá
+
+    // Kiểm tra nếu sản phẩm có flash_sales
+    if (product?.flash_sales && product.flash_sales.length > 0) {
+        if (product.flash_sales[0].pivot.stock !== undefined && totalQuantity > product.flash_sales[0].pivot.stock) {
+            toast.error('Số lượng vượt quá số lượng trong kho!'); // Thông báo lỗi nếu vượt quá tồn kho
+            return; // Dừng hàm nếu vượt quá
+        }
     }
 
     const body = {
@@ -452,9 +456,10 @@ const handleAddToCart = async () => {
     }
 };
 
-const handleBuyNow = async () => {
-    
+console.log(product);
 
+
+const handleBuyNow = async () => {
     const checkoutData = {
         productId: product?.id, // Use the current product ID
         selectedItems: [{
@@ -463,7 +468,7 @@ const handleBuyNow = async () => {
             name: product?.name || '', // Get name for the selected item
             image: product?.image || '' // Get image for the selected item
         }],
-        totalAmount: mainPrice, // Save total amount
+        totalAmount: mainPrice ? mainPrice * quantity : 0, // Save total amount based on quantity
         pointCart: 0, // Assuming no loyalty points for now
     };
 

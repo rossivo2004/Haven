@@ -80,12 +80,7 @@ function Header({ params }: { params: { lang: string } }) {
     const [brands, setBrands] = useState<Brand[]>([]);
     const [cart, setCart] = useState<CartItem[]>([]);
 
-    const [theme, setTheme] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('theme') || 'light';
-        }
-        return 'light';
-    });
+    const [theme, setTheme] = useState('light');
 
     const cartItems = useSelector((state: RootState) => state.cart.items);
     const CartCount = cartItems.length; // Get the count of items in the cart
@@ -236,19 +231,17 @@ function Header({ params }: { params: { lang: string } }) {
 
 
     useEffect(() => {
-        // Khi theme thay đổi, cập nhật class trên document
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [theme]);
+        // Only run this on the client
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    }, []);
 
     const toggleTheme = () => {
-        // Chuyển đổi theme giữa light và dark
-        setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.classList.toggle('dark', newTheme === 'dark');
     };
 
     const handleLanguageChange = (e: any) => {
@@ -338,7 +331,7 @@ console.log(filteredProducts);
 
 
     return (
-        <div>
+        <div className={theme}>
             <div className='lg:h-[130px]'>
                 <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 `}>
                     {/* <div className={`fixed top-0 left-0 right-0 bg-white transition-transform duration-300 z-50 ${isVisible ? 'transform translate-y-0' : 'transform -translate-y-full'
@@ -534,13 +527,14 @@ console.log(filteredProducts);
                                                                     </div>
                                                                     <div className='flex-1 text-right'>
                                                                         <div className='text-price font-semibold'>
-                                                                        {userId ? (
-                                                                                item.product_variant.flash_sales.length > 0
-                                                                                    ? item.product_variant.flash_sales[0].pivot.stock > 0 
-                                                                                        ? Math.min(item.product_variant.DiscountedPrice, item.product_variant.FlashSalePrice).toLocaleString('vi-VN') 
-                                                                                        : item.product_variant.DiscountedPrice.toLocaleString('vi-VN')
-                                                                                    : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')
-                                                                            ) : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN')} VND
+                                                                        {/* {userId ? (
+    item.product_variant.flash_sales.length > 0 
+        ? item.product_variant.flash_sales[0].pivot.stock > 0
+            ? item.product_variant.FlashSalePrice.toLocaleString('vi-VN') // Ưu tiên FlashSalePrice
+            : item.product_variant.DiscountedPrice.toLocaleString('vi-VN') // Nếu hết stock thì hiển thị giá gốc
+        : item.product_variant.DiscountedPrice?.toLocaleString('vi-VN') // Nếu không có flash sale thì hiển thị DiscountedPrice
+) : item.product_variant.FlashSalePrice?.toLocaleString('vi-VN')} VND */}
+
                                                                         </div>
 
                                                                     </div>
